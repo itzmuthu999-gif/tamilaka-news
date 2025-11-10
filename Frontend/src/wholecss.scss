@@ -1,0 +1,99 @@
+*{
+     padding: 0;margin: 0;
+     box-sizing: border-box;
+}
+
+.logo img
+{
+     width: 200px;
+}
+
+@mixin lnk()
+{
+   text-decoration: none;
+   color: black;
+}
+.main-container
+{
+     width: 99vw;
+     height: 80vh;
+     display: flex; flex-direction: column;gap: 20px;
+     justify-content: center;
+     align-items: center;
+}
+
+.mc-c1-b1,.mc-c1-b2
+{
+     border: 1px solid;
+     border-radius: 20px;
+     padding: 5px 30px;
+     @include lnk();
+
+
+}
+//TEMPLATE PAGE.
+.navcon1
+{
+
+     width: 100vw;
+     display: flex; 
+     justify-content: center;
+     align-items: center;
+}
+.navcon2
+{
+     display: flex; flex-direction: column;
+     gap: 5px;
+}
+.nav-c1-logo img
+{
+     width: 250px;
+}
+.nav-c1
+{
+     display: flex;
+     justify-content: space-between;
+     align-items: end;
+     width: 1250px;
+}
+.nav-c3 
+{
+     display: flex;
+
+          justify-content: space-between;
+     align-items: end;
+
+}
+.nav-c1-date
+{
+     font-size: 13px;
+}
+.nav-c1-links,.nav-c3-ham
+{
+     display: flex; gap: 10px;
+     font-size: 20px;
+}
+.nav-c3-sections
+{
+     display: flex; gap: 20px;
+}
+.nav-c2-line
+{
+     width: 1250px; height: 2px;
+     background-color: pink;
+
+}
+.break-news
+{
+     background-color: rgb(220, 220, 220);
+     width: 2000px;
+     height: 30px;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     white-space: nowrap;
+     overflow: hidden;
+     margin: 30px 0px;
+
+
+}
