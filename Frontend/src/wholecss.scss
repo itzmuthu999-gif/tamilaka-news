@@ -31,6 +31,40 @@
 
 
 }
+
+.navbar
+
+{
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     width: 100vw;
+     padding: 0% 22px;
+}
+.link 
+{
+     text-decoration: none;
+     color: black;
+     font-size: 20px;
+     font-weight: bold;
+     background-color: rgb(235, 206, 232);
+     padding: 10px 15px;
+     border-radius: 20px;
+     align-items: center
+}
+.nb-container
+{
+     display: flex;
+     gap: 20px;
+     padding: 20px;
+     justify-content: left;
+     align-items: center;
+     background-color: gray;
+     font-weight: bold;
+     justify-content: space-between;
+
+
+}
 //TEMPLATE PAGE.
 .navcon1
 {
@@ -86,17 +120,18 @@
 .break-news
 {
      background-color: rgb(220, 220, 220);
-     width: 2000px;
+     width: 1530px;
      height: 30px;
      display: flex;
      justify-content: center;
      align-items: center;
      white-space: nowrap;
-     overflow: hidden;
+     overflow-x: hidden;
      margin: 30px 0px;
 
 
 }
+
 .container
 {
      display: flex;
@@ -134,3 +169,115 @@
 
 
 }
+
+.news-m-cont
+{
+     width: 100vw;
+
+     display: flex;
+     justify-content: center;
+     align-items: center;
+
+}
+.ele-news
+{
+     background-color: yellow;
+     width: 895px;height: 300px ;
+     margin: 5px;
+}
+.news-m-cont2
+{
+     max-width: 1250px;
+     width: fit-content;
+
+     display: flex;
+     
+}
+.hr-line
+{
+     width: 2px;height: 500px;
+     border-radius: 5px;
+     background-color: pink;
+}
+.side-news
+{
+     padding: 5px;
+     display: flex;flex-direction: column;
+     width: 400px;
+     gap: 5px;
+}
+.mn-txt
+{
+     font-size: 12px;font-weight: bold;
+     width:230px;
+
+}
+.morenews
+{
+     display: flex;
+}
+.mrn-in-cont
+{
+     display: flex;flex-direction: column;
+     gap: 5px;
+}
+/* Main container */
+.news-grid-container {
+  padding: 40px 60px;
+  width: 100vwc;
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+}
+
+/* Fixed 3x3 Grid layout */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* Each card */
+.news-card {
+  background-color: #f1f1f1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Image placeholder */
+.news-image {
+  background-color: #f76c6c;
+  height: 180px;
+  width: 100%;
+}
+
+/* Content box */
+.news-content {
+  padding: 12px 15px;
+  background-color: #e6e6e6;
+}
+
+/* Text styles */
+.news-content h3 {
+  font-size: 15px;
+  margin: 6px 0 4px;
+  color: #111;
+  font-weight: 600;
+}
+
+.news-content p 
+{
+font-size: 13px;
+  color: #333;
+  line-height: 1.4
+}
+
