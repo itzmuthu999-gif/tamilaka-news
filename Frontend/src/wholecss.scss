@@ -97,3 +97,40 @@
 
 
 }
+.container
+{
+     display: flex;
+}
+.navbar
+
+{
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     width: 100vw;
+     padding: 0% 22px;
+}
+.link 
+{
+     text-decoration: none;
+     color: black;
+     font-size: 20px;
+     font-weight: bold;
+     background-color: rgb(235, 206, 232);
+     padding: 10px 15px;
+     border-radius: 20px;
+     align-items: center
+}
+.nb-container
+{
+     display: flex;
+     gap: 20px;
+     padding: 20px;
+     justify-content: left;
+     align-items: center;
+     background-color: gray;
+     font-weight: bold;
+     justify-content: space-between;
+
+
+}
