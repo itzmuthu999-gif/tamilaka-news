@@ -3,10 +3,13 @@ import logo from '../assets/logo.png'
 import { Link } from 'react-router-dom'
 import luffy from '../assets/luffy.webp'
 import dmk from '../assets/download.jpeg'
-export default function Newsbund() {
+export default function Newsbund() 
+{
   return (
     <div>
-       <nav className='navbar'>
+
+      
+    <nav className='navbar'>
           <div  className='logo'><img src={logo} alt="alt"/></div>     
           <Link className='link' to="/Newsupload"> upload News</Link>    
        </nav>
