@@ -11,6 +11,8 @@ export default function AdminHome() {
        <div className="main-container">
             <Link to="/Newsbund" className="mc-c1-b1">raw news</Link>
             <Link className="mc-c1-b2">Edit Paper</Link>
+            <Link to="/Newspaper" className="mc-c1-b2">Newspaper</Link>
+          
        </div>
 
     </div>

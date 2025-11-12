@@ -5,6 +5,7 @@ import AdminHome from './Pages/AdminHome';
 import Newsupload from './Pages/Newsupload'
 import Newsbund from './Pages/Newsbund';
 import Templatepage from './Pages/Templatepage';
+import Newspaper from "./Pages/Newspaper";
 function App() {
 
 
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<AdminHome />} />
           <Route path="/Newsbund" element={<Newsbund />} />
             <Route path="/Newsupload" element={<Templatepage />} />
+            <Route path="/Newspaper" element={<Newspaper />} />
       </Routes>
     </BrowserRouter>
     </>
