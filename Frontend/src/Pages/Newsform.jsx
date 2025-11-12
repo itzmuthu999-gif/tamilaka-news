@@ -1,7 +1,7 @@
-import React from 'react'
-import { useState } from 'react';
+import React, { useState } from 'react';
+
 export default function Newsform() {
-   const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     headline: "",
     oneLiner: "",
     thumbnail: null,
@@ -21,20 +21,21 @@ export default function Newsform() {
     console.log("Form Submitted:", formData);
     alert("News uploaded successfully!");
   };
+
   return (
     <div className='newsform-con'>
-
       <form onSubmit={handleSubmit} className="news-form">
+        
         {/* News Headline */}
         <div className="form-group">
           <label className="form-label">News Headline</label>
-          <input
-            type="text"
+          <textarea
             name="headline"
             value={formData.headline}
             onChange={handleChange}
             placeholder="Enter news headline"
-            className="form-input"
+            className="form-textarea"
+            rows="2"
             required
           />
         </div>
@@ -42,13 +43,13 @@ export default function Newsform() {
         {/* News One-Liner */}
         <div className="form-group">
           <label className="form-label">News One-Liner</label>
-          <input
-            type="text"
+          <textarea
             name="oneLiner"
             value={formData.oneLiner}
             onChange={handleChange}
             placeholder="Enter a short one-liner"
-            className="form-input"
+            className="form-textarea"
+            rows="3"
             required
           />
         </div>
@@ -69,13 +70,13 @@ export default function Newsform() {
         {/* Zonal */}
         <div className="form-group">
           <label className="form-label">Zonal</label>
-          <input
-            type="text"
+          <textarea
             name="zonal"
             value={formData.zonal}
             onChange={handleChange}
             placeholder="Enter zone (e.g., North, South, etc.)"
-            className="form-input"
+            className="form-textarea"
+            rows="2"
             required
           />
         </div>
@@ -86,5 +87,5 @@ export default function Newsform() {
         </button>
       </form>
     </div>
-  )
+  );
 }
