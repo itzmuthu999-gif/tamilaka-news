@@ -7,6 +7,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import newsimg from "../assets/newsimg.avif";
 import Newsform from './newsform';
+
 function NewsCard({
   title = "Title goes here",
   image,
