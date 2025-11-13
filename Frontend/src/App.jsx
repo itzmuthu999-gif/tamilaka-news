@@ -6,6 +6,7 @@ import Newsupload from './Pages/Newsupload'
 import Newsbund from './Pages/Newsbund';
 import Templatepage from './Pages/Templatepage';
 import Newspaper from "./Pages/Newspaper";
+import ResizableDragPage from './Pages/ResizableDragPage';
 function App() {
 
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/Newsbund" element={<Newsbund />} />
             <Route path="/Newsupload" element={<Templatepage />} />
             <Route path="/Newspaper" element={<Newspaper />} />
+              <Route path="/ResizableDragPage" element={<ResizableDragPage />} />
       </Routes>
     </BrowserRouter>
     </>

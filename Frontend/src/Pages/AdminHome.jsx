@@ -12,6 +12,7 @@ export default function AdminHome() {
             <Link to="/Newsbund" className="mc-c1-b1">raw news</Link>
             <Link className="mc-c1-b2">Edit Paper</Link>
             <Link to="/Newspaper" className="mc-c1-b2">Newspaper</Link>
+              <Link to="/ResizableDragPage" className="mc-c1-b2">Try</Link>
           
        </div>
 

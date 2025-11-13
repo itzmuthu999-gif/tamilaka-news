@@ -7,7 +7,154 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import newsimg from "../assets/newsimg.avif";
 import Newsform from './newsform';
+import luffy from '../assets/luffy.webp'
+import { useSelector } from 'react-redux';
 
+import { useState } from "react";
+import { Rnd } from "react-rnd";
+import { FaCheck, FaEdit, FaTimes } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { updateBox } from "./Slice/newsformslice"; 
+function ParagraphBox({ id, onDelete }) {
+  const dispatch = useDispatch();
+  const [text, setText] = useState("");
+  const [editing, setEditing] = useState(true);
+
+  return (
+    <Rnd
+      bounds="parent"
+      default={{
+        x: 50,
+        y: 50,
+        width: 550,
+        height: "auto",
+      }}
+      onDragStop={(e, d) => {
+        dispatch(updateBox({ id, updatedData: { x: d.x, y: d.y } }));
+      }}
+      onResizeStop={(e, direction, ref, delta, position) => {
+        dispatch(updateBox({
+          id,
+          updatedData: {
+            width: parseInt(ref.style.width),
+            height: parseInt(ref.style.height),
+            ...position,
+          },
+        }));
+      }}
+      style={{
+        border: "2px dashed #555",
+        background: "#fff",
+        borderRadius: "8px",
+        padding: "8px",
+      }}
+    >
+      {editing ? (
+        <div style={{ display: "flex", gap: "6px" }}>
+          <textarea
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              dispatch(updateBox({ id, updatedData: { content: e.target.value } }));
+            }}
+            placeholder="Enter text..."
+            style={{ width: "100%", height: "200px" }}
+          />
+          <FaCheck color="green" onClick={() => setEditing(false)} />
+        </div>
+      ) : (
+        <div>
+          <p style={{ whiteSpace: "pre-wrap" }}>{text}</p>
+          <FaEdit color="blue" onClick={() => setEditing(true)} />
+        </div>
+      )}
+    </Rnd>
+  );
+}
+function ImageBox({ id, onDelete }) {
+  const dispatch = useDispatch();
+  const [image, setImage] = useState(null);
+  const [editing, setEditing] = useState(true);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setImage(url);
+      setEditing(false);
+
+      // 🧠 store image URL in redux
+      dispatch(updateBox({ id, updatedData: { content: url } }));
+    }
+  };
+
+  const handleDoubleClick = () => {
+    onDelete(id);
+  };
+
+  return (
+    <Rnd
+      bounds="parent"
+      default={{
+        x: 100,
+        y: 100,
+        width: 250,
+        height: "auto",
+      }}
+      minWidth={150}
+      minHeight={100}
+      onDragStop={(e, d) => {
+        dispatch(updateBox({ id, updatedData: { x: d.x, y: d.y } }));
+      }}
+      onResizeStop={(e, direction, ref, delta, position) => {
+        dispatch(
+          updateBox({
+            id,
+            updatedData: {
+              width: parseInt(ref.style.width),
+              height: parseInt(ref.style.height),
+              ...position,
+            },
+          })
+        );
+      }}
+      style={{
+        border: "2px dashed #555",
+        background: "#fdfdfd",
+        borderRadius: "8px",
+        padding: "8px",
+      }}
+    >
+      <div onDoubleClick={handleDoubleClick}>
+        {editing ? (
+          <div>
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+          </div>
+        ) : (
+          <div style={{ position: "relative" }}>
+            <img
+              src={image}
+              alt="uploaded"
+              style={{ width: "100%", borderRadius: "8px" }}
+            />
+            <div style={{ position: "absolute", top: 5, right: 5 }}>
+              <FaEdit
+                style={{ cursor: "pointer", marginRight: "8px" }}
+                color="blue"
+                onClick={() => setEditing(true)}
+              />
+              <FaTimes
+                style={{ cursor: "pointer" }}
+                color="red"
+                onDoubleClick={handleDoubleClick}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </Rnd>
+  );
+}
 function NewsCard({
   title = "Title goes here",
   image,
@@ -118,10 +265,44 @@ function AdvertisementBox({ width = "300px", height = "250px" }) {
 }
 
 export default function Templatepage() {
-  
+  const formNewsData = useSelector((state) => state.formslice.data); 
+  const [boxes, setBoxes] = useState([]);
+
+  const addBox = (type) => {
+  const newBox = {
+    id: Date.now(),
+    type,
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 150,
+    content: "",
+  };
+
+  setBoxes([...boxes, newBox]);
+  dispatch(addBox(newBox)); // 🧠 store in redux
+};
+  const removeBox = (id) => {
+    setBoxes(boxes.filter((b) => b.id !== id));
+  };
+   const [divHeight, setDivHeight] = useState(1000);
+
+  const handleInputChange = (event) => {
+    setDivHeight(event.target.value);
+  };
+
+  const handleIncreaseClick = () => {
+    setDivHeight(divHeight + 10);
+  };
+
+  const handleDecreaseClick = () => {
+    if (divHeight > 10) {
+      setDivHeight(divHeight - 10);
+    }
+  };
   return (
    <div>
-       <Newsform/>  
+       <Newsform addbx={addBox} rmvbx={removeBox} divHeight={divHeight} handleDecreaseClick={handleDecreaseClick} handleIncreaseClick={handleIncreaseClick} handleInputChange={handleInputChange}/>  
        <div className='navcon1'>
        <div className='navcon2'>
            <div className="nav-c1">
@@ -155,7 +336,32 @@ export default function Templatepage() {
        <div className="news-m-cont">
         <div className="news-m-cont2">
        <div className="ele-news">
-            
+            <div className="ele-const-news">
+                <div className="ele-const-zonar">{formNewsData?.zonal || "No zonal data yet"}</div>
+                <div className="ele-con-ne-head">{ formNewsData?.headline || "The Head line is comming here..."}</div>
+                <div className="ele-con-ne-oneliner">
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {formNewsData?.oneLiner || "one liner is comming soon...one liner is comming soon...one liner is comming soon...one liner is comming soon"}
+                </div>
+                <div className="ele-con-tmbnl"> {formNewsData?.thumbnail ? (
+    <img
+      src={URL.createObjectURL(formNewsData.thumbnail)}
+      alt="uploaded thumbnail"
+    />
+  ) : (
+    <img src={luffy} alt="default" />
+  )} </div>
+            </div>
+            <div className="el-full-news" style={{height: `${divHeight}px`}}>
+  
+        {boxes.map((box) =>
+          box.type === "paragraph" ? (
+            <ParagraphBox key={box.id} id={box.id} onDelete={removeBox} />
+          ) : (
+            <ImageBox key={box.id} id={box.id} onDelete={removeBox} />
+          )
+        )}
+      
+            </div>
        </div>
        <div className="hr-line"></div>
        <div className="side-news">
