@@ -22,7 +22,8 @@ function NewsCard({
         fontFamily: "'Helvetica Neue', Arial, sans-serif",
       }}
     >
-      {/* Top section with text and image */}
+      
+      {}
       <div
         style={{
           display: "flex",
@@ -31,7 +32,7 @@ function NewsCard({
           gap: "5px",
         }}
       >
-        {/* Text Section */}
+        { }
         <div style={{ flex: 1,
               fontSize: "15px",
               lineHeight: "1.2",
@@ -43,7 +44,7 @@ function NewsCard({
        
         </div>
 
-        {/* Image Section */}
+        {}
         {image && (
           <img
             src={image}
@@ -59,7 +60,7 @@ function NewsCard({
         )}
       </div>
 
-      {/* Time and Divider */}
+      {}
       <div >
         <span
           style={{
@@ -104,7 +105,7 @@ function AdvertisementBox({ width = "300px", height = "250px" }) {
   width = "100%",
   height = "1px",
   color = "#ffb1ffff",
-  orientation = "horizontal", // 'horizontal' or 'vertical'
+  orientation = "horizontal", 
   margin = "10px 0",
 }) {
   const style = {
