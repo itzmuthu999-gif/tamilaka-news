@@ -1,52 +1,82 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  data: {
-    timeAndDate: "",
-    headline: "",
-    oneLiner: "",
-    thumbnail: null,
-    zonal: "",
-  },
-  fullContent: [],
+  allNews: [],      // multiple saved news
+  trash: [],        // deleted news
+  currentNews: null // news being edited (full object)
 };
 
 const newsFormSlice = createSlice({
   name: "newsform",
   initialState,
   reducers: {
-    setNewsData: (state, action) => {
-      state.data = {
-        ...state.data,
+    // Create a new news item
+    saveNews: (state, action) => {
+      const news = {
+        id: Date.now(),
         ...action.payload,
-        timeAndDate: new Date().toLocaleString(),
+        time: new Date().toLocaleString(),
       };
+      state.allNews.push(news);
     },
-    addBox: (state, action) => {
-      state.fullContent.push(action.payload);
+
+    // Set current news to be edited/viewed
+    setCurrentNews: (state, action) => {
+      state.currentNews = action.payload;
     },
-    updateBox: (state, action) => {
-      const { id, updatedData } = action.payload;
-      const index = state.fullContent.findIndex((b) => b.id === id);
+
+    // Update an existing news item (in-place)
+    updateNews: (state, action) => {
+      const { id, updatedNews } = action.payload;
+      const index = state.allNews.findIndex(n => n.id === id);
       if (index !== -1) {
-        state.fullContent[index] = {
-          ...state.fullContent[index],
-          ...updatedData,
-        };
+        state.allNews[index] = { ...state.allNews[index], ...updatedNews };
+      }
+      // if currentNews is the same id, update it too
+      if (state.currentNews && state.currentNews.id === id) {
+        state.currentNews = { ...state.currentNews, ...updatedNews };
       }
     },
-    removeBox: (state, action) => {
-      state.fullContent = state.fullContent.filter(
-        (b) => b.id !== action.payload
-      );
+
+    // Move to trash
+    deleteNews: (state, action) => {
+      const id = action.payload;
+      const news = state.allNews.find(n => n.id === id);
+      if (news) {
+        state.trash.push(news);
+      }
+      state.allNews = state.allNews.filter(n => n.id !== id);
+      if (state.currentNews && state.currentNews.id === id) {
+        state.currentNews = null;
+      }
     },
-    resetNewsData: (state) => {
-      Object.assign(state, initialState);
+
+    // Restore from trash
+    restoreNews: (state, action) => {
+      const id = action.payload;
+      const restored = state.trash.find(n => n.id === id);
+      if (restored) {
+        state.allNews.push(restored);
+      }
+      state.trash = state.trash.filter(n => n.id !== id);
     },
+
+    // Permanently delete
+    permanentDelete: (state, action) => {
+      const id = action.payload;
+      state.trash = state.trash.filter(n => n.id !== id);
+    }
   },
 });
 
-export const { setNewsData, addBox, updateBox, removeBox, resetNewsData } =
-  newsFormSlice.actions;
+export const {
+  saveNews,
+  updateNews,
+  deleteNews,
+  restoreNews,
+  permanentDelete,
+  setCurrentNews,
+} = newsFormSlice.actions;
 
 export default newsFormSlice.reducer;
+

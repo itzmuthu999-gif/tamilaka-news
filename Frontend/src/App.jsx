@@ -7,6 +7,7 @@ import Newsbund from './Pages/Newsbund';
 import Templatepage from './Pages/Templatepage';
 import Newspaper from "./Pages/Newspaper";
 import ResizableDragPage from './Pages/ResizableDragPage';
+
 function App() {
 
 

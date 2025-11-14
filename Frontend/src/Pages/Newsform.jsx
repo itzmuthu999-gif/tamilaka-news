@@ -1,141 +1,218 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setNewsData } from "./Slice/newsformslice";
+import React, { useEffect, useState } from "react";
+import { Rnd } from "react-rnd";
+import { AiOutlineSlack } from "react-icons/ai";
+import { FaTimes } from "react-icons/fa";
 
-
-export default function  Newsform({ addbx, rmvbx, handleDecreaseClick,handleIncreaseClick,handleInputChange,divHeight }) {
-    const dispatch = useDispatch();
+export default function Newsform({
+  initialData = null,
+  onChange = () => {},
+  onSave = () => {},
+  addbx,
+  rmvbx,
+  handleDecreaseClick,
+  handleIncreaseClick,
+  handleInputChange,
+  divHeight
+}) {
   const [formData, setFormData] = useState({
     headline: "",
     oneLiner: "",
     thumbnail: null,
     zonal: "",
+    images: []
   });
 
-  const [thumbnailPreview, setThumbnailPreview] = useState(null); // 👈 for single thumbnail
-  const [multiPreviews, setMultiPreviews] = useState([]); // 👈 for multiple import images
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [multiPreviews, setMultiPreviews] = useState([]);
+
+  const [openForm, setOpenForm] = useState(false); // <-- NEW
+
+  // Initialize when editing
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({ ...prev, ...initialData.data }));
+      if (initialData.data && initialData.data.thumbnail) {
+        try {
+          if (typeof initialData.data.thumbnail === "string") {
+            setThumbnailPreview(initialData.data.thumbnail);
+          } else {
+            setThumbnailPreview(URL.createObjectURL(initialData.data.thumbnail));
+          }
+        } catch {}
+      }
+    }
+  }, [initialData]);
+
+  useEffect(() => {
+    onChange(formData);
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
     if (files && files[0]) {
       const file = files[0];
-      setFormData({ ...formData, [name]: file });
+      setFormData(prev => ({ ...prev, [name]: file }));
 
       if (name === "thumbnail") {
-        const imagePreviewUrl = URL.createObjectURL(file);
-        setThumbnailPreview(imagePreviewUrl);
+        setThumbnailPreview(URL.createObjectURL(file));
       }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   const handleMultiImages = (e) => {
     const files = Array.from(e.target.files);
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    const newPreviews = files.map(file => URL.createObjectURL(file));
 
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      images: [...(prev.images || []), ...files],
+      images: [...(prev.images || []), ...files]
     }));
 
-    setMultiPreviews((prev) => [...prev, ...newPreviews]);
+    setMultiPreviews(prev => [...prev, ...newPreviews]);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(setNewsData(formData));
-    console.log("Form Submitted:", formData);
-    alert("News uploaded successfully!");
+  const submit = (e) => {
+    e && e.preventDefault();
+    onSave(formData);
   };
 
+  /* ------------------------------ UI RETURN ------------------------------ */
   return (
-    <div className="newsform-con">
-      <form onSubmit={handleSubmit} className="news-form">
-        {/* News Headline */}
-        <div className="form-group">
-          <label className="form-label">News Headline</label>
-          <textarea
-            name="headline"
-            value={formData.headline}
-            onChange={handleChange}
-            placeholder="Enter news headline"
-            className="form-textarea"
-            rows="2"
-            required
-          />
+    <div>
+      {/* Floating Icon (initial stage) */}
+      {!openForm && (
+        <div
+          onClick={() => setOpenForm(true)}
+          style={{
+            position: "fixed",
+            top: 20,
+            left: 20,
+            fontSize: "40px",
+            cursor: "pointer",
+            zIndex: 9999
+          }}
+        >
+          <AiOutlineSlack />
         </div>
+      )}
 
-        {/* News One-Liner */}
-        <div className="form-group">
-          <label className="form-label">News One-Liner</label>
-          <textarea
-            name="oneLiner"
-            value={formData.oneLiner}
-            onChange={handleChange}
-            placeholder="Enter a short one-liner"
-            className="form-textarea"
-            rows="3"
-            required
-          />
-        </div>
+      {/* Draggable + Resizable Form */}
+      {openForm && (
+        <Rnd
+          default={{ x: 20, y: 20, width: 350, height: "auto" }}
+          bounds="window"
+          dragHandleClassName="drag-header"
+          style={{
+            background: "white",
+            borderRadius: "10px",
+            boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
+            padding: "10px",
+            zIndex: 9999
+          }}
+        >
+          {/* Drag Header + Close Button */}
+          <div
+            className="drag-header"
+            style={{
+              fontWeight: "bold",
+              cursor: "move",
+              marginBottom: "10px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
+            <span>News Form</span>
+            <FaTimes
+              style={{ cursor: "pointer", color: "red" }}
+              onClick={() => setOpenForm(false)}
+            />
+          </div>
 
-        {/* Thumbnail Image */}
-        <div className="form-group">
-          <label className="form-label">Thumbnail Image</label>
-          <input
-            type="file"
-            name="thumbnail"
-            accept="image/*"
-            onChange={handleChange}
-            className="form-file"
-            required
-          />
+          {/* Actual form */}
+          <div className="newsform-con">
+            <form onSubmit={submit} className="news-form">
 
-          {/* 👇 Single Image Preview */}
-          {thumbnailPreview && (
-            <div className="image-preview">
-              <img
-                src={thumbnailPreview}
-                alt="Thumbnail Preview"
-                className="preview-img"
+              <div className="form-group">
+                <label className="form-label">News Headline</label>
+                <textarea
+                  name="headline"
+                  value={formData.headline}
+                  onChange={handleChange}
+                  placeholder="Enter news headline"
+                  className="form-textarea"
+                  rows="2"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">News One-Liner</label>
+                <textarea
+                  name="oneLiner"
+                  value={formData.oneLiner}
+                  onChange={handleChange}
+                  placeholder="Enter a short one-liner"
+                  className="form-textarea"
+                  rows="3"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Thumbnail Image</label>
+                <input
+                  type="file"
+                  name="thumbnail"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="form-file"
+                />
+
+                {thumbnailPreview && (
+                  <div className="image-preview">
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail Preview"
+                      className="preview-img"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Zonal</label>
+                <textarea
+                  name="zonal"
+                  value={formData.zonal}
+                  onChange={handleChange}
+                  placeholder="Enter zone"
+                  className="form-textarea"
+                  rows="2"
+                  required
+                />
+              </div>
+
+              <div onClick={() => addbx("paragraph")}>Add Paragraph</div>
+              <div onClick={() => addbx("image")}>Add Image</div>
+
+              <input
+                type="number"
+                value={divHeight}
+                onChange={handleInputChange}
+                style={{ width: "100px" }}
               />
-            </div>
-          )}
-        </div>
 
-        {/* Zonal */}
-        <div className="form-group">
-          <label className="form-label">Zonal</label>
-          <textarea
-            name="zonal"
-            value={formData.zonal}
-            onChange={handleChange}
-            placeholder="Enter zone (e.g., North, South, etc.)"
-            className="form-textarea"
-            rows="2"
-            required
-          />
-        </div>
-
-        {/* Upload Button */}
-        <button type="submit" className="upload-button">
-          Upload
-        </button>
-
- 
-      </form>
-<button onClick={() => addbx("paragraph")}>➕ Add Paragraph</button>
-<button onClick={() => addbx("image")}>🖼️ Add Image</button>
-   <input
-        type="number"
-        value={divHeight}
-        onChange={handleInputChange}
-        style={{ width: '100px' }}
-      />
-
-
+              <button type="submit" onClick={submit} className="upload-button">
+                Preview / Apply
+              </button>
+            </form>
+          </div>
+        </Rnd>
+      )}
     </div>
   );
 }

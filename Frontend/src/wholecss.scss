@@ -358,14 +358,7 @@ font-size: 13px;
   color: #333;
   line-height: 1.4
 }
-.newsform-con
-{
 
-     border-radius: 5px;
-     position: absolute;
-     transform:  translate(1000px,20px);
-     position: fixed;
-}
 .image-preview {
   margin-top: 10px;
   text-align: center;
@@ -427,33 +420,37 @@ font-size: 13px;
   
 
 }
-.image-preview-multi {
+
+
+/* MAIN DRAGGABLE CONTAINER */
+.newsform-con {
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s ease-out;
+  width: 340px;
+}
+
+/* DRAG HEADER BAR */
+.drag-header {
+  background: linear-gradient(to right, #ff4da6, #ff1a8c);
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  cursor: move;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 10px;
-  background: #fff0f6;
-  border-radius: 10px;
-  border: 1px solid #ffd6e7;
-  scrollbar-width: thin;
-  scrollbar-color: #ff69b4 #ffe6f2;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.image-preview-multi::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
-}
-
-.image-preview-multi::-webkit-scrollbar-thumb {
-  background: #ff69b4;
-  border-radius: 10px;
-}
-
-.image-preview-multi::-webkit-scrollbar-thumb:hover {
-  background: #ff1493;
+/* CLOSE BTN */
+.drag-header svg {
+  font-size: 20px;
+  cursor: pointer;
 }
 
 .preview-box {
@@ -479,7 +476,7 @@ font-size: 13px;
   display: block;
   margin-bottom: 6px;
   font-weight: 600;
-  color: #e60073; /* Tamilaka News pink */
+  color: #e60073;
   font-size: 15px;
 }
 
@@ -513,6 +510,47 @@ font-size: 13px;
   border-color: #e60073;
 }
 
+/* ADD IMAGE / PARAGRAPH BUTTONS */
+.action-btn {
+  background: #ff4da6;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.action-btn:hover {
+  background: #e60073;
+}
+
+/* HEIGHT CONTROL SECTION */
+.height-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.height-btn {
+  background: #ff4da6;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.height-btn:hover {
+  background: #e60073;
+}
+
 .upload-button {
   background-color: #e60073;
   color: #fff;
@@ -543,11 +581,11 @@ font-size: 13px;
 }
 
 @media (max-width: 600px) {
-  .news-form {
+  .newsform-con {
     width: 90%;
-    padding: 20px;
   }
 }
+
 
 .news-container {
   width: 90%;
