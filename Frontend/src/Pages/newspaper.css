@@ -37,7 +37,7 @@
   border-radius: 6px;
   overflow: hidden;
   transition: transform 0.2s ease;
-  max-width: 700px;
+  max-width: 2000px;
   margin: 20px 130px;
   font-family: "Noto Sans Tamil", sans-serif;
   
@@ -87,11 +87,11 @@
 
 /* WEATHER CARD */
 .weather-card {
-  width: 100%;
+  width: 250px;
   background-color: #1e1f26;
   color: #fff;
   border-radius: 10px;
-  padding: 18px 20px;
+  padding: 0px 80px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -101,7 +101,7 @@
   align-items: left;
   font-weight: 600;
   margin-bottom: 10px;
-  row-gap: 100px;
+  row-gap: 1000px;
 }
 
 .weather-header .today {
@@ -116,7 +116,7 @@
 
 .weather-main h1 {
   font-size: 2.5rem;
-  margin: 0;
+  margin: 10px;
 }
 
 .weather-main p {
