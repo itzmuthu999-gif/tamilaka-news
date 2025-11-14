@@ -152,6 +152,7 @@ export default function Newspaper() {
         </p>
         <span className="news-time">5 hrs ago</span>
       </div>
+      <div>
        <div className="right-container">
       {/* Weather Widget */}
       <div className="weather-card">
@@ -183,6 +184,7 @@ export default function Newspaper() {
         <p>Advertisement here</p>
       </div>
     </div> 
+    </div>
     </div>
     
     
