@@ -32,7 +32,14 @@ export default function Newsbund() {
     <div>
       <nav className='navbar'>
         <div className='logo'><img src={logo} alt="alt" /></div>
-        <Link className='link' to="/Newsupload"> upload News</Link>
+<Link 
+  className='link' 
+  to="/Newsupload"
+  onClick={() => dispatch(setCurrentNews(null))}
+>
+  Upload News
+</Link>
+
       </nav>
 
       <div className="news-grid-container">
@@ -93,6 +100,17 @@ export default function Newsbund() {
                     Delete
                   </button>
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    dispatch(setCurrentNews(news));
+                    navigate("/preview");
+                  }}
+                >
+                  Preview
+                </button>
+
+
 
               </div>
             );

@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  MLayout: 1,
   allNews: [],      // multiple saved news
   trash: [],        // deleted news
   currentNews: null // news being edited (full object)
@@ -24,6 +25,9 @@ const newsFormSlice = createSlice({
     setCurrentNews: (state, action) => {
       state.currentNews = action.payload;
     },
+    setLayout: (state, action) => {
+  state.MLayout = action.payload; // payload is 1 or 2
+},
 
     // Update an existing news item (in-place)
     updateNews: (state, action) => {
@@ -76,6 +80,7 @@ export const {
   restoreNews,
   permanentDelete,
   setCurrentNews,
+  setLayout 
 } = newsFormSlice.actions;
 
 export default newsFormSlice.reducer;

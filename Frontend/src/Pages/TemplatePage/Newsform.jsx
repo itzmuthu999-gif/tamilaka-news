@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
 import { AiOutlineSlack } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
+import layout1 from  "../../assets/Layout1.png"
+import layout2 from  "../../assets/Layout2.png"
+import { useDispatch } from "react-redux";
+import { setLayout } from "../Slice/newsformslice.js";
+import { useSelector } from "react-redux";
+import "../TemplatePage/Templatepage.scss"
+
 
 export default function Newsform({
   initialData = null,
   onChange = () => {},
   onSave = () => {},
   addbx,
-  rmvbx,
-  handleDecreaseClick,
-  handleIncreaseClick,
   handleInputChange,
   divHeight
 }) {
@@ -23,9 +27,10 @@ export default function Newsform({
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  const [multiPreviews, setMultiPreviews] = useState([]);
-
   const [openForm, setOpenForm] = useState(false); // <-- NEW
+  const dispatch = useDispatch();
+  const MLayout = useSelector(state => state.newsform.MLayout);
+
 
   // Initialize when editing
   useEffect(() => {
@@ -38,7 +43,7 @@ export default function Newsform({
           } else {
             setThumbnailPreview(URL.createObjectURL(initialData.data.thumbnail));
           }
-        } catch {}
+        } catch(e) { console.log(e)}
       }
     }
   }, [initialData]);
@@ -62,17 +67,7 @@ export default function Newsform({
     }
   };
 
-  const handleMultiImages = (e) => {
-    const files = Array.from(e.target.files);
-    const newPreviews = files.map(file => URL.createObjectURL(file));
 
-    setFormData(prev => ({
-      ...prev,
-      images: [...(prev.images || []), ...files]
-    }));
-
-    setMultiPreviews(prev => [...prev, ...newPreviews]);
-  };
 
   const submit = (e) => {
     e && e.preventDefault();
@@ -81,7 +76,7 @@ export default function Newsform({
 
   /* ------------------------------ UI RETURN ------------------------------ */
   return (
-    <div>
+    <div  className="form-main-cont">
       {/* Floating Icon (initial stage) */}
       {!openForm && (
         <div
@@ -102,7 +97,7 @@ export default function Newsform({
       {/* Draggable + Resizable Form */}
       {openForm && (
         <Rnd
-          default={{ x: 20, y: 20, width: 350, height: "auto" }}
+          default={{ x: 1080, y:0, width: 450, height: 700 }}
           bounds="window"
           dragHandleClassName="drag-header"
           style={{
@@ -184,7 +179,7 @@ export default function Newsform({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Zonal</label>
+                <label className="form-label">Zonar</label>
                 <textarea
                   name="zonal"
                   value={formData.zonal}
@@ -196,19 +191,66 @@ export default function Newsform({
                 />
               </div>
 
-              <div onClick={() => addbx("paragraph")}>Add Paragraph</div>
-              <div onClick={() => addbx("image")}>Add Image</div>
-
-              <input
+              <div className="add-pi">
+                              <div className="add-para"  onClick={() => addbx("paragraph")}>Add Paragraph</div>
+              <div className="add-img"  onClick={() => addbx("image")}>Add Image</div>
+              
+              </div>
+              <div className="inc-ht">  
+                <div className="inc-ht-txt">Main News Container height:</div>
+                <div className="inc-ht-inp"><input  
                 type="number"
                 value={divHeight}
                 onChange={handleInputChange}
                 style={{ width: "100px" }}
-              />
+              /></div>
+
+              </div>
+
 
               <button type="submit" onClick={submit} className="upload-button">
                 Preview / Apply
               </button>
+
+<div>Select Layout</div>
+
+<div
+  className="layout lone"
+  onClick={() => dispatch(setLayout(1))}
+  style={{
+    border: MLayout === 1 ? "3px solid #ff008c" : "3px solid #ffcce5",
+    background: MLayout === 1 ? "#ffd0e8" : "#ffe6f2",
+    borderRadius: "10px",
+    padding: "5px",
+    cursor: "pointer",
+    transition: "0.3s",
+    marginBottom: "10px"
+  }}
+>
+  <img src={layout1} style={{ width: "100%", borderRadius: "8px" }} />
+</div>
+
+<div
+  className="layout ltwo"
+  onClick={() => dispatch(setLayout(2))}
+  style={{
+    border: MLayout === 2 ? "3px solid #ff008c" : "3px solid #ffcce5",
+    background: MLayout === 2 ? "#ffd0e8" : "#ffe6f2",
+    borderRadius: "10px",
+    padding: "5px",
+    cursor: "pointer",
+    transition: "0.3s"
+  }}
+>
+  <img src={layout2} style={{ width: "100%", borderRadius: "8px" }} />
+</div>
+
+<div>
+  <div>
+</div>
+
+                 
+              </div>
             </form>
           </div>
         </Rnd>
