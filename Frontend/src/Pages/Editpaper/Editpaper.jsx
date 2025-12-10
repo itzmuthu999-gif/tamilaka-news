@@ -7,6 +7,9 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { useState,useRef, useEffect } from "react";
 
+import NewsFilter from "./Components/NewsFilter";
+import PageEditor from "./Components/PageEditor";
+
 import logo from "../../assets/logo.png";
 import bcs from "./../../assets/bcs.jpg";
 import jwt from "./../../assets/jwt.jpg";
@@ -363,6 +366,23 @@ export default function Editpaper() {
   const sampleHeadline= `பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்`;
   const sampleImage=jwt;
   const sampleTime="5 hrs ago ";
+  const categories = ["Politics", "Sports", "Cinema", "Weather", "Astrology", "Kids"];
+
+const newsData = [
+  {
+    title: "சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம்",
+    time: "5 hrs ago",
+    zonal: "Politics",
+    img: bcs
+  },
+  {
+    title: "புதிய சினிமா டிரைலர் வெளியீடு",
+    time: "2 hrs ago",
+    zonal: "Cinema",
+    img: bcs
+  }
+];
+
   return (
     <div>
       <div className="navcon1">
@@ -415,7 +435,17 @@ export default function Editpaper() {
         </p>
       </div>
       <div className="ep-main-ed-cont">
-  <div className="ep-floater1">
+        <PageEditor
+  pages={["politics", "cinema", "sports"]}
+  containers={[
+    { img: bcs, label: "Big container type 1" },
+    { img: bcs, label: "Big container type 2" },
+    { img: bcs, label: "normal container type 1" }
+  ]}
+/>
+
+        {/* <NewsFilter categories={categories} newsData={newsData}/> */}
+  {/* <div className="ep-floater1">
       <div className="ep-fl1-sort">sort by </div>
            <div className="ep-fl1-btns">
                <div className="epf1b-btn">Politics</div>
@@ -436,7 +466,7 @@ export default function Editpaper() {
                </div>
            </div>
 
-        </div>
+        </div> */}
         <div className="ep-ed-cont">
 
           
