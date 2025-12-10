@@ -23,6 +23,7 @@ export default function Newsform({
     oneLiner: "",
     thumbnail: null,
     zonal: "",
+    author: "", 
     images: []
   });
 
@@ -156,26 +157,55 @@ export default function Newsform({
                   required
                 />
               </div>
+              <div className="form-group">
+                <label className="form-label">Author</label>
+                <input
+                  type="text"
+                  name="author"
+                  value={formData.author}
+                  onChange={handleChange}
+                  placeholder="Enter author name"
+                  className="form-textarea"
+                  required
+                />
+              </div>
 
               <div className="form-group">
                 <label className="form-label">Thumbnail Image</label>
                 <input
                   type="file"
                   name="thumbnail"
-                  accept="image/*"
+                   accept="image/*,video/*,.gif"
                   onChange={handleChange}
                   className="form-file"
                 />
 
-                {thumbnailPreview && (
-                  <div className="image-preview">
-                    <img
-                      src={thumbnailPreview}
-                      alt="Thumbnail Preview"
-                      className="preview-img"
-                    />
-                  </div>
-                )}
+                 {thumbnailPreview && (
+    <div className="image-preview">
+      {/* Check file type and render accordingly */}
+      {formData.thumbnail && 
+       (formData.thumbnail.type?.startsWith('video/') || 
+        (typeof formData.thumbnail === 'string' && formData.thumbnail.includes('.mp4'))) ? (
+        <video
+          src={thumbnailPreview}
+          controls
+          style={{
+            width: '100%',
+            maxHeight: '200px',
+            borderRadius: '8px'
+          }}
+        >
+          Your browser does not support the video tag.
+        </video>
+      ) : (
+        <img
+          src={thumbnailPreview}
+          alt="Thumbnail Preview"
+          className="preview-img"
+        />
+      )}
+    </div>
+  )}
               </div>
 
               <div className="form-group">
@@ -206,15 +236,9 @@ export default function Newsform({
               /></div>
 
               </div>
-
-
-              <button type="submit" onClick={submit} className="upload-button">
-                Preview / Apply
-              </button>
-
-<div>Select Layout</div>
-
-<div
+              <div>Select Layout</div>
+<div className="layout-encloser" style={{display: "flex", gap: "10px", margin: "10px"}}> 
+  <div
   className="layout lone"
   onClick={() => dispatch(setLayout(1))}
   style={{
@@ -244,6 +268,13 @@ export default function Newsform({
 >
   <img src={layout2} style={{ width: "100%", borderRadius: "8px" }} />
 </div>
+</div>
+
+
+              <button type="submit" onClick={submit} className="upload-button">
+                Preview / Apply
+              </button>
+
 
 <div>
   <div>

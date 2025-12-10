@@ -1,0 +1,722 @@
+.navcon1 {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.navcon2 {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.nav-c1-logo img {
+  width: 250px;
+}
+.nav-c1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  width: 1250px;
+}
+.nav-c3 {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: end;
+}
+.nav-c1-date {
+  font-size: 13px;
+}
+.nav-c1-links,
+.nav-c3-ham {
+  display: flex;
+  gap: 10px;
+  font-size: 20px;
+}
+.nav-c3-sections {
+  display: flex;
+  gap: 20px;
+}
+.nav-c2-line {
+  width: 1250px;
+  height: 2px;
+  background-color: pink;
+}
+.break-news {
+  background-color: rgb(220, 220, 220);
+  width: 1530px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+  overflow-x: hidden;
+  margin: 30px 0px;
+}
+
+.ep-main-ed-cont {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+    position: relative;
+}
+.ep-ed-cont {
+  width: 1250px;
+  height: fit-content;
+  border: 1px solid;
+
+
+}
+
+.ep-fl1-btns
+{
+    display: flex;gap: 10px;
+    font-weight: bold;
+    width: 450px;
+}
+
+.ep-floater1
+{
+    background-color: pink;
+    width: 500px;height: 500px;
+    padding: 20px;
+    transform: translate(-500px, -120px);
+    position: absolute;
+    border-radius: 10px;
+
+}
+.ep-fl1-news-cont
+{
+    background-color: aliceblue;
+    width: 450px; height: 400px;
+    border: 1px solid;border-radius: 5px;
+    margin: 10px 0px;padding: 10px;
+    
+
+}
+.ep-f1nc-n
+{
+    display: flex;gap: 5px;
+    width: 430px;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 13px;
+    
+}
+.epf1ncn-subc1
+{
+    display: flex;flex-direction: column;
+    gap: 5px;
+    width: 200px;
+
+}
+.epf1ncn-img
+{
+    width: 100px; height: 80px;
+    overflow: hidden;
+}
+.epf1ncn-img img
+{ 
+    width: 100%;height: 100%;
+    object-fit: cover;
+}
+
+
+
+// -----------container CSS--------------//
+.ep-bg-news-1,.ep-bg-news-2,.ep-bg-news-3,.ep-bg-news-4,.ep-nm-news-1,
+.ep-nm-news-2,.ep-nm-news-3,.ep-nm-news-4,.ep-nm-news-5,.ep-nm-news-6,
+.ep-nm-news-7,.ep-nm-news-8,.ep-nm2-news-1,.ep-nm2-news-2,.ep-nm2-news-3
+{
+    border: solid 1px;
+}
+
+// big news container 1
+$gap1: 15px;
+$gap2: 15px;
+
+.ep-bg-news-1 {
+  width: 800px;
+  height: fit-content;
+  // border: solid;
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-bg-news-1:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epbn1-img {
+  width: 800px;
+  height: 500px;
+  border-radius: $gap1;
+  overflow: hidden;
+}
+.epbn1-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epbn1-hdln {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.epbn1-onln {
+  font-size: 14px;
+}
+
+// big news container 2
+.ep-bg-news-2 {
+  width: 800px;
+  height: fit-content;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-bg-news-2:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epbn2-img {
+  width: 500px;
+  height: 350px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epbn2-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epbn2-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epbn2-onln {
+  font-size: 13px;
+}
+
+// big news container 3
+.ep-bg-news-3 {
+  width: 400px;
+  height: fit-content;
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-bg-news-3:hover {
+  color: rgb(237, 1, 141);
+}
+.epbn3-img {
+  width: 400px;
+  height: 350px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epbn3-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epbn3-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epbn3-onln {
+  font-size: 13px;
+}
+//big news version 5 container 1
+.ep-bg-news5-1 {
+  width: 1000px;
+  height: fit-content;
+  margin: 5px;
+  display: flex;
+  gap: 10px;
+
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-bg-news5-1:hover {
+  color: rgb(237, 1, 141);
+}
+.epbn51-img {
+  width: 500px;
+  height: 300px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epbn51-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epbn51-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epbn51-onln {
+  font-size: 13px;
+}
+
+// big news container 3
+.ep-bg-news-4 {
+  width: 400px;
+  height: fit-content;
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-bg-news-4:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epbn4-img {
+  width: 400px;
+  height: 350px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epbn4-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epbn4-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+////normal news
+/// normal news container 1
+.ep-nm-news-1 {
+  width: 800px;
+  height: fit-content;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-1:hover {
+  color: rgb(237, 1, 141);
+}
+.epnn1-img {
+  width: 1000px;
+
+  height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn1-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epnn1-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epnn1-onln {
+  font-size: 13px;
+}
+
+/// normal news container 2
+.ep-nm-news-2 {
+  width: 800px;
+  height: fit-content;
+  // border: solid;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-2:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn2-img {
+  width: 1000px;
+
+  height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn2-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epnn2-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epnn2-onln {
+  font-size: 13px;
+}
+
+/// normal news container 3
+.ep-nm-news-3 {
+  width: 395px;
+  height: 100px;
+  // border: solid;
+  margin: 5px;
+  overflow: hidden;
+  display: flex;
+  gap: $gap2;
+
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-3:hover {
+  color: rgb(237, 1, 141);
+}
+
+.ep-nm3-sbc {
+  max-width: 200px;
+}
+.epnn3-img {
+  max-width: 200px;
+  max-height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn3-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+
+.epnn3-onln {
+  font-size: 13px;
+  height: 84px;
+  overflow: hidden;
+}
+
+/// normal news container 4
+.ep-nm-news-4 {
+  width: 395px;
+  height: 100px;
+  // border: solid;
+  margin: 5px;
+  overflow: hidden;
+  display: flex;
+  gap: $gap2;
+
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-4:hover {
+  color: rgb(237, 1, 141);
+}
+
+.ep-nm4-sbc {
+  max-width: 200px;
+}
+
+.epnn4-img {
+  max-width: 200px;
+  max-height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn4-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+
+.epnn4-onln {
+  font-size: 13px;
+  height: 84px;
+  overflow: hidden;
+}
+/// normal news container 5
+.ep-nm-news-5 {
+  width: 395px;
+  height: 100px;
+  // border: solid;
+  margin: 5px;
+  overflow: hidden;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-5:hover {
+  color: rgb(237, 1, 141);
+}
+
+.ep-nm5-sbc {
+  max-width: 200px;
+}
+.epnn5-img {
+  max-width: 200px;
+  max-height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn5-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epbn5-hdln {
+  font-size: 15px;
+  font-weight: bold;
+  height: 84px;
+  overflow: hidden;
+}
+
+.epnn5-onln {
+  font-size: 13px;
+}
+/// normal news container 6
+.ep-nm-news-6 {
+  width: 395px;
+  height: 100px;
+  // border: solid;
+  margin: 5px;
+  overflow: hidden;
+  display: flex;
+  gap: $gap2;
+  // border: 1px solid;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-6:hover {
+  color: rgb(237, 1, 141);
+}
+
+.ep-nm6-sbc {
+  max-width: 200px;
+}
+.epnn6-img {
+  max-width: 200px;
+  max-height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn6-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+
+.epbn6-hdln {
+  font-size: 15px;
+  font-weight: bold;
+  height: 84px;
+  overflow: hidden;
+}
+
+////normal container phase 2 - 1
+.ep-nm2-news-1 {
+  width: 400px;
+  height: fit-content;
+  // border: solid;
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm2-news-1:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn21-img {
+  width: 400px;
+  height: 350px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn21-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epbn21-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+.epnn21-onln {
+  font-size: 15px;
+}
+////normal container phase 2 - 2
+.ep-nm2-news-2 {
+  width: 425px;
+  height: fit-content;
+  // border: solid 1px;
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm2-news-2:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn22-img {
+  width: 100px; /* fixed width */
+  height: 70px; /* fixed height */
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0; /* IMPORTANT if inside a flex container */
+}
+
+.epnn22-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.epbn22-hdln {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.epnn22-onln {
+  font-size: 11px;
+  height: 53px;
+  overflow: hidden;
+}
+.ep-nm22-sbc {
+  display: flex;
+}
+////normal container phase 2 - 3
+.ep-nm2-news-3 {
+  width: 425px;
+  height: fit-content;
+
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm2-news-3:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn23-img {
+  width: 100px; /* fixed width */
+  height: 70px; /* fixed height */
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0; /* IMPORTANT if inside a flex container */
+}
+
+.epnn23-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.epbn23-hdln {
+  font-size: 15px;
+  font-weight: bold;
+}
+.epnn23-onln {
+  font-size: 11px;
+  height: 53px;
+  overflow: hidden;
+}
+.ep-nm23-sbc {
+  display: flex;
+  gap: $gap2;
+}
+
+/// normal news container 7
+.ep-nm-news-7 {
+  width: 300px;
+  height: 100px;
+  max-width: 300px;
+  max-height: 100px;
+  // border: solid;
+  flex: 0 0 300px;
+  margin: 4px;
+  overflow: hidden;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-7:hover {
+  color: rgb(237, 1, 141);
+}
+
+.ep-nm7-sbc {
+  max-width: 200px;
+}
+.epnn7-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.epnn7-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+
+.epnn7-hdln {
+  font-size: 15px;
+  font-weight: bold;
+  height: 84px;
+  overflow: hidden;
+}
+
+/// normal news container 8
+.ep-nm-news-8 {
+  width: 300px;
+  height: 100px;
+  max-width: 300px;
+  max-height: 100px;
+  // border: solid;
+  flex: 0 0 300px;
+  margin: 4px;
+  overflow: hidden;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-8:hover {
+  color: rgb(237, 1, 141);
+}
+
+.ep-nm8-sbc {
+  max-width: 200px;
+}
+.epnn8-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.epnn8-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+
+.epnn8-hdln {
+  font-size: 15px;
+  font-weight: bold;
+  height: 84px;
+  overflow: hidden;
+}
+
+.epn-tm {
+  font-size: 10px;
+  color: gray;
+  // background-color: blue;
+}
+

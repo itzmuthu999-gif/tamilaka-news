@@ -9,7 +9,6 @@ import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 
-
 export default function PreviewPage() {
   const currentNews = useSelector((state) => state.newsform.currentNews);
   const MLayout = useSelector((state) => state.newsform.MLayout);
@@ -21,18 +20,34 @@ export default function PreviewPage() {
   const { data, fullContent } = currentNews;
 
   /* ------------------------- thumbnail handling ------------------------- */
+  /* ------------------------- thumbnail handling ------------------------- */
   const thumb = (() => {
-    if (!data?.thumbnail) return luffy;
-    if (typeof data.thumbnail === "string") return data.thumbnail;
-    if (data.thumbnail instanceof File)
-      return URL.createObjectURL(data.thumbnail);
-    return luffy;
+    if (!data?.thumbnail) return { url: luffy, isVideo: false };
+
+    let url = null;
+    let isVideo = false;
+
+    if (typeof data.thumbnail === "string") {
+      url = data.thumbnail;
+      isVideo =
+        data.thumbnail.includes(".mp4") ||
+        data.thumbnail.includes(".webm") ||
+        data.thumbnail.includes(".ogg");
+    } else if (data.thumbnail instanceof File) {
+      url = URL.createObjectURL(data.thumbnail);
+      isVideo = data.thumbnail.type?.startsWith("video/");
+    }
+
+    return {
+      url: url || luffy,
+      isVideo,
+    };
   })();
 
   return (
     <div>
       <style>
-{`
+        {`
   .ele-news {
     overflow: visible !important;
     position: relative;
@@ -45,7 +60,7 @@ export default function PreviewPage() {
     display: flex !important; /* remove flex clipping effect */
   }
 `}
-</style>
+      </style>
 
       {/* ------------------------------- NAVBAR ------------------------------- */}
       <div className="navcon1">
@@ -95,9 +110,9 @@ export default function PreviewPage() {
         <p>
           சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம் | டெல்லியில் மழை
           வெள்ளம் – போக்குவரத்து பாதிப்பு | பெங்களூருவில் பெரிய IT நிறுவனத்தில்
-          திடீர் பணிநீக்கம் | தமிழகத்தில் இன்று மின்தடை அறிவிப்பு | கோவை
-          அருகே வெடிகுண்டு பரபரப்பு – போலீஸ் விசாரணை தொடக்கம் | பங்குச்சந்தை
-          சரிவு – முதலீட்டாளர்கள் அதிர்ச்சி
+          திடீர் பணிநீக்கம் | தமிழகத்தில் இன்று மின்தடை அறிவிப்பு | கோவை அருகே
+          வெடிகுண்டு பரபரப்பு – போலீஸ் விசாரணை தொடக்கம் | பங்குச்சந்தை சரிவு –
+          முதலீட்டாளர்கள் அதிர்ச்சி
         </p>
       </div>
 
@@ -106,28 +121,55 @@ export default function PreviewPage() {
         <div className="news-m-cont2">
           <div className="ele-news2">
             <div className="ele-const-news">
-              <div className="ele-const-zonar">{data.zonal}</div>
+              {!currentNews.hiddenElements?.zonar && (
+                <div className="ele-const-zonar">{data.zonal}</div>
+              )}
+              {!currentNews.hiddenElements?.author && (
+                <div className="ele-const-author">
+                  {" "}
+                  By: {data.author || "Unknown Author"}{" "}
+                </div>
+              )}
+              <div className="ele-const-time">
+                {currentNews.time || "No date available"}
+              </div>
               <div className="ele-con-ne-head">{data.headline}</div>
               <div className="ele-con-ne-oneliner">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{data.oneLiner}
               </div>
-
-              <div className="ele-con-tmbnl">
-                <img src={thumb} alt="thumbnail" />
-              </div>
+              {!currentNews.hiddenElements?.thumbnail && (
+                <div className="ele-con-tmbnl">
+                  {thumb.isVideo ? (
+                    <video
+                      src={thumb.url}
+                      controls
+                      controlsList="nodownload" // Optional: prevent download
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <img src={thumb.url} alt="thumbnail" />
+                  )}
+                </div>
+              )}
             </div>
 
             {/* ------------------------- FULL NEWS AREA ------------------------- */}
-              <div
-                className="el-full-news"
-                style={{
-                  height: `${currentNews.divHeight || 900}px`,
-                  position: "relative",
-                  overflow: "visible",        // IMPORTANT FIX
-                  display: "block",           // IMPORTANT FIX
-                }}
-              >
-
+            <div
+              className="el-full-news"
+              style={{
+                height: `${currentNews.divHeight || 900}px`,
+                position: "relative",
+                overflow: "visible", // IMPORTANT FIX
+                display: "block", // IMPORTANT FIX
+              }}
+            >
               {fullContent.map((box) =>
                 box.type === "paragraph" ? (
                   <ParagraphStatic key={box.id} box={box} />
@@ -187,7 +229,11 @@ function ImageStatic({ box }) {
 }
 
 /* ------------------------------ SIDE NEWS CARD ----------------------------- */
-function NewsCard({ title = "Sample title", image = newsimg, time = "5hrs ago" }) {
+function NewsCard({
+  title = "Sample title",
+  image = newsimg,
+  time = "5hrs ago",
+}) {
   return (
     <div style={{ width: 400, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -204,40 +250,74 @@ function NewsCard({ title = "Sample title", image = newsimg, time = "5hrs ago" }
   );
 }
 
-function Line({ width = "100%", height = "1px", color = "#ffb1ffff", orientation = "horizontal", margin = "10px 0" }) {
-  const style = { backgroundColor: color, margin, width: orientation === "horizontal" ? width : height, height: orientation === "horizontal" ? height : width };
+function Line({
+  width = "100%",
+  height = "1px",
+  color = "#ffb1ffff",
+  orientation = "horizontal",
+  margin = "10px 0",
+}) {
+  const style = {
+    backgroundColor: color,
+    margin,
+    width: orientation === "horizontal" ? width : height,
+    height: orientation === "horizontal" ? height : width,
+  };
   return <div style={style}></div>;
 }
 
 /* ---------------------------- SIDE ABOUT NEWS ----------------------------- */
 function AdvertisementBox({ width = "300px", height = "250px" }) {
   return (
-    <div style={{ width, height, backgroundColor: "#e0e0e0", display: "flex", alignItems: "center", justifyContent: "center", color: "#555", fontSize: "14px", fontFamily: "'Helvetica Neue', Arial, sans-serif", borderRadius: "4px" }}>
+    <div
+      style={{
+        width,
+        height,
+        backgroundColor: "#e0e0e0",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#555",
+        fontSize: "14px",
+        fontFamily: "'Helvetica Neue', Arial, sans-serif",
+        borderRadius: "4px",
+      }}
+    >
       Advertisement here
     </div>
   );
 }
 
-
-
-function Melumnews()
-{
+function Melumnews() {
   return (
     <>
-       <div className="side-news">
-          <div><AdvertisementBox width='100%' height='100px'/></div>
-          <div className="morenews">
-            <div className="mn-txt">மேலும் செய்திகள்</div>
-            <Line height='2px' width='100%'/>
-            </div>
-          <div className="mrn-in-cont">
-                 <NewsCard image={newsimg} title='பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்'/>
-                 <NewsCard image={newsimg} title='பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்'/>
-                 <NewsCard image={newsimg} title='பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்'/>
-                 <NewsCard image={newsimg} title='பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்'/>
-          </div>
-       </div>    
+      <div className="side-news">
+        <div>
+          <AdvertisementBox width="100%" height="100px" />
+        </div>
+        <div className="morenews">
+          <div className="mn-txt">மேலும் செய்திகள்</div>
+          <Line height="2px" width="100%" />
+        </div>
+        <div className="mrn-in-cont">
+          <NewsCard
+            image={newsimg}
+            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
+          />
+          <NewsCard
+            image={newsimg}
+            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
+          />
+          <NewsCard
+            image={newsimg}
+            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
+          />
+          <NewsCard
+            image={newsimg}
+            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
+          />
+        </div>
+      </div>
     </>
-
-  )
+  );
 }
