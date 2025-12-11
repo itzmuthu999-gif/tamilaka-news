@@ -9,9 +9,6 @@ export default function NewsFilter({ categories, newsData }) {
 
   return (
     <div className="ep-floater1">
-
-      <div className="ep-fl1-sort">Sort by</div>
-
       <div className="ep-fl1-btns">
         {categories.map((cat, idx) => (
           <div

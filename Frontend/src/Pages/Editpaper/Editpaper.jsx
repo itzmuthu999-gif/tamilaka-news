@@ -380,11 +380,65 @@ const newsData = [
     time: "2 hrs ago",
     zonal: "Cinema",
     img: bcs
+  },
+    {
+    title: "சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம்",
+    time: "5 hrs ago",
+    zonal: "Politics",
+    img: bcs
+  },
+  {
+    title: "புதிய சினிமா டிரைலர் வெளியீடு",
+    time: "2 hrs ago",
+    zonal: "Cinema",
+    img: bcs
+  },  {
+    title: "சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம்",
+    time: "5 hrs ago",
+    zonal: "Politics",
+    img: bcs
+  },
+  {
+    title: "புதிய சினிமா டிரைலர் வெளியீடு",
+    time: "2 hrs ago",
+    zonal: "Cinema",
+    img: bcs
+  },
+    {
+    title: "சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம்",
+    time: "5 hrs ago",
+    zonal: "Politics",
+    img: bcs
+  },
+  {
+    title: "புதிய சினிமா டிரைலர் வெளியீடு",
+    time: "2 hrs ago",
+    zonal: "Cinema",
+    img: bcs
+  },
+    {
+    title: "சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம்",
+    time: "5 hrs ago",
+    zonal: "Politics",
+    img: bcs
+  },
+  {
+    title: "புதிய சினிமா டிரைலர் வெளியீடு",
+    time: "2 hrs ago",
+    zonal: "Cinema",
+    img: bcs
   }
 ];
+const [showEditor, setShowEditor] = useState(false);
 
   return (
     <div>
+      <PageEditor
+  open={showEditor}
+  onClose={() => setShowEditor(false)}
+  categories={categories}
+
+/>
       <div className="navcon1">
         <div className="navcon2">
           <div className="nav-c1">
@@ -435,16 +489,26 @@ const newsData = [
         </p>
       </div>
       <div className="ep-main-ed-cont">
-        <PageEditor
-  pages={["politics", "cinema", "sports"]}
-  containers={[
-    { img: bcs, label: "Big container type 1" },
-    { img: bcs, label: "Big container type 2" },
-    { img: bcs, label: "normal container type 1" }
-  ]}
-/>
+<button
+  onClick={() => {setShowEditor(true); console.log("running")}}
+  style={{
+    padding: "10px 20px",
+    margin: "10px",
+    background: "#4F46E5",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "600",
+    position: "absolute"
+  }}
+>
+  Open Page Editor
+</button>
 
-        {/* <NewsFilter categories={categories} newsData={newsData}/> */}
+
+{/* 
+        <NewsFilter categories={categories} newsData={newsData}/> */}
   {/* <div className="ep-floater1">
       <div className="ep-fl1-sort">sort by </div>
            <div className="ep-fl1-btns">

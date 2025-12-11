@@ -1,31 +1,46 @@
 .ep-floater1 {
   width: 450px; height: 600px;
   padding: 15px;
-  background: #101010;
+  background: #ffffff;
   border-radius: 10px;
-  color: #fff;
+  color: #000000;
   font-family: 'Inter', sans-serif;
   position: absolute;
   transform: translate(-500px,-200px);
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);  
 }
 
 .ep-fl1-sort {
   font-size: 14px;
   opacity: 0.7;
   margin-bottom: 10px;
+  color: black;
+  font-weight: bold;
+  background-color: #ffb2e7;
+  width: fit-content;
+  padding: 5px 20px;
+  border-radius: 20px;
 }
 
 .ep-fl1-btns {
   display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
+  width: 400px;
+  overflow-x: scroll;
+   overflow-y: scroll;        /* scrolling works */
+    -ms-overflow-style: none;  /* IE, Edge */
+    scrollbar-width: none; 
+
 }
+.ep-fl1-btns ::-webkit-scrollbar {
+    display: none;
+}
+
 
 .epf1b-btn {
   padding: 6px 14px;
-  background: #1b1b1b;
+  width: fit-content;
   border: 1px solid #333;
   border-radius: 20px;
   cursor: pointer;
@@ -34,7 +49,7 @@
 }
 
 .epf1b-btn:hover {
-  background: #262626;
+  background: #464646;
 }
 
 .epf1b-btn.active {
@@ -46,19 +61,45 @@
 .ep-fl1-news-cont {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 10px;
+  height: 495px;
+  overflow-y: scroll;
+}
+.ep-fl1-news-cont::-webkit-scrollbar {
+    width: 5px;           /* scrollbar width */
+    height: 8px;           /* scrollbar height (for horizontal) */
+}
+
+/* Scrollbar background */
+.ep-fl1-news-cont::-webkit-scrollbar-track {
+    background: #ff00a2;   /* track color */
+    border-radius: 10px;
+}
+
+/* Scrollbar handle */
+.ep-fl1-news-cont::-webkit-scrollbar-thumb {
+    background: #ffb2e7;       /* thumb color */
+    border-radius: 10px;
+}
+
+/* On hover */
+.ep-fl1-news-cont::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
 }
 
 .ep-f1nc-n {
   display: flex;
   gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid #2b2b2b;
+  padding: 5px 0;
+  border: 1px solid pink;
+
+  border-radius: 5px;
+  margin: 5px;
 }
 
 .epf1ncn-img {
-  width: 140px;
-  height: 90px;
+  width: 50px;
+  height: 50px;
   overflow: hidden;
   border-radius: 8px;
   flex-shrink: 0;
