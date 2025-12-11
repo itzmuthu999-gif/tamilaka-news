@@ -2,6 +2,16 @@ import { useState } from "react";
 import { Rnd } from "react-rnd";
 import { X, Plus } from "lucide-react";
 
+import bcont1 from "../../../assets/Containers/bcont1.png";
+import bcont2 from "../../../assets/Containers/bcont2.png";
+import bcont3 from "../../../assets/Containers/bcont3.png";
+import bcont4 from "../../../assets/Containers/bcont4.png";
+import ncont1 from "../../../assets/Containers/ncont1.png";
+import ncont2 from "../../../assets/Containers/ncont2.png";
+import ncont3 from "../../../assets/Containers/ncont3.png";
+import ncont4 from "../../../assets/Containers/ncont4.png";
+import ncont5 from "../../../assets/Containers/ncont5.png";
+
 export default function PageEditor({
   open = false,
   onClose = () => {},
@@ -33,11 +43,19 @@ export default function PageEditor({
   };
 
   // Sample container data
-  const containerTypes = [
-    { id: 1, img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=200&fit=crop", label: "Big container type 1" },
-    { id: 2, img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=200&fit=crop", label: "Big container type 2" },
-    { id: 3, img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=200&fit=crop", label: "normal container type 1" },
-  ];
+const containerTypes = [
+  { id: 1, img: bcont1, label: "Big Container Type 1" },
+  { id: 2, img: bcont2, label: "Big Container Type 2" },
+  { id: 3, img: bcont3, label: "Big Container Type 3" },
+  { id: 4, img: bcont4, label: "Big Container Type 4" },
+
+  { id: 5, img: ncont1, label: "Normal Container Type 1" },
+  { id: 6, img: ncont2, label: "Normal Container Type 2" },
+  { id: 7, img: ncont3, label: "Normal Container Type 3" },
+  { id: 8, img: ncont4, label: "Normal Container Type 4" },
+  { id: 9, img: ncont5, label: "Normal Container Type 5" },
+];
+
 
   const sliderTypes = [
     { id: 4, img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=200&fit=crop", label: "Slider type 1" },
@@ -337,18 +355,23 @@ export default function PageEditor({
                   onMouseDown={(e) => e.currentTarget.style.cursor = "grabbing"}
                   onMouseUp={(e) => e.currentTarget.style.cursor = "grab"}
                 >
-                  <img
-                    src={item.img}
-                    alt={item.label}
-                    style={{
-                      width: "100%",
-                      height: "90px",
-                      objectFit: "cover",
-                      borderRadius: "4px",
-                      border: showBorders ? "2px solid #999" : "none",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-                    }}
-                  />
+<img
+  src={item.img}
+  alt={item.label}
+  style={{
+    maxWidth: "120px",     // miniature size
+    maxHeight: "120px",    // miniature size
+    width: "auto",         // keep original width ratio
+    height: "auto",        // keep original height ratio
+    objectFit: "contain",  // scale without cropping
+    borderRadius: "4px",
+    border: showBorders ? "2px solid #999" : "none",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+    display: "block",
+    margin: "0 auto"
+  }}
+/>
+
                   <div style={{
                     fontSize: "12px",
                     marginTop: "5px",

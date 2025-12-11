@@ -1,45 +1,98 @@
 import { useState } from "react";
-import "./newsfilter.scss"
-export default function NewsFilter({ categories, newsData }) {
+import { useSelector } from "react-redux";
+import { Rnd } from "react-rnd";
+import "./newsfilter.scss";
+
+export default function NewsFilter({ open, onClose }) {
+  // Retrieve real news from Redux store
+  const allNews = useSelector((state) => state.newsform.allNews || []);
+  
+  // Fixed list of categories
+  const categories = ["politics", "cinema", "sports", "weather", "astrology"];
+
   const [activeCategory, setActiveCategory] = useState(categories[0]);
 
-  const filteredNews = newsData.filter(
-    (n) => n.zonal.toLowerCase() === activeCategory.toLowerCase()
+  // Filter news based on active category (case-insensitive)
+  // Note: zonal is inside news.data.zonal (matching Newsbund structure)
+  const filteredNews = allNews.filter(
+    (news) => news.data?.zonal?.trim().toLowerCase() === activeCategory.toLowerCase()
   );
 
+  // Helper function to safely get thumbnail (same as Newsbund)
+  const getThumbnail = (thumbnail) => {
+    if (!thumbnail) return null;
+
+    // If already a URL string → just use it
+    if (typeof thumbnail === "string") {
+      return thumbnail;
+    }
+
+    // If it's a File → convert to object URL
+    if (thumbnail instanceof File) {
+      return URL.createObjectURL(thumbnail);
+    }
+
+    // If unexpected type (object from JSON) → cannot use
+    return null;
+  };
+
+  console.log("All News:", allNews); // Debug
+  console.log("Active Category:", activeCategory); // Debug
+  console.log("Filtered News:", filteredNews); // Debug
+
+  // Don't render if not open
+  if (!open) return null;
+
   return (
-    <div className="ep-floater1">
-      <div className="ep-fl1-btns">
-        {categories.map((cat, idx) => (
-          <div
-            key={idx}
-            className={`epf1b-btn ${activeCategory === cat ? "active" : ""}`}
-            onClick={() => setActiveCategory(cat)}
-          >
-            {cat}
-          </div>
-        ))}
-      </div>
-
-      <div className="ep-fl1-news-cont">
-        {filteredNews.length === 0 && (
-          <div className="no-news">No news available.</div>
-        )}
-
-        {filteredNews.map((n, index) => (
-          <div key={index} className="ep-f1nc-n">
-            <div className="epf1ncn-img">
-              <img src={n.img} alt="news" />
+    <Rnd
+      default={{ x: 100, y: 100, width: 400, height: 600 }}
+      bounds="window"
+      dragHandleClassName="drag-handle-filter"
+      style={{
+        zIndex: 9998
+      }}
+    >
+      <div className="ep-floater1">
+        <div className="ep-close-btn-sec drag-handle-filter" style={{ cursor: "move" }}>
+          <div className="epcbs-btn" onClick={onClose}>X</div>
+        </div>
+        <div className="ep-fl1-btns">
+          {categories.map((cat, idx) => (
+            <div
+              key={idx}
+              className={`epf1b-btn ${activeCategory === cat ? "active" : ""}`}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
             </div>
+          ))}
+        </div>
 
-            <div className="epf1ncn-subc">
-              <div className="epf1ncn-header">{n.title}</div>
-              <div className="epf1ncn-time">{n.time}</div>
-            </div>
-          </div>
-        ))}
+        <div className="ep-fl1-news-cont">
+          {filteredNews.length === 0 && (
+            <div className="no-news">No news available for {activeCategory}.</div>
+          )}
+
+          {filteredNews.map((news, index) => {
+            const thumb = getThumbnail(news.data?.thumbnail);
+
+            return (
+              <div key={news.id || index} className="ep-f1nc-n">
+                <div className="epf1ncn-img">
+                  {thumb && (
+                    <img src={thumb} alt="news" />
+                  )}
+                </div>
+
+                <div className="epf1ncn-subc">
+                  <div className="epf1ncn-header">{news.data?.headline || 'Untitled'}</div>
+                  <div className="epf1ncn-time">{news.time}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-
-    </div>
+    </Rnd>
   );
 }

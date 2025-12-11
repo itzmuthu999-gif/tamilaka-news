@@ -7,6 +7,8 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { useState,useRef, useEffect } from "react";
 
+import { AiFillGitlab } from "react-icons/ai";
+
 import NewsFilter from "./Components/NewsFilter";
 import PageEditor from "./Components/PageEditor";
 
@@ -14,6 +16,7 @@ import logo from "../../assets/logo.png";
 import bcs from "./../../assets/bcs.jpg";
 import jwt from "./../../assets/jwt.jpg";
 import "./editpapercss.scss";
+import { BiCube } from "react-icons/bi";
 
 import PerfectSlider from "./Containers_/PerfectSlider";
 // Container 1: News 8 - Headline with image on right
@@ -337,7 +340,8 @@ const CONTAINER_MAP = {
   BigNewsContainer4V2,
 };
 
-const sampleItems = [
+const sampleItems = 
+[
     {
       image: bcs,
       headline: 'தமிழகத்தில் கனமழை எச்சரிக்கை',
@@ -431,14 +435,40 @@ const newsData = [
 ];
 const [showEditor, setShowEditor] = useState(false);
 
+const [showNewsFilter, setShowNewsFilter] = useState(false); // NEW STATE
+
   return (
     <div>
-      <PageEditor
+<PageEditor
   open={showEditor}
   onClose={() => setShowEditor(false)}
   categories={categories}
-
 />
+
+{!showEditor && (
+  <button 
+    className="pageeditorbtn"
+    onClick={() => setShowEditor(true)}
+  >
+    <AiFillGitlab />
+  </button>
+)}
+
+<NewsFilter 
+  open={showNewsFilter}
+  onClose={() => setShowNewsFilter(false)}
+/>
+
+{!showNewsFilter && (
+  <button 
+    className="pageeditorbtn2"
+    onClick={() => setShowNewsFilter(true)}
+  >
+    <BiCube />
+  </button>
+)}
+
+
       <div className="navcon1">
         <div className="navcon2">
           <div className="nav-c1">
@@ -489,62 +519,13 @@ const [showEditor, setShowEditor] = useState(false);
         </p>
       </div>
       <div className="ep-main-ed-cont">
-<button
-  onClick={() => {setShowEditor(true); console.log("running")}}
-  style={{
-    padding: "10px 20px",
-    margin: "10px",
-    background: "#4F46E5",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontWeight: "600",
-    position: "absolute"
-  }}
->
-  Open Page Editor
-</button>
 
 
-{/* 
-        <NewsFilter categories={categories} newsData={newsData}/> */}
-  {/* <div className="ep-floater1">
-      <div className="ep-fl1-sort">sort by </div>
-           <div className="ep-fl1-btns">
-               <div className="epf1b-btn">Politics</div>
-               <div className="epf1b-btn">sports </div>
-               <div className="epf1b-btn">cinema</div>
-               <div className="epf1b-btn">weather</div>
-               <div className="epf1b-btn">Astrology</div>
-               <div className="epf1b-btn">Kids</div>
-           </div>
-
-           <div className="ep-fl1-news-cont">
-               <div className="ep-f1nc-n">
-                     <div className="epf1ncn-img"><img src={bcs}  /></div>
-                     <div className="epf1ncn-subc">
-                        <div className="epf1ncn-header">சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம்</div>
-                       <div className="epf1ncn-time">5 hrs ago</div>
-                     </div>
-               </div>
-           </div>
-
-        </div> */}
         <div className="ep-ed-cont">
 
           
 
-          {/* <PerfectSlider
-          items={sampleItems}
-          containerType="NewsContainer7"
-           CONTAINER_MAP={CONTAINER_MAP}
-          autoSlideInterval={5000}
-          direction="left"
-          showControls={true}
-          showIndicators={true}
-          pauseOnHover={true}
-        /> */}
+
               <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}>
 
       <NewsContainer7 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
@@ -587,7 +568,16 @@ bg v1 and v2
     <br />
       <BigNewsContainer4V1       image={sampleImage} headline={sampleHeadline} time={sampleTime} />
       <BigNewsContainer4V2       image={sampleImage} headline={sampleHeadline} time={sampleTime} />
-
+                {/* <PerfectSlider
+          items={sampleItems}
+          containerType="NewsContainer7"
+           CONTAINER_MAP={CONTAINER_MAP}
+          autoSlideInterval={5000}
+          direction="left"
+          showControls={true}
+          showIndicators={true}
+          pauseOnHover={true}
+        /> */}
     </div>
 </div>
       </div>
