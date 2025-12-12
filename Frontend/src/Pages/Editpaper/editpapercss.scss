@@ -65,6 +65,8 @@
   width: 1250px;
   height: fit-content;
   border: 1px solid;
+ position: relative;
+  overflow: visible !important;
 
 
 }
@@ -124,22 +126,23 @@
 
 .pageeditorbtn
 {
-    padding: 10px 20px;
+    padding: 10px 40px 10px 20px;
+        font-size: 20px;
      margin: 10px;
-    background: #4F46E5;
+    background: #ff04e6;
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     position: fixed;
-    transform: translate(1450px,0px);
+    transform: translate(1460px,0px);
 }
 .pageeditorbtn2
 {
-    padding: 10px 20px;
+    padding: 10px 20px 10px 40px;
      margin: 10px;
-    background: #4F46E5;
+    background: #ff04e6;
     color: white;
     border: none;
     border-radius: 8px;
@@ -147,7 +150,7 @@
     font-weight: 600;
     font-size: 20px;
     position: fixed;
-    transform: translate(0px,0px);
+    transform: translate(-40px,0px);
 }
 // -----------container CSS--------------//
 .ep-bg-news-1,.ep-bg-news-2,.ep-bg-news-3,.ep-bg-news-4,.ep-nm-news-1,

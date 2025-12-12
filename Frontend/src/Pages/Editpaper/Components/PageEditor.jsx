@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Edit2, Grid3x3, Space } from "lucide-react";
+import "./pageeditor.scss";
 
 import bcont1 from "../../../assets/Containers/bcont1.png";
 import bcont2 from "../../../assets/Containers/bcont2.png";
@@ -12,11 +13,166 @@ import ncont3 from "../../../assets/Containers/ncont3.png";
 import ncont4 from "../../../assets/Containers/ncont4.png";
 import ncont5 from "../../../assets/Containers/ncont5.png";
 
+// Simple EditableContainer Component
+export function EditableContainer({ id, onDelete, initialPosition }) {
+  const [showSettings, setShowSettings] = useState(false);
+  const [columns, setColumns] = useState(2);
+  const [gap, setGap] = useState(10);
+
+  const handleDelete = (e) => {
+    if (e.detail === 2) {
+      onDelete(id);
+    }
+  };
+
+  return (
+    <Rnd
+      default={{
+        x: initialPosition.x,
+        y: initialPosition.y,
+        width: 700,
+        height: 250,
+      }}
+      minWidth={300}
+      minHeight={150}
+      bounds="parent"
+      enableResizing={true}
+      dragHandleClassName="drag-handle-container"
+      style={{
+        border: "2px dashed #666",
+        background: "transparent",
+        position: "absolute",
+        cursor: "move"
+      }}
+    >
+      <div className="drag-handle-container" style={{ width: "100%", height: "100%", position: "relative", pointerEvents: "auto" }}>
+        <div style={{ position: "absolute", top: "8px", right: "8px", display: "flex", gap: "8px", zIndex: 1000, pointerEvents: "auto" }}>
+          <button 
+            onClick={() => setShowSettings(!showSettings)} 
+            className="control-btn edit-btn"
+            style={{ 
+              background: "green", 
+              border: "none", 
+              borderRadius: "4px", 
+              padding: "6px", 
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Edit2 size={18} color="white" />
+          </button>
+          <button 
+            onClick={handleDelete} 
+            className="control-btn delete-btn" 
+            title="Double click to delete"
+            style={{ 
+              background: "red", 
+              border: "none", 
+              borderRadius: "4px", 
+              padding: "6px", 
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <X size={18} color="white" />
+          </button>
+        </div>
+
+        {showSettings && (
+          <div 
+            className="settings-panel"
+            style={{
+              position: "absolute",
+              top: "50px",
+              right: "8px",
+              background: "white",
+              border: "2px solid #666",
+              borderRadius: "8px",
+              padding: "15px",
+              zIndex: 20,
+              minWidth: "220px",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+              <span style={{ fontWeight: "600", fontSize: "14px" }}>Settings</span>
+              <button 
+                onClick={() => setShowSettings(false)} 
+                className="settings-close"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "4px",
+                  display: "flex",
+                  alignItems: "center"
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div style={{ marginBottom: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                <Grid3x3 size={16} />
+                <label style={{ fontSize: "13px", fontWeight: "500" }}>Column Count</label>
+              </div>
+              <input
+                type="number"
+                value={columns}
+                onChange={(e) => setColumns(parseInt(e.target.value) || 1)}
+                min="1"
+                max="6"
+                className="settings-input"
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  fontSize: "13px"
+                }}
+              />
+            </div>
+
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                <Space size={16} />
+                <label style={{ fontSize: "13px", fontWeight: "500" }}>Gap (px)</label>
+              </div>
+              <input
+                type="number"
+                value={gap}
+                onChange={(e) => setGap(parseInt(e.target.value) || 0)}
+                min="0"
+                max="50"
+                className="settings-input"
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  fontSize: "13px"
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </Rnd>
+  );
+}
+
+// PageEditor Component
 export default function PageEditor({
   open = false,
   onClose = () => {},
   categories: initialCategories = [],
-
+  onHeightChange = () => {},
+  onAddContainer = () => {},
 }) {
   const [categories, setCategories] = useState(initialCategories);
   const [activeCategory, setActiveCategory] = useState(initialCategories[0] || "");
@@ -25,6 +181,7 @@ export default function PageEditor({
   const [activeTab, setActiveTab] = useState("containers");
   const [showBorders, setShowBorders] = useState(true);
   const [showLines, setShowLines] = useState(true);
+  const [height, setHeight] = useState(600);
 
   if (!open) return null;
 
@@ -42,56 +199,72 @@ export default function PageEditor({
     }
   };
 
-  // Sample container data
-const containerTypes = [
-  { id: 1, img: bcont1, label: "Big Container Type 1" },
-  { id: 2, img: bcont2, label: "Big Container Type 2" },
-  { id: 3, img: bcont3, label: "Big Container Type 3" },
-  { id: 4, img: bcont4, label: "Big Container Type 4" },
+  const handleHeightChange = (e) => {
+    const newHeight = parseInt(e.target.value) || 600;
+    setHeight(newHeight);
+    onHeightChange(newHeight);
+  };
 
-  { id: 5, img: ncont1, label: "Normal Container Type 1" },
-  { id: 6, img: ncont2, label: "Normal Container Type 2" },
-  { id: 7, img: ncont3, label: "Normal Container Type 3" },
-  { id: 8, img: ncont4, label: "Normal Container Type 4" },
-  { id: 9, img: ncont5, label: "Normal Container Type 5" },
-];
-
+  const containerTypes = [
+    { id: 1, img: bcont1, label: "Big Container Type 1" },
+    { id: 2, img: bcont2, label: "Big Container Type 2" },
+    { id: 3, img: bcont3, label: "Big Container Type 3" },
+    { id: 4, img: bcont4, label: "Big Container Type 4" },
+    { id: 5, img: ncont1, label: "Normal Container Type 1" },
+    { id: 6, img: ncont2, label: "Normal Container Type 2" },
+    { id: 7, img: ncont3, label: "Normal Container Type 3" },
+    { id: 8, img: ncont4, label: "Normal Container Type 4" },
+    { id: 9, img: ncont5, label: "Normal Container Type 5" },
+  ];
 
   const sliderTypes = [
-    { id: 4, img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=200&fit=crop", label: "Slider type 1" },
-    { id: 5, img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=200&fit=crop", label: "Slider type 2" },
+    { id: 4, label: "Slider type 1" },
+    { id: 5, label: "Slider type 2" },
   ];
 
   const lineTypes = [
-    { id: 6, img: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=300&h=200&fit=crop", label: "Line style 1" },
-    { id: 7, img: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=300&h=200&fit=crop", label: "Line style 2" },
+    { id: 6, label: "Line style 1" },
+    { id: 7, label: "Line style 2" },
   ];
 
   const headerTypes = [
-    { id: 8, img: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=300&h=200&fit=crop", label: "Header type 1" },
-    { id: 9, img: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=300&h=200&fit=crop", label: "Header type 2" },
+    { id: 8, label: "Header type 1" },
+    { id: 9, label: "Header type 2" },
   ];
 
   const adTypes = [
-    { id: 10, img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop", label: "Ad banner 1" },
-    { id: 11, img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop", label: "Ad banner 2" },
+    { id: 10, label: "Ad banner 1" },
+    { id: 11, label: "Ad banner 2" },
+  ];
+
+  const layoutTypes = [
+    { id: 12, label: "Layout 1" },
+    { id: 13, label: "Layout 2" },
   ];
 
   const getActiveItems = () => {
-    switch(activeTab) {
-      case "containers": return containerTypes;
-      case "sliders": return sliderTypes;
-      case "lines": return lineTypes;
-      case "headers": return headerTypes;
-      case "ad": return adTypes;
-      default: return containerTypes;
+    switch (activeTab) {
+      case "containers":
+        return containerTypes;
+      case "sliders":
+        return sliderTypes;
+      case "lines":
+        return lineTypes;
+      case "headers":
+        return headerTypes;
+      case "ad":
+        return adTypes;
+      case "layouts":
+        return layoutTypes;
+      default:
+        return containerTypes;
     }
   };
 
   return (
     <Rnd
       default={{
-        x: window.innerWidth / 2 - 225,
+        x: 100,
         y: 100,
         width: 450,
         height: 600,
@@ -102,101 +275,40 @@ const containerTypes = [
       dragHandleClassName="drag-handle"
       style={{
         zIndex: 99999,
+        position: "fixed",
       }}
     >
-      <div style={{
-        width: "100%",
-        height: "100%",
-        background: "#fdfdfd",
-        borderRadius: "6px",
-        border: "1px solid #999",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-        display: "flex",
-        flexDirection: "column",
-        fontFamily: "sans-serif",
-        overflow: "hidden"
-      }}>
-        {/* Header with Close Button and Drag Handle */}
-        <div className="drag-handle" style={{
-          padding: "10px 15px",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          cursor: "move",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderBottom: "1px solid #999"
-        }}>
-          <div style={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>
-            Page Editor
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              border: "none",
-              borderRadius: "4px",
-              padding: "6px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s"
-            }}
-            onMouseEnter={(e) => e.target.style.background = "rgba(255,255,255,0.3)"}
-            onMouseLeave={(e) => e.target.style.background = "rgba(255,255,255,0.2)"}
-          >
-            <X size={18} color="white" />
+      <div className="page-editor-container">
+        <div className="page-editor-header drag-handle">
+          <div className="page-editor-title">Page Editor</div>
+          <button className="page-editor-close-btn" onClick={onClose}>
+            <X size={18} />
           </button>
         </div>
 
-        {/* Content Area */}
-        <div style={{ padding: "15px", flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
-          {/* Switch Pages Section */}
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ fontWeight: "bold", fontSize: "14px", marginBottom: "10px" }}>
-              switch pages
-            </div>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "10px" }}>
+        <div className="page-editor-content">
+          <div className="switch-pages-section">
+            <div className="section-title">switch pages</div>
+            <div className="categories-container">
               {categories.map((cat, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveCategory(cat)}
-                  style={{
-                    background: activeCategory === cat ? "#e9e9e9" : "#f6f6f6",
-                    border: "1px solid #bbb",
-                    padding: "4px 12px",
-                    borderRadius: "20px",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: activeCategory === cat ? "bold" : "normal"
-                  }}
+                  className={`category-btn ${activeCategory === cat ? "active" : ""}`}
                 >
                   {cat.toLowerCase()}
                 </button>
               ))}
             </div>
 
-            {/* Add New Page Button */}
             {!showAddInput && (
-              <button
-                onClick={() => setShowAddInput(true)}
-                style={{
-                  padding: "4px 12px",
-                  background: "#f6f6f6",
-                  border: "1px solid #bbb",
-                  borderRadius: "20px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  marginRight: "8px"
-                }}
-              >
+              <button onClick={() => setShowAddInput(true)} className="add-page-btn">
                 Add New page
               </button>
             )}
 
-            {/* Add Page Input */}
             {showAddInput && (
-              <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
+              <div className="add-page-input-container">
                 <input
                   type="text"
                   value={newCategory}
@@ -204,28 +316,9 @@ const containerTypes = [
                   onKeyPress={handleKeyPress}
                   placeholder="Enter page name..."
                   autoFocus
-                  style={{
-                    flex: 1,
-                    padding: "6px 10px",
-                    border: "1px solid #bbb",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    outline: "none"
-                  }}
+                  className="add-page-input"
                 />
-                <button
-                  onClick={handleAddCategory}
-                  style={{
-                    padding: "6px 16px",
-                    background: "#667eea",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "500"
-                  }}
-                >
+                <button onClick={handleAddCategory} className="add-page-submit-btn">
                   Add
                 </button>
                 <button
@@ -233,113 +326,49 @@ const containerTypes = [
                     setShowAddInput(false);
                     setNewCategory("");
                   }}
-                  style={{
-                    padding: "6px 16px",
-                    background: "#f0f0f0",
-                    border: "1px solid #bbb",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "12px"
-                  }}
+                  className="add-page-cancel-btn"
                 >
                   Cancel
                 </button>
               </div>
             )}
 
-            <button
-              style={{
-                padding: "4px 12px",
-                background: "#ededed",
-                border: "1px solid #bcbcbc",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "12px",
-                marginTop: "10px"
-              }}
-            >
-              Save changes
-            </button>
+            <button className="save-changes-btn">Save changes</button>
           </div>
 
-          {/* Borders and Remove Lines Buttons */}
-          <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-            <button
-              onClick={() => setShowBorders(!showBorders)}
-              style={{
-                padding: "4px 10px",
-                background: showBorders ? "#667eea" : "#ededed",
-                color: showBorders ? "white" : "#333",
-                border: "1px solid #bcbcbc",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "12px"
-              }}
-            >
+          <div className="toggle-buttons-container">
+            <button onClick={() => setShowBorders(!showBorders)} className={`toggle-btn ${showBorders ? "active" : ""}`}>
               {showBorders ? "Hide Borders" : "Show Borders"}
             </button>
-            <button
-              onClick={() => setShowLines(!showLines)}
-              style={{
-                padding: "4px 10px",
-                background: showLines ? "#667eea" : "#ededed",
-                color: showLines ? "white" : "#333",
-                border: "1px solid #bcbcbc",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "12px"
-              }}
-            >
+            <button onClick={() => setShowLines(!showLines)} className={`toggle-btn ${showLines ? "active" : ""}`}>
               {showLines ? "Remove Lines" : "Show Lines"}
             </button>
           </div>
 
-          {/* Drag and Drop Section */}
-          <div style={{ marginTop: "10px", flex: 1, display: "flex", flexDirection: "column" }}>
-            <div style={{ fontWeight: "bold", fontSize: "14px", marginBottom: "10px" }}>
-              Drag and Drop the containers
+          <div className="drag-drop-section">
+            <div className="section-title">Drag and Drop the containers</div>
+
+            <button onClick={onAddContainer} className="dds-add-cont-btn">
+              <Plus size={18} />
+              Add Container Overlay
+            </button>
+
+            <div className="dds-add-ht">
+              <div>Height</div>
+              <div className="div">
+                <input type="number" value={height} onChange={handleHeightChange} />
+              </div>
             </div>
 
-            {/* Tabs */}
-            <div style={{
-              display: "flex",
-              gap: "15px",
-              borderBottom: "1px solid #b5b5b5",
-              marginBottom: "10px"
-            }}>
-              {["containers", "sliders", "lines", "headers", "ad"].map((tab) => (
-                <div
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  style={{
-                    padding: "4px 6px",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                    color: activeTab === tab ? "#a30000" : "#444",
-                    fontWeight: activeTab === tab ? "bold" : "normal",
-                    borderBottom: activeTab === tab ? "2px solid #a30000" : "none",
-                    marginBottom: "-1px"
-                  }}
-                >
+            <div className="tabs-container">
+              {["containers", "sliders", "lines", "headers", "ad", "layouts"].map((tab) => (
+                <div key={tab} onClick={() => setActiveTab(tab)} className={`tab-item ${activeTab === tab ? "active" : ""}`}>
                   {tab}
                 </div>
               ))}
             </div>
 
-            {/* Drag Box with Items */}
-            <div style={{
-              width: "100%",
-              flex: 1,
-              background: "#eee",
-              border: "1px solid #bdbdbd",
-              borderRadius: "4px",
-              padding: "12px",
-              overflowY: "auto",
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "15px",
-              alignContent: "flex-start"
-            }}>
+            <div className="drag-box">
               {getActiveItems().map((item) => (
                 <div
                   key={item.id}
@@ -347,39 +376,13 @@ const containerTypes = [
                   onDragStart={(e) => {
                     e.dataTransfer.setData("text/plain", item.label);
                   }}
-                  style={{
-                    width: "140px",
-                    cursor: "grab",
-                    transition: "transform 0.2s"
-                  }}
-                  onMouseDown={(e) => e.currentTarget.style.cursor = "grabbing"}
-                  onMouseUp={(e) => e.currentTarget.style.cursor = "grab"}
+                  className="draggable-item"
                 >
-<img
-  src={item.img}
-  alt={item.label}
-  style={{
-    maxWidth: "120px",     // miniature size
-    maxHeight: "120px",    // miniature size
-    width: "auto",         // keep original width ratio
-    height: "auto",        // keep original height ratio
-    objectFit: "contain",  // scale without cropping
-    borderRadius: "4px",
-    border: showBorders ? "2px solid #999" : "none",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    display: "block",
-    margin: "0 auto"
-  }}
-/>
-
-                  <div style={{
-                    fontSize: "12px",
-                    marginTop: "5px",
-                    textAlign: "center",
-                    color: "#333"
-                  }}>
-                    {item.label}
-                  </div>
+                  {item.img && (
+                    <img src={item.img} alt={item.label} className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`} />
+                  )}
+                  {!item.img && <div className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`}></div>}
+                  <div className="draggable-item-label">{item.label}</div>
                 </div>
               ))}
             </div>

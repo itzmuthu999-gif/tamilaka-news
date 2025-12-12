@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
-
+import {CONTAINER_MAP} from "./Containers"
 const PerfectSlider = ({
   items = [],
   containerType = 'NewsContainer7',
@@ -10,7 +10,7 @@ const PerfectSlider = ({
   pauseOnHover = true,
   transitionDuration = 500,
   defaultVisibleItems = 4,
-  CONTAINER_MAP = {},
+  CONTAINER_MAP = {CONTAINER_MAP},
 }) => {
   const [width, setWidth] = useState(1200);
   const [position, setPosition] = useState({ x: 0, y: 0 });

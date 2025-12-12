@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Rnd } from "react-rnd";
 import "./newsfilter.scss";
+import { IoClose } from "react-icons/io5";
 
 export default function NewsFilter({ open, onClose }) {
   // Retrieve real news from Redux store
@@ -49,12 +50,13 @@ export default function NewsFilter({ open, onClose }) {
       bounds="window"
       dragHandleClassName="drag-handle-filter"
       style={{
-        zIndex: 9998
+        zIndex: 9998,position: "fixed"
       }}
     >
       <div className="ep-floater1">
         <div className="ep-close-btn-sec drag-handle-filter" style={{ cursor: "move" }}>
-          <div className="epcbs-btn" onClick={onClose}>X</div>
+          <div className="epcbs-nm">News Container</div>
+          <div className="epcbs-btn" onClick={onClose}><IoClose /></div>
         </div>
         <div className="ep-fl1-btns">
           {categories.map((cat, idx) => (

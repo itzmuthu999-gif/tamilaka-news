@@ -1,105 +1,269 @@
-.page-editor {
-  width: 450px; height: 600px;
-  padding: 15px;
-  border: 1px solid #999;
-  border-radius: 6px;
+/* Page Editor Container */
+.page-editor-container {
+  width: 100%;
+  height: 100%;
   background: #fdfdfd;
+  border-radius: 6px;
+  border: 1px solid #999;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
   font-family: sans-serif;
+  overflow: visible !important;
+  position: relative; 
+  z-index: 999999;
+  transform: translate(530px,-50px);
 }
 
-.pe-section {
+/* Header */
+.page-editor-header {
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #ff13f7 0%, #764ba2 100%);
+  cursor: move;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #999;
+}
+
+.page-editor-title {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.page-editor-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 4px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.page-editor-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Content Area */
+.page-editor-content {
+  padding: 15px;
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Switch Pages Section */
+.switch-pages-section {
   margin-bottom: 20px;
 }
 
-.pe-title {
+.section-title {
   font-weight: bold;
   font-size: 14px;
   margin-bottom: 10px;
 }
 
-.pe-page-buttons {
+.categories-container {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 10px;
 }
 
-.pe-page-btn {
+.category-btn {
   background: #f6f6f6;
   border: 1px solid #bbb;
   padding: 4px 12px;
   border-radius: 20px;
   cursor: pointer;
   font-size: 12px;
+  font-weight: normal;
 }
 
-.pe-page-btn.active {
+.category-btn.active {
   background: #e9e9e9;
   font-weight: bold;
 }
 
-.pe-row {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.pe-sm-btn {
-  padding: 4px 10px;
-  background: #ededed;
-  border: 1px solid #bcbcbc;
+.add-page-btn {
+  padding: 4px 12px;
+  background: #f6f6f6;
+  border: 1px solid #bbb;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 12px;
-  border-radius: 4px;
+  margin-right: 8px;
 }
 
-.drag-section {
+/* Add Page Input */
+.add-page-input-container {
+  display: flex;
+  gap: 8px;
   margin-top: 10px;
 }
 
-.pe-tabs {
+.add-page-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+}
+.dds-add-cont-btn
+{
+    padding: 3px 10px;
+  background: #e666ea;
+  width: fit-content;
+  margin: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: 1s;
+}
+.dds-add-cont-btn:hover
+{
+  background: #fdb9ff;
+}
+.add-page-submit-btn {
+  padding: 6px 16px;
+  background: #e666ea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.add-page-cancel-btn {
+  padding: 6px 16px;
+  background: #f0f0f0;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.save-changes-btn {
+  padding: 4px 12px;
+  background: #ededed;
+  border: 1px solid #bcbcbc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+/* Toggle Buttons */
+.toggle-buttons-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.toggle-btn {
+  padding: 4px 10px;
+  background: #ededed;
+  color: #333;
+  border: 1px solid #bcbcbc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.toggle-btn.active {
+  background: #ea66d8;
+  color: white;
+}
+
+/* Drag and Drop Section */
+.drag-drop-section {
+  margin-top: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tabs */
+.tabs-container {
   display: flex;
   gap: 15px;
   border-bottom: 1px solid #b5b5b5;
   margin-bottom: 10px;
 }
 
-.pe-tab {
+.tab-item {
   padding: 4px 6px;
   font-size: 13px;
   cursor: pointer;
   color: #444;
+  font-weight: normal;
+  border-bottom: none;
+  margin-bottom: -1px;
 }
 
-.pe-tab.active {
-  font-weight: bold;
+.tab-item.active {
   color: #a30000;
-  border-bottom: 2px solid #a30000;
+  font-weight: bold;
+  border-bottom: 2px solid #9b00a3;
 }
 
-.pe-drag-box {
+/* Drag Box */
+.drag-box {
   width: 100%;
-  height: 380px;
+  flex: 1;
   background: #eee;
   border: 1px solid #bdbdbd;
+  border-radius: 4px;
   padding: 12px;
   overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-content: flex-start;
 }
 
-.pe-box-item {
+/* Draggable Item */
+.draggable-item {
   width: 140px;
-  margin-bottom: 15px;
+  cursor: grab;
+  transition: transform 0.2s;
 }
 
-.pe-box-item img {
-  width: 100%;
-  height: 90px;
-  object-fit: cover;
+.draggable-item:active {
+  cursor: grabbing;
+}
+
+.draggable-item-img {
+  max-width: 120px;
+  max-height: 120px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 auto;
 }
 
-.pe-box-label {
+.draggable-item-img.with-border {
+  border: 2px solid #999;
+}
+
+.draggable-item-img.no-border {
+  border: none;
+}
+
+.draggable-item-label {
   font-size: 12px;
   margin-top: 5px;
   text-align: center;
+  color: #333;
 }
