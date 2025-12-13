@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Rnd } from "react-rnd";
 import { X, Plus, Edit2, Grid3x3, Space } from "lucide-react";
 import "./pageeditor.scss";
 
@@ -12,160 +11,7 @@ import ncont2 from "../../../assets/Containers/ncont2.png";
 import ncont3 from "../../../assets/Containers/ncont3.png";
 import ncont4 from "../../../assets/Containers/ncont4.png";
 import ncont5 from "../../../assets/Containers/ncont5.png";
-
-// Simple EditableContainer Component
-export function EditableContainer({ id, onDelete, initialPosition }) {
-  const [showSettings, setShowSettings] = useState(false);
-  const [columns, setColumns] = useState(2);
-  const [gap, setGap] = useState(10);
-
-  const handleDelete = (e) => {
-    if (e.detail === 2) {
-      onDelete(id);
-    }
-  };
-
-  return (
-    <Rnd
-      default={{
-        x: initialPosition.x,
-        y: initialPosition.y,
-        width: 700,
-        height: 250,
-      }}
-      minWidth={300}
-      minHeight={150}
-      bounds="parent"
-      enableResizing={true}
-      dragHandleClassName="drag-handle-container"
-      style={{
-        border: "2px dashed #666",
-        background: "transparent",
-        position: "absolute",
-        cursor: "move"
-      }}
-    >
-      <div className="drag-handle-container" style={{ width: "100%", height: "100%", position: "relative", pointerEvents: "auto" }}>
-        <div style={{ position: "absolute", top: "8px", right: "8px", display: "flex", gap: "8px", zIndex: 1000, pointerEvents: "auto" }}>
-          <button 
-            onClick={() => setShowSettings(!showSettings)} 
-            className="control-btn edit-btn"
-            style={{ 
-              background: "green", 
-              border: "none", 
-              borderRadius: "4px", 
-              padding: "6px", 
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Edit2 size={18} color="white" />
-          </button>
-          <button 
-            onClick={handleDelete} 
-            className="control-btn delete-btn" 
-            title="Double click to delete"
-            style={{ 
-              background: "red", 
-              border: "none", 
-              borderRadius: "4px", 
-              padding: "6px", 
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <X size={18} color="white" />
-          </button>
-        </div>
-
-        {showSettings && (
-          <div 
-            className="settings-panel"
-            style={{
-              position: "absolute",
-              top: "50px",
-              right: "8px",
-              background: "white",
-              border: "2px solid #666",
-              borderRadius: "8px",
-              padding: "15px",
-              zIndex: 20,
-              minWidth: "220px",
-              boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-              <span style={{ fontWeight: "600", fontSize: "14px" }}>Settings</span>
-              <button 
-                onClick={() => setShowSettings(false)} 
-                className="settings-close"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                  display: "flex",
-                  alignItems: "center"
-                }}
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            <div style={{ marginBottom: "12px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                <Grid3x3 size={16} />
-                <label style={{ fontSize: "13px", fontWeight: "500" }}>Column Count</label>
-              </div>
-              <input
-                type="number"
-                value={columns}
-                onChange={(e) => setColumns(parseInt(e.target.value) || 1)}
-                min="1"
-                max="6"
-                className="settings-input"
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  fontSize: "13px"
-                }}
-              />
-            </div>
-
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                <Space size={16} />
-                <label style={{ fontSize: "13px", fontWeight: "500" }}>Gap (px)</label>
-              </div>
-              <input
-                type="number"
-                value={gap}
-                onChange={(e) => setGap(parseInt(e.target.value) || 0)}
-                min="0"
-                max="50"
-                className="settings-input"
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  fontSize: "13px"
-                }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    </Rnd>
-  );
-}
-
+import { GrRevert } from "react-icons/gr";
 // PageEditor Component
 export default function PageEditor({
   open = false,
@@ -182,6 +28,7 @@ export default function PageEditor({
   const [showBorders, setShowBorders] = useState(true);
   const [showLines, setShowLines] = useState(true);
   const [height, setHeight] = useState(600);
+    const [switchpos, setSwitchpos]=useState([1080,10]);
 
   if (!open) return null;
 
@@ -261,32 +108,26 @@ export default function PageEditor({
     }
   };
 
+
+
   return (
-    <Rnd
-      default={{
-        x: 100,
-        y: 100,
-        width: 450,
-        height: 600,
-      }}
-      minWidth={400}
-      minHeight={500}
-      bounds="window"
-      dragHandleClassName="drag-handle"
-      style={{
-        zIndex: 99999,
-        position: "fixed",
-      }}
-    >
-      <div className="page-editor-container">
-        <div className="page-editor-header drag-handle">
+
+      <div className="page-editor-container" style={{transform: `translate(${switchpos[0]}px,${switchpos[1]}px)`}}>
+        <div className="page-editor-header">
           <div className="page-editor-title">Page Editor</div>
-          <button className="page-editor-close-btn" onClick={onClose}>
+         <div style={{display: "flex", gap: "10px"}}>
+                    <button className="pe-rev-btn" onClick={() => setSwitchpos(v => v[0] === 1080 ? [10, 10] : [1080, 10])}><GrRevert/></button>
+         <button className="page-editor-close-btn" onClick={onClose}>
             <X size={18} />
           </button>
+
+         </div>
         </div>
 
-        <div className="page-editor-content">
+        <div className="page-editor-content" style={{ 
+          overflowY: "auto",
+          flex: 1
+        }}>
           <div className="switch-pages-section">
             <div className="section-title">switch pages</div>
             <div className="categories-container">
@@ -389,6 +230,6 @@ export default function PageEditor({
           </div>
         </div>
       </div>
-    </Rnd>
+   
   );
 }
