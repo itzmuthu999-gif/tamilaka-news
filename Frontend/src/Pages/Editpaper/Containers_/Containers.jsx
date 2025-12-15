@@ -298,6 +298,7 @@ const BigNewsContainer4V2 = ({ image, headline, time }) => (
   </div>
 );
 
+
 export const CONTAINER_MAP = {
   NewsContainer1,
   NewsContainer2,

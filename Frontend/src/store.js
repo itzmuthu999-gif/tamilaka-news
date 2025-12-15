@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import newsformReducer from "./Pages/Slice/newsformslice.js"
+import editpaperReducer from "./Pages/Slice/editpaperslice.js";
 
 const loadState = () => {
   try {
@@ -25,6 +26,7 @@ const preloadedState = {
 const store = configureStore({
   reducer: {
     newsform: newsformReducer,
+    editpaper: editpaperReducer,
   },
   preloadedState,
 });

@@ -37,7 +37,7 @@ const pageLayoutSlice = createSlice({
   name: "pageLayout",
   initialState,
   reducers: {
-    /* -------------------- PAGE -------------------- */
+
 
     addPage: {
       reducer(state, action) {
@@ -64,7 +64,6 @@ const pageLayoutSlice = createSlice({
       if (page) page.height = height;
     },
 
-    /* -------------------- CONTAINERS -------------------- */
 
     addContainer: {
       reducer(state, action) {

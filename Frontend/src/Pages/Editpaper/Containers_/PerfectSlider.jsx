@@ -138,7 +138,6 @@ const PerfectSlider = ({
               </div>
             ))}
           </div>
-
           {shouldShowControls && isHovered && (
             <>
               <button
