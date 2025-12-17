@@ -77,20 +77,6 @@ const NewsContainer6 = ({ image, headline, time }) => (
   </div>
 );
 
-// Container 7: News 2.1 - Headline, content, time on left, image on right
-// const NewsContainer21 = ({ image, headline, content, time }) => (
-//   <div className="ep-nm2-news-1">
-//     <div className="ep-nm21-sbc">
-//       <div className="epbn21-hdln">{headline}</div>
-//       <div className="epnn21-onln">{content}</div>
-//       <div className="epn-tm">{time}</div>
-//     </div>
-//     <div className="epnn21-img">
-//       <img src={image} alt="" />
-//     </div>
-//   </div>
-// );
-
 // Container 8: News 2.2 - Headline on top, content and image side by side
 const NewsContainer21 = ({ image, headline, content, time }) => (
   <div className="ep-nm2-news-2">

@@ -185,7 +185,7 @@ const [showNewsFilter, setShowNewsFilter] = useState(false); // NEW STATE
 
     <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}>
 
-      {/* <NewsContainer7 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
+      <NewsContainer7 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
       <NewsContainer8 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
  <br />
 

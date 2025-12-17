@@ -1,29 +1,14 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
 
-/**
- * FINAL DATA MODEL (CLEAN)
- *
- * pages[] = [
- *   {
- *     catName,
- *     height,
- *     containers: [
- *       {
- *         id,
- *         position: { x, y },
- *         grid: { columns, gap },
- *         items: [
- *           { slotId, newsId: null, containerType }
- *         ]
- *       }
- *     ]
- *   }
- * ]
- */
+/* ---------- helper logger ---------- */
+const logState = (state, actionName) => {
+  console.log(`📦 PAGE LAYOUT UPDATED → ${actionName}`);
+  console.log(JSON.parse(JSON.stringify(state)));
+};
 
+/* ---------- initial state ---------- */
 const initialState = {
   activePage: "main",
-
   pages: [
     {
       catName: "main",
@@ -38,10 +23,12 @@ const pageLayoutSlice = createSlice({
   initialState,
   reducers: {
 
+    /* -------------------- PAGES -------------------- */
 
     addPage: {
       reducer(state, action) {
         state.pages.push(action.payload);
+        logState(state, "addPage");
       },
       prepare(catName) {
         return {
@@ -56,20 +43,24 @@ const pageLayoutSlice = createSlice({
 
     setActivePage(state, action) {
       state.activePage = action.payload;
+      logState(state, "setActivePage");
     },
 
     setPageHeight(state, action) {
       const { catName, height } = action.payload;
       const page = state.pages.find(p => p.catName === catName);
       if (page) page.height = height;
+      logState(state, "setPageHeight");
     },
 
+    /* -------------------- CONTAINERS -------------------- */
 
     addContainer: {
       reducer(state, action) {
         const { catName, container } = action.payload;
         const page = state.pages.find(p => p.catName === catName);
         if (page) page.containers.push(container);
+        logState(state, "addContainer");
       },
       prepare(catName, position) {
         return {
@@ -77,12 +68,12 @@ const pageLayoutSlice = createSlice({
             catName,
             container: {
               id: nanoid(),
-              position,      // { x, y }
+              position, // { x, y }
               grid: {
                 columns: 2,
                 gap: 10
               },
-              items: []      // empty news slots
+              items: []
             }
           }
         };
@@ -96,6 +87,7 @@ const pageLayoutSlice = createSlice({
         ?.containers.find(c => c.id === containerId);
 
       if (cont) cont.position = position;
+      logState(state, "updateContainerPosition");
     },
 
     updateContainerGrid(state, action) {
@@ -108,6 +100,7 @@ const pageLayoutSlice = createSlice({
         cont.grid.columns = columns;
         cont.grid.gap = gap;
       }
+      logState(state, "updateContainerGrid");
     },
 
     deleteContainer(state, action) {
@@ -116,6 +109,7 @@ const pageLayoutSlice = createSlice({
       if (page) {
         page.containers = page.containers.filter(c => c.id !== containerId);
       }
+      logState(state, "deleteContainer");
     },
 
     /* -------------------- NEWS SLOTS -------------------- */
@@ -133,6 +127,7 @@ const pageLayoutSlice = createSlice({
           containerType
         });
       }
+      logState(state, "addEmptySlot");
     },
 
     dropNewsIntoSlot(state, action) {
@@ -143,6 +138,7 @@ const pageLayoutSlice = createSlice({
         ?.items.find(i => i.slotId === slotId);
 
       if (slot) slot.newsId = newsId;
+      logState(state, "dropNewsIntoSlot");
     },
 
     removeNewsFromSlot(state, action) {
@@ -153,10 +149,12 @@ const pageLayoutSlice = createSlice({
         ?.items.find(i => i.slotId === slotId);
 
       if (slot) slot.newsId = null;
+      logState(state, "removeNewsFromSlot");
     }
   }
 });
 
+/* ---------- exports ---------- */
 export const {
   addPage,
   setActivePage,

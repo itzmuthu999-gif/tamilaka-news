@@ -11,9 +11,11 @@ import { EditableContainer } from "./Components/EditableContainer";
 import logo from "../../assets/logo.png";
 import bcs from "./../../assets/bcs.jpg";
 import jwt from "./../../assets/jwt.jpg";
+import BigNewsContainer1 from "./Containers_/BigContainer1";
 import "./editpapercss.scss";
 import { BiCube } from "react-icons/bi";
 import PerfectSlider from "./Containers_/PerfectSlider";
+import BigNewsContainer3 from "./Containers_/BigContainer3";
 
 export default function Editpaper() {
   const categories = ["Politics", "Sports", "Cinema", "Weather", "Astrology", "Kids"];
@@ -118,6 +120,22 @@ export default function Editpaper() {
               onDelete={handleDeleteContainer}
             />
           ))}
+      <BigNewsContainer1
+      image={bcs}
+      headline="தமிழகத்தில் மிதமான மிதமான மிதமான மிதமான மிதமான மழை"
+      content="பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்
+                    என,பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்"
+      time="2 hours ago"
+      border= {true}
+    />
+          <BigNewsContainer3
+      image={bcs}
+      headline="தமிழகத்தில் மிதமான மிதமான மிதமான மிதமான மிதமான மழை"
+      content="பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்
+                    என,பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்"
+      time="2 hours ago"
+      border= {true}
+    />
 
           {containers.length === 0 && (
             <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}></div>

@@ -19,21 +19,19 @@ export default function NewsFilter({ open, onClose }) {
     (news) => news.data?.zonal?.trim().toLowerCase() === activeCategory.toLowerCase()
   );
 
-  // Helper function to safely get thumbnail (same as Newsbund)
+
   const getThumbnail = (thumbnail) => {
     if (!thumbnail) return null;
 
-    // If already a URL string → just use it
     if (typeof thumbnail === "string") {
       return thumbnail;
     }
 
-    // If it's a File → convert to object URL
     if (thumbnail instanceof File) {
       return URL.createObjectURL(thumbnail);
     }
 
-    // If unexpected type (object from JSON) → cannot use
+
     return null;
   };
 

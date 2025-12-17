@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Plus, Edit2, Grid3x3, Space } from "lucide-react";
-import "./pageeditor.scss";
+import { GrRevert } from "react-icons/gr";
+import './pageeditor.scss';
 
 import bcont1 from "../../../assets/Containers/bcont1.png";
 import bcont2 from "../../../assets/Containers/bcont2.png";
@@ -11,7 +12,6 @@ import ncont2 from "../../../assets/Containers/ncont2.png";
 import ncont3 from "../../../assets/Containers/ncont3.png";
 import ncont4 from "../../../assets/Containers/ncont4.png";
 import ncont5 from "../../../assets/Containers/ncont5.png";
-import { GrRevert } from "react-icons/gr";
 // PageEditor Component
 export default function PageEditor({
   open = false,
@@ -23,12 +23,14 @@ export default function PageEditor({
   const [categories, setCategories] = useState(initialCategories);
   const [activeCategory, setActiveCategory] = useState(initialCategories[0] || "");
   const [showAddInput, setShowAddInput] = useState(false);
+  const [showDeleteInput, setShowDeleteInput] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [deleteCategory, setDeleteCategory] = useState("");
   const [activeTab, setActiveTab] = useState("containers");
   const [showBorders, setShowBorders] = useState(true);
   const [showLines, setShowLines] = useState(true);
   const [height, setHeight] = useState(600);
-    const [switchpos, setSwitchpos]=useState([1080,10]);
+  const [switchpos, setSwitchpos] = useState([1080, 10]);
 
   if (!open) return null;
 
@@ -40,9 +42,34 @@ export default function PageEditor({
     }
   };
 
+  const handleDeleteCategory = () => {
+    const categoryToDelete = deleteCategory.trim();
+    
+    // Check if the category exists
+    if (categoryToDelete && categories.includes(categoryToDelete)) {
+      const updatedCategories = categories.filter(cat => cat !== categoryToDelete);
+      setCategories(updatedCategories);
+      
+      // If the deleted category was active, switch to the first available category
+      if (activeCategory === categoryToDelete) {
+        setActiveCategory(updatedCategories[0] || "");
+      }
+    }
+    
+    // Close the delete input regardless of whether deletion happened
+    setDeleteCategory("");
+    setShowDeleteInput(false);
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleAddCategory();
+    }
+  };
+
+  const handleDeleteKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleDeleteCategory();
     }
   };
 
@@ -107,129 +134,155 @@ export default function PageEditor({
         return containerTypes;
     }
   };
-
-
-
   return (
-
-      <div className="page-editor-container" style={{transform: `translate(${switchpos[0]}px,${switchpos[1]}px)`}}>
-        <div className="page-editor-header">
-          <div className="page-editor-title">Page Editor</div>
-         <div style={{display: "flex", gap: "10px"}}>
-                    <button className="pe-rev-btn" onClick={() => setSwitchpos(v => v[0] === 1080 ? [10, 10] : [1080, 10])}><GrRevert/></button>
-         <button className="page-editor-close-btn" onClick={onClose}>
+    <div className="page-editor-container" style={{transform: `translate(${switchpos[0]}px,${switchpos[1]}px)`}}>
+      <div className="page-editor-header">
+        <div className="page-editor-title">Page Editor</div>
+        <div style={{display: "flex", gap: "10px"}}>
+          <button className="pe-rev-btn" onClick={() => setSwitchpos(v => v[0] === 1080 ? [10, 10] : [1080, 10])}>
+            <GrRevert/>
+          </button>
+          <button className="page-editor-close-btn" onClick={onClose}>
             <X size={18} />
           </button>
-
-         </div>
         </div>
+      </div>
 
-        <div className="page-editor-content" style={{ 
-          overflowY: "auto",
-          flex: 1
-        }}>
-          <div className="switch-pages-section">
-            <div className="section-title">switch pages</div>
-            <div className="categories-container">
-              {categories.map((cat, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`category-btn ${activeCategory === cat ? "active" : ""}`}
-                >
-                  {cat.toLowerCase()}
-                </button>
-              ))}
-            </div>
+      <div className="page-editor-content" style={{ 
+        overflowY: "auto",
+        flex: 1
+      }}>
+        <div className="switch-pages-section">
+          <button className="save-changes-btn">Save changes</button>
+          <div className="section-title">switch pages</div>
+          <div className="categories-container">
+            {categories.map((cat, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveCategory(cat)}
+                className={`category-btn ${activeCategory === cat ? "active" : ""}`}
+              >
+                {cat.toLowerCase()}
+              </button>
+            ))}
+          </div>
 
-            {!showAddInput && (
+          {!showAddInput && !showDeleteInput && (
+            <>
               <button onClick={() => setShowAddInput(true)} className="add-page-btn">
                 Add New page
               </button>
-            )}
+              <button onClick={() => setShowDeleteInput(true)} className="dlt-page-btn">
+                Delete page
+              </button>
+            </>
+          )}
 
-            {showAddInput && (
-              <div className="add-page-input-container">
-                <input
-                  type="text"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Enter page name..."
-                  autoFocus
-                  className="add-page-input"
-                />
-                <button onClick={handleAddCategory} className="add-page-submit-btn">
-                  Add
-                </button>
-                <button
-                  onClick={() => {
-                    setShowAddInput(false);
-                    setNewCategory("");
-                  }}
-                  className="add-page-cancel-btn"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+          {showAddInput && (
+            <div className="add-page-input-container">
+              <input
+                type="text"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Enter page name..."
+                autoFocus
+                className="add-page-input"
+              />
+              <button onClick={handleAddCategory} className="add-page-submit-btn">
+                Add
+              </button>
+              <button
+                onClick={() => {
+                  setShowAddInput(false);
+                  setNewCategory("");
+                }}
+                className="add-page-cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
 
-            <button className="save-changes-btn">Save changes</button>
+          {showDeleteInput && (
+            <div className="add-page-input-container">
+              <input
+                type="text"
+                value={deleteCategory}
+                onChange={(e) => setDeleteCategory(e.target.value)}
+                onKeyPress={handleDeleteKeyPress}
+                placeholder="Enter page name to delete..."
+                autoFocus
+                className="add-page-input"
+              />
+              <button onClick={handleDeleteCategory} className="dlt-page-btn">
+                Delete
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteInput(false);
+                  setDeleteCategory("");
+                }}
+                className="add-page-cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="toggle-buttons-container">
+          <button onClick={() => setShowBorders(!showBorders)} className={`toggle-btn ${showBorders ? "active" : ""}`}>
+            {showBorders ? "Hide Borders" : "Show Borders"}
+          </button>
+          <button onClick={() => setShowLines(!showLines)} className={`toggle-btn ${showLines ? "active" : ""}`}>
+            {showLines ? "Remove Lines" : "Show Lines"}
+          </button>
+        </div>
+
+        <div className="drag-drop-section">
+          <div className="section-title">Drag and Drop the containers</div>
+
+          <button onClick={onAddContainer} className="dds-add-cont-btn">
+            <Plus size={18} />
+            Add Container Overlay
+          </button>
+
+          <div className="dds-add-ht">
+            <div>Height</div>
+            <div className="div">
+              <input type="number" value={height} onChange={handleHeightChange} />
+            </div>
           </div>
 
-          <div className="toggle-buttons-container">
-            <button onClick={() => setShowBorders(!showBorders)} className={`toggle-btn ${showBorders ? "active" : ""}`}>
-              {showBorders ? "Hide Borders" : "Show Borders"}
-            </button>
-            <button onClick={() => setShowLines(!showLines)} className={`toggle-btn ${showLines ? "active" : ""}`}>
-              {showLines ? "Remove Lines" : "Show Lines"}
-            </button>
+          <div className="tabs-container">
+            {["containers", "sliders", "lines", "headers", "ad", "layouts"].map((tab) => (
+              <div key={tab} onClick={() => setActiveTab(tab)} className={`tab-item ${activeTab === tab ? "active" : ""}`}>
+                {tab}
+              </div>
+            ))}
           </div>
 
-          <div className="drag-drop-section">
-            <div className="section-title">Drag and Drop the containers</div>
-
-            <button onClick={onAddContainer} className="dds-add-cont-btn">
-              <Plus size={18} />
-              Add Container Overlay
-            </button>
-
-            <div className="dds-add-ht">
-              <div>Height</div>
-              <div className="div">
-                <input type="number" value={height} onChange={handleHeightChange} />
+          <div className="drag-box">
+            {getActiveItems().map((item) => (
+              <div
+                key={item.id}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("text/plain", item.label);
+                }}
+                className="draggable-item"
+              >
+                {item.img && (
+                  <img src={item.img} alt={item.label} className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`} />
+                )}
+                {!item.img && <div className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`}></div>}
+                <div className="draggable-item-label">{item.label}</div>
               </div>
-            </div>
-
-            <div className="tabs-container">
-              {["containers", "sliders", "lines", "headers", "ad", "layouts"].map((tab) => (
-                <div key={tab} onClick={() => setActiveTab(tab)} className={`tab-item ${activeTab === tab ? "active" : ""}`}>
-                  {tab}
-                </div>
-              ))}
-            </div>
-
-            <div className="drag-box">
-              {getActiveItems().map((item) => (
-                <div
-                  key={item.id}
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", item.label);
-                  }}
-                  className="draggable-item"
-                >
-                  {item.img && (
-                    <img src={item.img} alt={item.label} className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`} />
-                  )}
-                  {!item.img && <div className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`}></div>}
-                  <div className="draggable-item-label">{item.label}</div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </div>
-   
+    </div>
   );
 }
