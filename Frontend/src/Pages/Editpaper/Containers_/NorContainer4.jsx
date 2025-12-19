@@ -4,7 +4,11 @@ import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { useSelector } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
-const BigNewsContainer1 = ({ border = false, onDelete }) => {
+
+const NorContainer4 = ({
+  border = false,
+  onDelete
+}) => {
   const [version, setVersion] = useState(1);
   const [newsId, setNewsId] = useState(null);
   const navigate = useNavigate();
@@ -67,53 +71,114 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
 
   return (
     <div
-      className="ep-bg-news-1"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onClick={handleNavigate}
-      style={{
-        border: border ? "2px dotted #999" : "none",
-        position: "relative",
-      }}
+
+      className={version === 1 ? "ep-nm-news-7" : "ep-nm-news-8"}
+  onDrop={handleDrop}
+  onDragOver={handleDragOver}
+  onClick={handleNavigate}
+  style={{
+    border: border ? "2px dotted #999" : "none",
+    position: "relative"
+  }}
     >
-      <style>
-        {`
-     .ep-bg-news-1 {
-  width: 800px; 
-  height: fit-content;
+        <style>
+    {
+        `
+        .ep-nm-news-7 {
+  width: 300px;
+  height: 100px;
+  max-width: 300px;
+  max-height: 100px;
   // border: solid;
-  margin: 5px;
+  flex: 0 0 300px;
+  margin: 4px;
+  overflow: hidden;
+  display: flex;
+  gap: 10px;
   transition: 0.5s ease-in-out;
   cursor: pointer;
 }
-.ep-bg-news-1:hover {
+.ep-nm-news-7:hover {
   color: rgb(237, 1, 141);
 }
 
-.epbn1-img {
-  width: 800px;
-  height: 500px;
+.ep-nm7-sbc {
+  max-width: 200px;
+}
+.epnn7-img {
+  width: 100px;
+  height: 100px;
   border-radius: 5px;
   overflow: hidden;
+  flex-shrink: 0;
 }
-.epbn1-img img {
+.epnn7-img img {
   width: 100%;
   height: 100%;
   object-fit: cover; /* This will make the image fill the box nicely */
 }
-.epbn1-hdln {
-  font-size: 25px;
+
+.epnn7-hdln {
+  font-size: 15px;
   font-weight: bold;
+  height: 84px;
+  overflow: hidden;
 }
 
-.epbn1-onln {
-  font-size: 14px;
+/// normal news container 8
+.ep-nm-news-8 {
+  width: 300px;
+  height: 100px;
+  max-width: 300px;
+  max-height: 100px;
+  // border: solid;
+  flex: 0 0 300px;
+  margin: 4px;
+  overflow: hidden;
+  display: flex;
+  gap: 10px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-8:hover {
+  color: rgb(237, 1, 141);
+}
+
+.ep-nm8-sbc {
+  max-width: 200px;
+}
+.epnn8-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.epnn8-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+
+.epnn8-hdln {
+  font-size: 15px;
+  font-weight: bold;
+  height: 84px;
+  overflow: hidden;
+}
+
+.epn-tm {
+  font-size: 10px;
+  color: gray;
+  // background-color: blue;
 }
 
 
-`}
-      </style>
-      {/* Action Buttons */}
+        
+        `
+    }
+</style>
+      {/* Action buttons */}
       {border && (
         <div
           style={{
@@ -122,78 +187,66 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
             right: "8px",
             display: "flex",
             gap: "6px",
+            zIndex: 10,
           }}
         >
-          {/* Change Button */}
+          {/* Change layout */}
           <button
             onClick={handleChange}
-            style={{
-              background: "transparent",
-              color: "lightblue",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-            }}
+            style={iconBtnStyle}
+            title="Change layout"
           >
             <TbArrowsExchange />
           </button>
 
-          {/* Close Button (DOUBLE CLICK) */}
+          {/* Delete (double click) */}
           <button
             onDoubleClick={handleDelete}
+            style={iconBtnStyle}
             title="Double click to delete"
-            style={{
-              fontWeight: "bold",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-              color: "red",
-            }}
           >
             <IoIosClose />
           </button>
         </div>
       )}
 
-      {/* VERSION 1 */}
+      {/* VERSION 1 – Image left */}
       {version === 1 && (
         <>
-          <div className="epbn1-img">
+          <div className="epnn7-img">
             <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
+          <div className="ep-nm7-sbc">
+            <div className="epnn7-hdln">{renderData.trimmedContent}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </div>
         </>
       )}
 
-      {/* VERSION 2 */}
+      {/* VERSION 2 – Image right */}
       {version === 2 && (
         <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-img">
+          <div className="ep-nm8-sbc">
+            <div className="epnn8-hdln">{renderData.trimmedContent}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </div>
+          <div className="epnn8-img">
             <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
-        </>
-      )}
-
-      {/* VERSION 3 */}
-      {version === 3 && (
-        <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epbn1-img">
-            <img src={renderData.image} alt="" />
-          </div>
-          <div className="epn-tm">{renderData.time}</div>
         </>
       )}
     </div>
   );
 };
 
-export default BigNewsContainer1;
+const iconBtnStyle = {
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "18px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export default NorContainer4;

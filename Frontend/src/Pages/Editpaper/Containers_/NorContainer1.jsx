@@ -4,7 +4,8 @@ import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { useSelector } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
-const BigNewsContainer1 = ({ border = false, onDelete }) => {
+
+const NorContainer1 = ({ border = false, onDelete }) => {
   const [version, setVersion] = useState(1);
   const [newsId, setNewsId] = useState(null);
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
 
   return (
     <div
-      className="ep-bg-news-1"
+      className={version === 1 ? "ep-nm-news-1" : "ep-nm-news-2"}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onClick={handleNavigate}
@@ -78,40 +79,78 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
     >
       <style>
         {`
-     .ep-bg-news-1 {
-  width: 800px; 
+
+
+        .ep-nm-news-1 {
+  width: 800px;
   height: fit-content;
-  // border: solid;
   margin: 5px;
+  display: flex;
+  gap: $gap2;
   transition: 0.5s ease-in-out;
   cursor: pointer;
 }
-.ep-bg-news-1:hover {
+.ep-nm-news-1:hover {
   color: rgb(237, 1, 141);
 }
-
-.epbn1-img {
-  width: 800px;
-  height: 500px;
+.epnn1-img {
+  width: 390px;height: 200px;
+  max-width: 700px;
+  max-height: 200px;
   border-radius: 5px;
   overflow: hidden;
 }
-.epbn1-img img {
+.epnn1-img img {
   width: 100%;
   height: 100%;
   object-fit: cover; /* This will make the image fill the box nicely */
 }
-.epbn1-hdln {
-  font-size: 25px;
+.epnn1-hdln {
+  font-size: 20px;
   font-weight: bold;
 }
 
-.epbn1-onln {
-  font-size: 14px;
+.epnn1-onln {
+  font-size: 13px;
 }
 
+/// normal news container 2
+.ep-nm-news-2 {
+  width: 800px;
+  height: fit-content;
+  // border: solid;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-2:hover {
+  color: rgb(237, 1, 141);
+}
 
-`}
+.epnn2-img {
+  width: 1000px;
+
+  height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn2-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epnn2-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epnn2-onln {
+  font-size: 13px;
+}
+
+        `}
       </style>
       {/* Action Buttons */}
       {border && (
@@ -122,35 +161,23 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
             right: "8px",
             display: "flex",
             gap: "6px",
+            zIndex: 10,
           }}
         >
-          {/* Change Button */}
+          {/* Change layout */}
           <button
             onClick={handleChange}
-            style={{
-              background: "transparent",
-              color: "lightblue",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-            }}
+            style={iconBtnStyle}
+            title="Change layout"
           >
             <TbArrowsExchange />
           </button>
 
-          {/* Close Button (DOUBLE CLICK) */}
+          {/* Delete (double click) */}
           <button
             onDoubleClick={handleDelete}
+            style={iconBtnStyle}
             title="Double click to delete"
-            style={{
-              fontWeight: "bold",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-              color: "red",
-            }}
           >
             <IoIosClose />
           </button>
@@ -160,40 +187,42 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
       {/* VERSION 1 */}
       {version === 1 && (
         <>
-          <div className="epbn1-img">
+          <div className="epnn1-img">
             <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
+          <div className="ep-nm1-sbc">
+            <div className="epnn1-hdln">{renderData.headline}</div>
+            <div className="epnn1-onln">{renderData.content}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </div>
         </>
       )}
 
       {/* VERSION 2 */}
       {version === 2 && (
         <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-img">
+          <div className="ep-nm2-sbc">
+            <div className="epnn2-hdln">{renderData.headline}</div>
+            <div className="epnn2-onln">{renderData.content}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </div>
+          <div className="epnn2-img">
             <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
-        </>
-      )}
-
-      {/* VERSION 3 */}
-      {version === 3 && (
-        <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epbn1-img">
-            <img src={renderData.image} alt="" />
-          </div>
-          <div className="epn-tm">{renderData.time}</div>
         </>
       )}
     </div>
   );
 };
 
-export default BigNewsContainer1;
+const iconBtnStyle = {
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "18px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export default NorContainer1;

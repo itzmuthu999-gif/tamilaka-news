@@ -12,7 +12,7 @@ import ncont2 from "../../../assets/Containers/ncont2.png";
 import ncont3 from "../../../assets/Containers/ncont3.png";
 import ncont4 from "../../../assets/Containers/ncont4.png";
 import ncont5 from "../../../assets/Containers/ncont5.png";
-// PageEditor Component
+
 export default function PageEditor({
   open = false,
   onClose = () => {},
@@ -45,18 +45,15 @@ export default function PageEditor({
   const handleDeleteCategory = () => {
     const categoryToDelete = deleteCategory.trim();
     
-    // Check if the category exists
     if (categoryToDelete && categories.includes(categoryToDelete)) {
       const updatedCategories = categories.filter(cat => cat !== categoryToDelete);
       setCategories(updatedCategories);
       
-      // If the deleted category was active, switch to the first available category
       if (activeCategory === categoryToDelete) {
         setActiveCategory(updatedCategories[0] || "");
       }
     }
     
-    // Close the delete input regardless of whether deletion happened
     setDeleteCategory("");
     setShowDeleteInput(false);
   };
@@ -84,11 +81,12 @@ export default function PageEditor({
     { id: 2, img: bcont2, label: "Big Container Type 2" },
     { id: 3, img: bcont3, label: "Big Container Type 3" },
     { id: 4, img: bcont4, label: "Big Container Type 4" },
-    { id: 5, img: ncont1, label: "Normal Container Type 1" },
-    { id: 6, img: ncont2, label: "Normal Container Type 2" },
-    { id: 7, img: ncont3, label: "Normal Container Type 3" },
-    { id: 8, img: ncont4, label: "Normal Container Type 4" },
-    { id: 9, img: ncont5, label: "Normal Container Type 5" },
+    { id: 5, img: bcont4, label: "Big Container Type 5" },
+    { id: 6, img: ncont1, label: "Normal Container Type 1" },
+    { id: 7, img: ncont2, label: "Normal Container Type 2" },
+    { id: 8, img: ncont3, label: "Normal Container Type 3" },
+    { id: 9, img: ncont4, label: "Normal Container Type 4" },
+    { id: 10, img: ncont5, label: "Normal Container Type 5" },
   ];
 
   const sliderTypes = [
@@ -134,6 +132,7 @@ export default function PageEditor({
         return containerTypes;
     }
   };
+
   return (
     <div className="page-editor-container" style={{transform: `translate(${switchpos[0]}px,${switchpos[1]}px)`}}>
       <div className="page-editor-header">
@@ -269,9 +268,17 @@ export default function PageEditor({
                 key={item.id}
                 draggable
                 onDragStart={(e) => {
+                  // Set the data to be transferred
                   e.dataTransfer.setData("text/plain", item.label);
+                  // Set effect to copy (shows + cursor icon)
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+                onDragEnd={(e) => {
+                  // This ensures the original stays in place
+                  e.preventDefault();
                 }}
                 className="draggable-item"
+                style={{ cursor: "grab" }}
               >
                 {item.img && (
                   <img src={item.img} alt={item.label} className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`} />

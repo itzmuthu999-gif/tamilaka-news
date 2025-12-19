@@ -100,15 +100,14 @@ export default function Newsbund() {
                     Delete
                   </button>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    dispatch(setCurrentNews(news));
-                    navigate("/preview");
-                  }}
-                >
-                  Preview
-                </button>
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    navigate(`/preview/${news.id}`);
+  }}
+>
+  Preview
+</button>
 
 
 

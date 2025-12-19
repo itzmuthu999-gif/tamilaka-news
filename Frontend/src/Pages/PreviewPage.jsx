@@ -8,19 +8,24 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
+import { useParams } from "react-router-dom";
+
 
 export default function PreviewPage() {
-  const currentNews = useSelector((state) => state.newsform.currentNews);
-  const MLayout = useSelector((state) => state.newsform.MLayout);
+  const { id } = useParams();
+const allNews = useSelector((state) => state.newsform.allNews);
 
-  if (!currentNews) {
+const currentNews = allNews.find(
+  (news) => news.id === Number(id)
+);
+
+  const MLayout = useSelector((state) => state.newsform.MLayout);
+  if (!currentNews) 
     return <div style={{ padding: 40 }}>No news selected for preview.</div>;
-  }
+  
 
   const { data, fullContent } = currentNews;
 
-  /* ------------------------- thumbnail handling ------------------------- */
-  /* ------------------------- thumbnail handling ------------------------- */
   const thumb = (() => {
     if (!data?.thumbnail) return { url: luffy, isVideo: false };
 

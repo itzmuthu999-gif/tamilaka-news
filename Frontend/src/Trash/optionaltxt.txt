@@ -185,46 +185,48 @@ const [showNewsFilter, setShowNewsFilter] = useState(false); // NEW STATE
 
     <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}>
 
-      <NewsContainer7 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
-      <NewsContainer8 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
- <br />
 
-      <NewsContainer3 image={sampleImage} content={sampleContent} time={sampleTime}/>
-      <NewsContainer4 image={sampleImage} content={sampleContent} time={sampleTime} />
-   <br />    
-      <NewsContainer5 image={sampleImage} headline={sampleHeadline} time={sampleTime} />
-      <NewsContainer6 image={sampleImage} headline={sampleHeadline} time={sampleTime} />
- <br />
 
- <br />
       <NewsContainer21 image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
       <NewsContainer22 image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
  <br />
 
+
+
+bg v1 and v2
+      <NewsContainer7 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
+      <NewsContainer8 image={sampleImage} headline={sampleHeadline}  time={sampleTime} />
+ 
+
+      <NewsContainer5 image={sampleImage} headline={sampleHeadline} time={sampleTime} />
+      <NewsContainer6 image={sampleImage} headline={sampleHeadline} time={sampleTime} />
+
+      <NewsContainer3 image={sampleImage} content={sampleContent} time={sampleTime}/>
+      <NewsContainer4 image={sampleImage} content={sampleContent} time={sampleTime} />
       <NewsContainer1            image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
       <NewsContainer2            image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
  <br />
-
-bg v1 and v2
       <BigNewsContainer1V1       image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
       <BigNewsContainer1V2       image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
       <BigNewsContainer1V3       image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
 
-<br />      
-      <BigNewsContainer2V1         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
-      <BigNewsContainer2V2         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
-<br />
-      <BigNewsContainer5V1         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
-      <BigNewsContainer5V2         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
-<br/>
-
       <BigNewsContainer3V1       image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
       <BigNewsContainer3V2       image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
       <BigNewsContainer3V3       image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
-
-    <br />
+    <BigNewsContainer2V1         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
+      <BigNewsContainer2V2         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
       <BigNewsContainer4V1       image={sampleImage} headline={sampleHeadline} time={sampleTime} />
-      <BigNewsContainer4V2       image={sampleImage} headline={sampleHeadline} time={sampleTime} /> */}
+      <BigNewsContainer4V2       image={sampleImage} headline={sampleHeadline} time={sampleTime} /> 
+
+      <BigNewsContainer5V1         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
+      <BigNewsContainer5V2         image={sampleImage} headline={sampleHeadline} content={sampleContent} time={sampleTime} />
+
+
+<br />      
+
+
+
+*/}
                 {/* <PerfectSlider
           items={sampleItems}
           containerType="NewsContainer7"

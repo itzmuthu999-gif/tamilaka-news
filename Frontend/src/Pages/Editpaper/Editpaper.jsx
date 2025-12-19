@@ -9,13 +9,22 @@ import NewsFilter from "./Components/NewsFilter";
 import PageEditor from "./Components/PageEditor";
 import { EditableContainer } from "./Components/EditableContainer";
 import logo from "../../assets/logo.png";
-import bcs from "./../../assets/bcs.jpg";
-import jwt from "./../../assets/jwt.jpg";
+// import bcs from "./../../assets/bcs.jpg";
+// import jwt from "./../../assets/jwt.jpg";
 import BigNewsContainer1 from "./Containers_/BigContainer1";
+
 import "./editpapercss.scss";
 import { BiCube } from "react-icons/bi";
 import PerfectSlider from "./Containers_/PerfectSlider";
 import BigNewsContainer3 from "./Containers_/BigContainer3";
+import BigNewsContainer2 from "./Containers_/BigContainer2";
+import BigNewsContainer4 from "./Containers_/BigContainer4";
+import BigNewsContainer5 from "./Containers_/BigContainer5";
+import NorContainer1 from "./Containers_/NorContainer1";
+import NorContainer2 from "./Containers_/NorContainer2";
+import NorContainer3 from "./Containers_/NorContainer3";
+import NorContainer4 from "./Containers_/NorContainer4";
+import NorContainer5 from "./Containers_/NorContainer5";
 
 export default function Editpaper() {
   const categories = ["Politics", "Sports", "Cinema", "Weather", "Astrology", "Kids"];
@@ -104,13 +113,14 @@ export default function Editpaper() {
         </div>
       </div>
 
-      <div className="break-news">
+      {/* <div className="break-news">
         <p>
           சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம் | டெல்லியில் மழை வெள்ளம் – போக்குவரத்து பாதிப்பு | பெங்களூருவில் பெரிய IT நிறுவனத்தில் திடீர் பணிநீக்கம் | தமிழகத்தில் இன்று மின்தடை அறிவிப்பு | கோவை அருகே வெடிகுண்டு பரபரப்பு – போலீஸ் விசாரணை தொடக்கம் | பங்குச்சந்தை சரிவு – முதலீட்டாளர்கள் அதிர்ச்சி
         </p>
-      </div>
+      </div> */}
 
       <div className="ep-main-ed-cont">
+        
         <div className="ep-ed-cont" style={{ height: `${edContHeight}px` }}>
           {containers.map((container) => (
             <EditableContainer
@@ -120,23 +130,6 @@ export default function Editpaper() {
               onDelete={handleDeleteContainer}
             />
           ))}
-      <BigNewsContainer1
-      image={bcs}
-      headline="தமிழகத்தில் மிதமான மிதமான மிதமான மிதமான மிதமான மழை"
-      content="பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்
-                    என,பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்"
-      time="2 hours ago"
-      border= {true}
-    />
-          <BigNewsContainer3
-      image={bcs}
-      headline="தமிழகத்தில் மிதமான மிதமான மிதமான மிதமான மிதமான மழை"
-      content="பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்
-                    என,பல மாவட்டங்களில் இன்று லேசான முதல் மிதமான மழை பதிவாகும்"
-      time="2 hours ago"
-      border= {true}
-    />
-
           {containers.length === 0 && (
             <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}></div>
           )}

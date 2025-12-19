@@ -4,7 +4,11 @@ import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { useSelector } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
-const BigNewsContainer1 = ({ border = false, onDelete }) => {
+
+const NorContainer3 = ({
+  border = false,
+  onDelete
+}) => {
   const [version, setVersion] = useState(1);
   const [newsId, setNewsId] = useState(null);
   const navigate = useNavigate();
@@ -65,55 +69,105 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
     navigate(`/preview/${newsId}`);
   };
 
+
   return (
     <div
-      className="ep-bg-news-1"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onClick={handleNavigate}
-      style={{
-        border: border ? "2px dotted #999" : "none",
-        position: "relative",
-      }}
+
+      className={version === 1 ? "ep-nm-news-5" : "ep-nm-news-6"}
+  onDrop={handleDrop}
+  onDragOver={handleDragOver}
+  onClick={handleNavigate}
+  style={{
+    border: border ? "2px dotted #999" : "none",
+    position: "relative"
+  }}
     >
-      <style>
-        {`
-     .ep-bg-news-1 {
-  width: 800px; 
-  height: fit-content;
+        <style>
+    {
+        `
+        
+.ep-nm-news-5 {
+  width: 395px;
+  height: 100px;
   // border: solid;
   margin: 5px;
+  overflow: hidden;
+  display: flex;
+  gap: 10px;
   transition: 0.5s ease-in-out;
   cursor: pointer;
 }
-.ep-bg-news-1:hover {
+.ep-nm-news-5:hover {
   color: rgb(237, 1, 141);
 }
 
-.epbn1-img {
-  width: 800px;
-  height: 500px;
+.ep-nm5-sbc {
+  max-width: 200px;
+}
+.epnn5-img {
+  max-width: 200px;
+  max-height: 100px;
   border-radius: 5px;
   overflow: hidden;
 }
-.epbn1-img img {
+.epnn5-img img {
   width: 100%;
   height: 100%;
   object-fit: cover; /* This will make the image fill the box nicely */
 }
-.epbn1-hdln {
-  font-size: 25px;
+.epbn5-hdln {
+  font-size: 15px;
   font-weight: bold;
+  height: 84px;
+  overflow: hidden;
 }
 
-.epbn1-onln {
-  font-size: 14px;
+.epnn5-onln {
+  font-size: 13px;
+}
+/// normal news container 6
+.ep-nm-news-6 {
+  width: 395px;
+  height: 100px;
+  // border: solid;
+  margin: 5px;
+  overflow: hidden;
+  display: flex;
+  gap: 10px;
+  // border: 1px solid;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-6:hover {
+  color: rgb(237, 1, 141);
 }
 
+.ep-nm6-sbc {
+  max-width: 200px;
+}
+.epnn6-img {
+  max-width: 200px;
+  max-height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn6-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
 
-`}
-      </style>
-      {/* Action Buttons */}
+.epbn6-hdln {
+  font-size: 15px;
+  font-weight: bold;
+  height: 84px;
+  overflow: hidden;
+}
+
+        `
+    }
+</style>
+      {/* Action buttons */}
       {border && (
         <div
           style={{
@@ -122,35 +176,23 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
             right: "8px",
             display: "flex",
             gap: "6px",
+            zIndex: 10,
           }}
         >
-          {/* Change Button */}
+          {/* Change layout */}
           <button
             onClick={handleChange}
-            style={{
-              background: "transparent",
-              color: "lightblue",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-            }}
+            style={iconBtnStyle}
+            title="Change layout"
           >
             <TbArrowsExchange />
           </button>
 
-          {/* Close Button (DOUBLE CLICK) */}
+          {/* Delete (double click) */}
           <button
             onDoubleClick={handleDelete}
+            style={iconBtnStyle}
             title="Double click to delete"
-            style={{
-              fontWeight: "bold",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-              color: "red",
-            }}
           >
             <IoIosClose />
           </button>
@@ -160,40 +202,40 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
       {/* VERSION 1 */}
       {version === 1 && (
         <>
-          <div className="epbn1-img">
+          <div className="epnn5-img">
             <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
+          <div className="ep-nm5-sbc">
+            <div className="epbn5-hdln">{renderData.trimmedContent}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </div>
         </>
       )}
 
       {/* VERSION 2 */}
       {version === 2 && (
         <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-img">
+          <div className="ep-nm6-sbc">
+            <div className="epbn6-hdln">{renderData.trimmedContent}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </div>
+          <div className="epnn6-img">
             <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
-        </>
-      )}
-
-      {/* VERSION 3 */}
-      {version === 3 && (
-        <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epbn1-img">
-            <img src={renderData.image} alt="" />
-          </div>
-          <div className="epn-tm">{renderData.time}</div>
         </>
       )}
     </div>
   );
 };
 
-export default BigNewsContainer1;
+const iconBtnStyle = {
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "18px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export default NorContainer3;

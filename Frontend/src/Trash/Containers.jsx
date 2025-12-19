@@ -25,31 +25,8 @@ const NewsContainer7 = ({ image, headline,time }) => (
   </div>
 );
 
-// Container 3: News 3 - Image on left, long content on right
-const NewsContainer3 = ({ image, content,time }) => (
-  <div className="ep-nm-news-3">
-    <div className="epnn3-img">
-      <img src={image} alt="" />
-    </div>
-    <div className="ep-nm3-sbc">
-      <div className="epnn3-onln">{content}</div>
-                   <div className="epn-tm">{time}</div>
-    </div>
-  </div>
-);
 
 // Container 4: News 4 - Content on left with time, image on right
-const NewsContainer4 = ({ image, content, time }) => (
-  <div className="ep-nm-news-4">
-    <div className="ep-nm4-sbc">
-      <div className="epnn4-onln">{content}</div>
-      <div className="epn-tm">{time}</div>
-    </div>
-    <div className="epnn4-img">
-      <img src={image} alt="" />
-    </div>
-  </div>
-);
 
 // Container 5: News 5 - Image on left, headline and time on right
 const NewsContainer5 = ({ image, headline, time }) => (
@@ -109,6 +86,32 @@ const NewsContainer22 = ({ image, headline, content, time }) => (
   </div>
 );
 
+
+// Container 3: News 3 - Image on left, long content on right
+const NewsContainer3 = ({ image, content,time }) => (
+  <div className="ep-nm-news-3">
+    <div className="epnn3-img">
+      <img src={image} alt="" />
+    </div>
+    <div className="ep-nm3-sbc">
+      <div className="epnn3-onln">{content}</div>
+                   <div className="epn-tm">{time}</div>
+    </div>
+  </div>
+);
+const NewsContainer4 = ({ image, content, time }) => (
+  <div className="ep-nm-news-4">
+    <div className="ep-nm4-sbc">
+      <div className="epnn4-onln">{content}</div>
+      <div className="epn-tm">{time}</div>
+    </div>
+    <div className="epnn4-img">
+      <img src={image} alt="" />
+    </div>
+  </div>
+);
+
+
 // Container 10: News 1 - Image on left, headline, content, time on right
 const NewsContainer1 = ({ image, headline, content, time }) => (
   <div className="ep-nm-news-1">
@@ -122,20 +125,23 @@ const NewsContainer1 = ({ image, headline, content, time }) => (
     </div>
   </div>
 );
-
-// Container 11: Big News 2 - Image on left, headline and content on right (400px width)
-const BigNewsContainer2V1 = ({ image, headline, content, time }) => (
-  <div className="ep-bg-news-2">
-    <div className="epbn2-img">
-      <img src={image} alt="" />
-    </div>
-    <div style={{ width: "400px" }}>
-      <div className="epbn2-hdln">{headline}</div>
-      <div className="epbn2-onln">{content}</div>
+const NewsContainer2 = ({ image, headline, content, time }) => (
+  <div className="ep-nm-news-2">
+    <div className="ep-nm2-sbc">
+      <div className="epnn2-hdln">{headline}</div>
+      <div className="epnn2-onln">{content}</div>
       <div className="epn-tm">{time}</div>
+    </div>
+    <div className="epnn2-img">
+      <img src={image} alt="" />
     </div>
   </div>
 );
+
+
+
+// Container 11: Big News 2 - Image on left, headline and content on right (400px width)
+
 const BigNewsContainer5V1 = ({ image, headline, content, time }) => (
   <div className="ep-bg-news5-1">
 
@@ -163,19 +169,78 @@ const BigNewsContainer5V2 = ({ image, headline, content, time }) => (
   </div>
 );
 // Container 12: News 2 - Headline, content, time on left, image on right
-const NewsContainer2 = ({ image, headline, content, time }) => (
-  <div className="ep-nm-news-2">
-    <div className="ep-nm2-sbc">
-      <div className="epnn2-hdln">{headline}</div>
-      <div className="epnn2-onln">{content}</div>
-      <div className="epn-tm">{time}</div>
-    </div>
-    <div className="epnn2-img">
+
+
+// Container 16: Big News 3 (Version 1) - Headline, image, content, time stacked
+
+// Container 18: Big News 4 (Version 1) - Image, headline, time stacked
+const BigNewsContainer4V1 = ({ image, headline, time }) => (
+  <div className="ep-bg-news-4">
+    <div className="epbn4-img">
       <img src={image} alt="" />
     </div>
+    <div className="epbn4-hdln">{headline}</div>
+    <div className="epn-tm">{time}</div>
   </div>
 );
 
+// Container 19: Big News 4 (Version 2) - Headline, time, image stacked
+const BigNewsContainer4V2 = ({ image, headline, time }) => (
+  <div className="ep-bg-news-4">
+    <div className="epbn4-hdln">{headline}</div>
+    
+    <div className="epbn4-img">
+      <img src={image} alt="" />
+    </div>
+    <div className="epn-tm">{time}</div>
+  </div>
+);
+
+const BigNewsContainer2V1 = ({ image, headline, content, time }) => (
+  <div className="ep-bg-news-2">
+    <div className="epbn2-img">
+      <img src={image} alt="" />
+    </div>
+    <div style={{ width: "400px" }}>
+      <div className="epbn2-hdln">{headline}</div>
+      <div className="epbn2-onln">{content}</div>
+      <div className="epn-tm">{time}</div>
+    </div>
+  </div>
+);
+const BigNewsContainer3V1 = ({ image, headline, content, time }) => (
+  <div className="ep-bg-news-3">
+    <div className="epbn3-hdln">{headline}</div>
+    <div className="epbn3-img">
+      <img src={image} alt="" />
+    </div>
+    <div className="epbn3-onln">{content}</div>
+    <div className="epn-tm">{time}</div>
+  </div>
+);
+const BigNewsContainer3V3 = ({ image, headline, content, time }) => (
+  <div className="ep-bg-news-3">
+    <div className="epbn3-hdln">{headline}</div>
+        <div className="epbn3-onln">{content}</div>
+    <div className="epbn3-img">
+      <img src={image} alt="" />
+    </div>
+
+    <div className="epn-tm">{time}</div>
+  </div>
+);
+
+// Container 17: Big News 3 (Version 2) - Image, headline, content, time stacked
+const BigNewsContainer3V2 = ({ image, headline, content, time }) => (
+  <div className="ep-bg-news-3">
+    <div className="epbn3-img">
+      <img src={image} alt="" />
+    </div>
+    <div className="epbn3-hdln">{headline}</div>
+    <div className="epbn3-onln">{content}</div>
+    <div className="epn-tm">{time}</div>
+  </div>
+);
 // Container 13: Big News 1 (Version 1) - Image, headline, content, time stacked
 const BigNewsContainer1V1 = ({ image, headline, content, time }) => (
   <div className="ep-bg-news-1">
@@ -210,7 +275,6 @@ const BigNewsContainer1V3 = ({ image, headline, content, time }) => (
     <div className="epn-tm">{time}</div>
   </div>
 );
-
 // Container 15: Big News 2 (Reversed) - Content on left (400px), image on right
 const BigNewsContainer2V2 = ({ image, headline, content, time }) => (
   <div className="ep-bg-news-2">
@@ -222,65 +286,6 @@ const BigNewsContainer2V2 = ({ image, headline, content, time }) => (
     <div className="epbn2-img">
       <img src={image} alt="" />
     </div>
-  </div>
-);
-
-
-// Container 16: Big News 3 (Version 1) - Headline, image, content, time stacked
-const BigNewsContainer3V1 = ({ image, headline, content, time }) => (
-  <div className="ep-bg-news-3">
-    <div className="epbn3-hdln">{headline}</div>
-    <div className="epbn3-img">
-      <img src={image} alt="" />
-    </div>
-    <div className="epbn3-onln">{content}</div>
-    <div className="epn-tm">{time}</div>
-  </div>
-);
-const BigNewsContainer3V3 = ({ image, headline, content, time }) => (
-  <div className="ep-bg-news-3">
-    <div className="epbn3-hdln">{headline}</div>
-        <div className="epbn3-onln">{content}</div>
-    <div className="epbn3-img">
-      <img src={image} alt="" />
-    </div>
-
-    <div className="epn-tm">{time}</div>
-  </div>
-);
-
-// Container 17: Big News 3 (Version 2) - Image, headline, content, time stacked
-const BigNewsContainer3V2 = ({ image, headline, content, time }) => (
-  <div className="ep-bg-news-3">
-    <div className="epbn3-img">
-      <img src={image} alt="" />
-    </div>
-    <div className="epbn3-hdln">{headline}</div>
-    <div className="epbn3-onln">{content}</div>
-    <div className="epn-tm">{time}</div>
-  </div>
-);
-
-// Container 18: Big News 4 (Version 1) - Image, headline, time stacked
-const BigNewsContainer4V1 = ({ image, headline, time }) => (
-  <div className="ep-bg-news-4">
-    <div className="epbn4-img">
-      <img src={image} alt="" />
-    </div>
-    <div className="epbn4-hdln">{headline}</div>
-    <div className="epn-tm">{time}</div>
-  </div>
-);
-
-// Container 19: Big News 4 (Version 2) - Headline, time, image stacked
-const BigNewsContainer4V2 = ({ image, headline, time }) => (
-  <div className="ep-bg-news-4">
-    <div className="epbn4-hdln">{headline}</div>
-    
-    <div className="epbn4-img">
-      <img src={image} alt="" />
-    </div>
-    <div className="epn-tm">{time}</div>
   </div>
 );
 

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
-import {CONTAINER_MAP} from "./Containers"
+import {CONTAINER_MAP} from "../../../Trash/Containers"
 const PerfectSlider = ({
   items = [],
   containerType = 'NewsContainer7',

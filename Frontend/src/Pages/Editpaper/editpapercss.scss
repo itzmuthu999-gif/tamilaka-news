@@ -55,6 +55,7 @@
 }
 
 .ep-main-ed-cont {
+  padding-top: 20px;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -164,102 +165,10 @@
 $gap1: 5px;
 $gap2: 15px;
 
-.ep-bg-news-1 {
-  width: 800px;
-  height: fit-content;
-  // border: solid;
-  margin: 5px;
-  transition: 0.5s ease-in-out;
-  cursor: pointer;
-}
-.ep-bg-news-1:hover {
-  color: rgb(237, 1, 141);
-}
-
-.epbn1-img {
-  width: 800px;
-  height: 500px;
-  border-radius: $gap1;
-  overflow: hidden;
-}
-.epbn1-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This will make the image fill the box nicely */
-}
-.epbn1-hdln {
-  font-size: 25px;
-  font-weight: bold;
-}
-
-.epbn1-onln {
-  font-size: 14px;
-}
 
 // big news container 2
-.ep-bg-news-2 {
-  width: 800px;
-  height: fit-content;
-  margin: 5px;
-  display: flex;
-  gap: $gap2;
-  transition: 0.5s ease-in-out;
-  cursor: pointer;
-}
-.ep-bg-news-2:hover {
-  color: rgb(237, 1, 141);
-}
-
-.epbn2-img {
-  width: 500px;
-  height: 350px;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.epbn2-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This will make the image fill the box nicely */
-}
-.epbn2-hdln {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.epbn2-onln {
-  font-size: 13px;
-}
 
 // big news container 3
-.ep-bg-news-3 {
-  width: 400px;
-  height: fit-content;
-  margin: 5px;
-  transition: 0.5s ease-in-out;
-  cursor: pointer;
-}
-.ep-bg-news-3:hover {
-  color: rgb(237, 1, 141);
-}
-.epbn3-img {
-  width: 400px;
-  height: 350px;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.epbn3-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This will make the image fill the box nicely */
-}
-.epbn3-hdln {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.epbn3-onln {
-  font-size: 13px;
-}
 //big news version 5 container 1
 .ep-bg-news5-1 {
   width: 1000px;
@@ -295,32 +204,6 @@ $gap2: 15px;
 }
 
 // big news container 3
-.ep-bg-news-4 {
-  width: 400px;
-  height: fit-content;
-  margin: 5px;
-  transition: 0.5s ease-in-out;
-  cursor: pointer;
-}
-.ep-bg-news-4:hover {
-  color: rgb(237, 1, 141);
-}
-
-.epbn4-img {
-  width: 400px;
-  height: 350px;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.epbn4-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This will make the image fill the box nicely */
-}
-.epbn4-hdln {
-  font-size: 20px;
-  font-weight: bold;
-}
 
 ////normal news
 /// normal news container 1
@@ -618,6 +501,12 @@ $gap2: 15px;
 .ep-nm22-sbc {
   display: flex;
 }
+.ep-nm23sbc-c1,.ep-nm22sbc-c1
+{
+  display: flex;flex-direction: column;gap: 2px;
+  width: 320px;
+
+}
 ////normal container phase 2 - 3
 .ep-nm2-news-3 {
   width: 425px;
@@ -657,7 +546,10 @@ $gap2: 15px;
   display: flex;
   gap: $gap2;
 }
-
+.ep-nm23sbc-c1
+{
+  display: flex;flex-direction: column;gap: 2px;
+}
 /// normal news container 7
 .ep-nm-news-7 {
   width: 300px;
@@ -747,4 +639,74 @@ $gap2: 15px;
   color: gray;
   // background-color: blue;
 }
+
+        .ep-nm-news-1 {
+  width: 800px;
+  height: fit-content;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-1:hover {
+  color: rgb(237, 1, 141);
+}
+.epnn1-img {
+  width: 1000px;
+
+  height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn1-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epnn1-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epnn1-onln {
+  font-size: 13px;
+}
+
+/// normal news container 2
+.ep-nm-news-2 {
+  width: 800px;
+  height: fit-content;
+  // border: solid;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-2:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn2-img {
+  width: 1000px;
+
+  height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn2-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epnn2-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epnn2-onln {
+  font-size: 13px;
+}
+
 

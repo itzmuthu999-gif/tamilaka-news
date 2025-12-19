@@ -3,21 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { useSelector } from "react-redux";
-import jwt from "../../../assets/jwt.jpg";
-const BigNewsContainer1 = ({ border = false, onDelete }) => {
-  const [version, setVersion] = useState(1);
+import jwt from "../../../assets/jwt.jpg"
+
+const BigNewsContainer4 = ({
+  border = false,
+  onDelete,
+}) => {
+const [version, setVersion] = useState(1);
   const [newsId, setNewsId] = useState(null);
   const navigate = useNavigate();
 
-  const allNews = useSelector((state) => state.newsform.allNews);
-  const news = allNews.find((n) => n.id === newsId);
+  const allNews = useSelector(state => state.newsform.allNews);
+  const news = allNews.find(n => n.id === newsId);
 
   const DEFAULT_DATA = {
     image: jwt,
     headline: "Breaking News Headline Comes Here",
-    content:
-      "This is a short description of the news. Drop a news card to replace this content.",
-    time: "Just now",
+    content: "This is a short description of the news. Drop a news card to replace this content.",
+    time: "Just now"
   };
 
   const renderData = news
@@ -33,7 +36,7 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: news.time || DEFAULT_DATA.time,
+        time: news.time || DEFAULT_DATA.time
       }
     : DEFAULT_DATA;
 
@@ -51,7 +54,7 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
 
   const handleChange = (e) => {
     e.stopPropagation();
-    setVersion((prev) => (prev === 3 ? 1 : prev + 1));
+    setVersion(prev => (prev === 3 ? 1 : prev + 1));
   };
 
   const handleDelete = (e) => {
@@ -60,59 +63,57 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
     onDelete?.();
   };
 
-  const handleNavigate = () => {
-    if (!newsId) return; // don't navigate for default template
-    navigate(`/preview/${newsId}`);
-  };
+const handleNavigate = () => {
+  if (!newsId) return; // don't navigate for default template
+  navigate(`/preview/${newsId}`);
+};
 
   return (
     <div
-      className="ep-bg-news-1"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onClick={handleNavigate}
-      style={{
-        border: border ? "2px dotted #999" : "none",
-        position: "relative",
-      }}
+      className="ep-bg-news-4"
+  onDrop={handleDrop}
+  onDragOver={handleDragOver}
+  onClick={handleNavigate}
+  style={{
+    border: border ? "2px dotted #999" : "none",
+    position: "relative"
+  }}
     >
-      <style>
-        {`
-     .ep-bg-news-1 {
-  width: 800px; 
+        <style>
+    {
+        `
+        .ep-bg-news-4 {
+  width: 400px;
   height: fit-content;
-  // border: solid;
   margin: 5px;
   transition: 0.5s ease-in-out;
   cursor: pointer;
+  gap: 5px;
 }
-.ep-bg-news-1:hover {
+.ep-bg-news-4:hover {
   color: rgb(237, 1, 141);
 }
 
-.epbn1-img {
-  width: 800px;
-  height: 500px;
+.epbn4-img {
+  width: 400px;
+  height: 350px;
   border-radius: 5px;
   overflow: hidden;
 }
-.epbn1-img img {
+.epbn4-img img {
   width: 100%;
   height: 100%;
   object-fit: cover; /* This will make the image fill the box nicely */
 }
-.epbn1-hdln {
-  font-size: 25px;
+.epbn4-hdln {
+  font-size: 20px;
   font-weight: bold;
 }
 
-.epbn1-onln {
-  font-size: 14px;
-}
-
-
-`}
-      </style>
+        
+        `
+    }
+</style>
       {/* Action Buttons */}
       {border && (
         <div
@@ -122,35 +123,23 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
             right: "8px",
             display: "flex",
             gap: "6px",
+            zIndex: 10,
           }}
         >
-          {/* Change Button */}
+          {/* Change layout */}
           <button
             onClick={handleChange}
-            style={{
-              background: "transparent",
-              color: "lightblue",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-            }}
+            style={iconBtnStyle}
+            title="Change layout"
           >
             <TbArrowsExchange />
           </button>
 
-          {/* Close Button (DOUBLE CLICK) */}
+          {/* Delete (double click) */}
           <button
             onDoubleClick={handleDelete}
+            style={iconBtnStyle}
             title="Double click to delete"
-            style={{
-              fontWeight: "bold",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
-              color: "red",
-            }}
           >
             <IoIosClose />
           </button>
@@ -160,11 +149,10 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
       {/* VERSION 1 */}
       {version === 1 && (
         <>
-          <div className="epbn1-img">
+          <div className="epbn4-img">
             <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
+          <div className="epbn4-hdln">{renderData.headline}</div>
           <div className="epn-tm">{renderData.time}</div>
         </>
       )}
@@ -172,21 +160,8 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
       {/* VERSION 2 */}
       {version === 2 && (
         <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-img">
-            <img src={renderData.image} alt="" />
-          </div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
-        </>
-      )}
-
-      {/* VERSION 3 */}
-      {version === 3 && (
-        <>
-          <div className="epbn1-hdln">{renderData.headline}</div>
-          <div className="epbn1-onln">{renderData.content}</div>
-          <div className="epbn1-img">
+          <div className="epbn4-hdln">{renderData.headline}</div>
+          <div className="epbn4-img">
             <img src={renderData.image} alt="" />
           </div>
           <div className="epn-tm">{renderData.time}</div>
@@ -196,4 +171,14 @@ const BigNewsContainer1 = ({ border = false, onDelete }) => {
   );
 };
 
-export default BigNewsContainer1;
+const iconBtnStyle = {
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "18px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export default BigNewsContainer4;

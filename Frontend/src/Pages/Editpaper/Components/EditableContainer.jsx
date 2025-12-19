@@ -1,18 +1,70 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import { X, Plus, Edit2, Grid3x3, Space } from "lucide-react";
+import BigNewsContainer1 from "../Containers_/BigContainer1";
+import BigNewsContainer2 from "../Containers_/BigContainer2";
+import BigNewsContainer3 from "../Containers_/BigContainer3";
+import BigNewsContainer4 from "../Containers_/BigContainer4";
+import BigNewsContainer5 from "../Containers_/BigContainer5";
 
+import NorContainer1 from "../Containers_/NorContainer1";
+import NorContainer2 from "../Containers_/NorContainer2";
+import NorContainer3 from "../Containers_/NorContainer3";
+import NorContainer4 from "../Containers_/NorContainer4";
+import NorContainer5 from "../Containers_/NorContainer5";
+
+import jwt from "../../../assets/jwt.jpg";
 
 export function EditableContainer({ id, onDelete, initialPosition }) {
   const [showSettings, setShowSettings] = useState(false);
   const [columns, setColumns] = useState(2);
   const [gap, setGap] = useState(10);
+  const [droppedContainers, setDroppedContainers] = useState([]);
 
   const handleDelete = (e) => {
     if (e.detail === 2) {
       onDelete(id);
     }
   };
+
+const handleDrop = (e) => {
+  e.preventDefault();
+  const type = e.dataTransfer.getData("text/plain");
+
+  const newContainer = {
+    id: Date.now(),
+    type,
+    data: {
+      image: jwt,
+      headline: `Sample Headline for ${type}`,
+      content: "This is sample content for the news container.",
+      time: "2 hours ago",
+    },
+  };
+
+  setDroppedContainers((prev) => [...prev, newContainer]);
+};
+
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDeleteDroppedContainer = (containerId) => {
+    setDroppedContainers(droppedContainers.filter(c => c.id !== containerId));
+  };
+const COMPONENT_MAP = {
+  "Big Container Type 1": BigNewsContainer1,
+  "Big Container Type 2": BigNewsContainer2,
+  "Big Container Type 3": BigNewsContainer3,
+  "Big Container Type 4": BigNewsContainer4,
+  "Big Container Type 5": BigNewsContainer5,
+  "Normal Container Type 1": NorContainer1,
+  "Normal Container Type 2": NorContainer2,
+  "Normal Container Type 3": NorContainer3,
+  "Normal Container Type 4": NorContainer4,
+  "Normal Container Type 5": NorContainer5,
+};
 
   return (
     <Rnd
@@ -34,7 +86,18 @@ export function EditableContainer({ id, onDelete, initialPosition }) {
         cursor: "move"
       }}
     >
-      <div className="drag-handle-container" style={{ width: "100%", height: "100%", position: "relative", pointerEvents: "auto" }}>
+      <div 
+        className="drag-handle-container" 
+        style={{ 
+          width: "100%", 
+          height: "100%", 
+          position: "relative", 
+          pointerEvents: "auto",
+          overflow: "auto"
+        }}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      >
         <div style={{ position: "absolute", top: "8px", right: "8px", display: "flex", gap: "8px", zIndex: 1000, pointerEvents: "auto" }}>
           <button 
             onClick={() => setShowSettings(!showSettings)} 
@@ -150,6 +213,49 @@ export function EditableContainer({ id, onDelete, initialPosition }) {
             </div>
           </div>
         )}
+
+        {/* Drop zone message when empty */}
+        {droppedContainers.length === 0 && (
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            color: "#999",
+            fontSize: "14px",
+            textAlign: "center",
+            padding: "20px"
+          }}>
+            Drop containers here
+          </div>
+        )}
+
+        {/* Render dropped containers */}
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: `repeat(${columns}, 1fr)`,
+    gap: `${gap}px`,
+    padding: "10px",
+    pointerEvents: "none",
+  }}
+>
+  {droppedContainers.map((container) => {
+    const Component = COMPONENT_MAP[container.type];
+    if (!Component) return null;
+
+    return (
+      <div key={container.id} style={{ pointerEvents: "auto" }}>
+        <Component
+          {...container.data}
+          border={true}
+          onDelete={() => handleDeleteDroppedContainer(container.id)}
+        />
+      </div>
+    );
+  })}
+</div>
+
       </div>
     </Rnd>
   );
