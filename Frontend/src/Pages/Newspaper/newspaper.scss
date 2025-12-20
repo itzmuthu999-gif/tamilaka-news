@@ -1,0 +1,33 @@
+.np-main-cont-ov
+{
+
+    width: 1536px;height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.np-main-cont
+{
+    border: solid 0.5px;
+    margin-top: 20px;
+     width: 1255px;height: fit-content;
+    
+}
+.nh-cont {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.nh-cont-txt {
+  font-weight: bold;
+  white-space: nowrap;   /* prevent wrapping */
+  flex-shrink: 0;        /* 🔑 stop shrinking */
+}
+
+.nh-cont-line {
+  flex: 1;               /* 🔑 take remaining space */
+  height: 2px;
+  background-color: #e80d8c;
+}

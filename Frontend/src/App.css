@@ -4,3 +4,16 @@
 
 }
 
+@font-face {
+  font-family: 'BaminiTamil03';
+  src: url('./assets/fonts/BAMINI-Tamil03.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'BaminiTamil07';
+  src: url('./assets/fonts/BAMINI-Tamil07.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}

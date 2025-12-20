@@ -8,7 +8,7 @@ import Templatepage from './Pages/TemplatePage/Templatepage';
 import Newspaper from "./Trash/Newspaper";
 import ResizableDragPage from './Trash/ResizableDragPage';
 import PreviewPage from './Pages/PreviewPage';
-
+import NewsPaperM from './Pages/Newspaper/NewsPaperM';
 import Editpaper from './Pages/Editpaper/Editpaper';
 import Tryout from './Tryout';
 function App() {
@@ -21,7 +21,7 @@ function App() {
         <Route path="/" element={<AdminHome />} />
           <Route path="/Newsbund" element={<Newsbund />} />
             <Route path="/Newsupload" element={<Templatepage />} />
-            <Route path="/Newspaper" element={<Newspaper />} />
+            <Route path="/Newspaper" element={<NewsPaperM />} />
   <Route path="/preview/:id" element={<PreviewPage />} />
 
                <Route path="/editpaper" element={<Editpaper />} />
