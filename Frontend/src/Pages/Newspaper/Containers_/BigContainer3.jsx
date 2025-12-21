@@ -8,9 +8,13 @@ const BigNewsContainer3 = ({
   border = false,
 }) => {
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform.allNews);
+const { allNews, translatedNews, language } = useSelector(
+  (state) => state.newsform
+);
 
-  const news = allNews.find((n) => n.id === newsId);
+const newsToShow = language === "en" ? translatedNews : allNews;
+
+  const news = newsToShow.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
     image: jwt,

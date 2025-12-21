@@ -1,25 +1,42 @@
 import React from "react";
 
 export default function Line({
-  direction = "H",   // "H" or "V"
-  length = "100px",  // width for H, height for V
+  direction = "H",
+  length = "100px",
   thickness = "2px",
   color = "#000"
 }) {
-  const style =
-    direction === "H"
-      ? {
-          width: length,
-          height: thickness,
-          backgroundColor: color,
-          margin: "5px 0px"
-        }
-      : {
-          height: length,
-          width: thickness,
-          backgroundColor: color,
-          margin: "5px 0px"
-        };
+  if (direction === "V") {
+    return (
+      <div
+        style={{
+          flex: "0 0 auto",     // 🔒 HARD STOP
+          minWidth: thickness, // 🔒 CANNOT COLLAPSE
+          display: "flex",
+          justifyContent: "center"
+        }}
+      >
+        <div
+          style={{
+            width: thickness,
+            height: length,
+            backgroundColor: color
+          }}
+        />
+      </div>
+    );
+  }
 
-  return <div style={style} />;
+  // Horizontal
+  return (
+    <div
+      style={{
+        width: length,
+        height: thickness,
+        backgroundColor: color,
+        margin: "5px 0",
+        flexShrink: 0
+      }}
+    />
+  );
 }

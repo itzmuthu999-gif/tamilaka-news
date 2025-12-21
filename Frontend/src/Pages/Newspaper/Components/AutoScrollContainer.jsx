@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useRef, useEffect, useState } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const AutoScrollContainer = ({ children, autoScroll = true }) => {
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
+  const [hovered, setHovered] = useState(false);
 
-  // Check scroll position
+  const scrollAmount = 300;
+
   const checkScroll = () => {
     const el = scrollRef.current;
     if (!el) return;
@@ -15,15 +17,15 @@ const AutoScrollContainer = ({ children, autoScroll = true }) => {
     setShowRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 5);
   };
 
-  // Manual scroll
-  const scrollByAmount = (amount) => {
-    scrollRef.current.scrollBy({
-      left: amount,
-      behavior: "smooth",
-    });
+  const scrollLeft = () => {
+    scrollRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
   };
 
-  // Auto scroll effect
+  const scrollRight = () => {
+    scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  };
+
+  // Auto scroll
   useEffect(() => {
     if (!autoScroll) return;
 
@@ -31,34 +33,36 @@ const AutoScrollContainer = ({ children, autoScroll = true }) => {
       const el = scrollRef.current;
       if (!el) return;
 
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth) {
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) {
         el.scrollTo({ left: 0, behavior: "smooth" });
       } else {
-        el.scrollBy({ left: 300, behavior: "smooth" });
+        el.scrollBy({ left: scrollAmount, behavior: "smooth" });
       }
-    }, 4000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [autoScroll]);
 
   return (
-    <div className="auto-scroll-wrapper">
+    <div
+      className="auto-scroll-wrapper"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <style>{`
         .auto-scroll-wrapper {
           position: relative;
           width: 100%;
-         
         }
 
-        .auto-scroll {
+        .auto-scroll-container {
           display: flex;
-          gap: 0px;
           overflow-x: auto;
           scroll-behavior: smooth;
-          padding: 5px 5px;
+          scrollbar-width: none;
         }
 
-        .auto-scroll::-webkit-scrollbar {
+        .auto-scroll-container::-webkit-scrollbar {
           display: none;
         }
 
@@ -66,53 +70,65 @@ const AutoScrollContainer = ({ children, autoScroll = true }) => {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          background: rgba(0,0,0,0.6);
+          background: rgba(0, 0, 0, 0.6);
           color: white;
-          border: none;
           border-radius: 50%;
-          width: 38px;
-          height: 38px;
+          width: 40px;
+          height: 40px;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
+          transition: opacity 0.3s ease, transform 0.3s ease;
           z-index: 10;
-          transition: 0.3s;
+        }
+
+        .scroll-btn.left {
+          left: 8px;
+        }
+
+        .scroll-btn.right {
+          right: 8px;
+        }
+
+        .scroll-btn.hidden {
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(-50%) scale(0.8);
+        }
+
+        .scroll-btn.visible {
+          opacity: 1;
         }
 
         .scroll-btn:hover {
-          background: rgba(0,0,0,0.85);
-        }
-
-        .scroll-left {
-          left: 5px;
-        }
-
-        .scroll-right {
-          right: 5px;
+          background: rgba(237, 1, 141, 0.9);
         }
       `}</style>
 
-      {showLeft && (
-        <button
-          className="scroll-btn scroll-left"
-          onClick={() => scrollByAmount(-306)}
-        >
-          <FiChevronLeft size={22} />
-        </button>
-      )}
-
-      {showRight && (
-        <button
-          className="scroll-btn scroll-right"
-          onClick={() => scrollByAmount(306)}
-        >
-          <FiChevronRight size={22} />
-        </button>
-      )}
-
+      {/* Left Button */}
       <div
-        className="auto-scroll"
+        className={`scroll-btn left ${
+          hovered && showLeft ? "visible" : "hidden"
+        }`}
+        onClick={scrollLeft}
+      >
+        <FaChevronLeft />
+      </div>
+
+      {/* Right Button */}
+      <div
+        className={`scroll-btn right ${
+          hovered && showRight ? "visible" : "hidden"
+        }`}
+        onClick={scrollRight}
+      >
+        <FaChevronRight />
+      </div>
+
+      {/* Scrollable Content */}
+      <div
+        className="auto-scroll-container"
         ref={scrollRef}
         onScroll={checkScroll}
       >

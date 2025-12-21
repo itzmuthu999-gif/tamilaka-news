@@ -2,18 +2,40 @@
 {
 
     width: 1536px;height: fit-content;
-    display: flex;
+    display: flex; flex-direction: column;
     justify-content: center;
     align-items: center;
     
 }
 .np-main-cont
 {
-    border: solid 0.5px;
+    // border: solid 0.5px;
     margin-top: 20px;
      width: 1255px;height: fit-content;
     
 }
+.nav-c1-logo{
+  width: 300px;
+
+  padding: 15px 15px;
+  display:flex; 
+    flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.nav-c1l-t1
+{
+  font-size: 50px;
+  font-family: 'BaminiTamil07';
+  font-weight: bold;
+  color: #e8098c;
+
+}
+.nav-c1l-t2
+{
+  font-size: 10px;
+    font-weight: bold;
+} 
 .nh-cont {
   display: flex;
   gap: 5px;
@@ -30,4 +52,77 @@
   flex: 1;               /* 🔑 take remaining space */
   height: 2px;
   background-color: #e80d8c;
+}
+
+.foot-con
+{
+       width: 1255px;height: fit-content;
+}
+/* Overlay */
+.sb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(5px);
+  z-index: 998;
+}
+
+/* Sidebar */
+.sb-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 100vh;
+  background: #ffffff;
+  z-index: 999;
+  animation: slideIn 0.35s ease forwards;
+  overflow-y: auto;
+  font-family: "Noto Sans Tamil";
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.sb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.sb-close {
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.sb-content {
+  padding: 10px 15px;
+}
+
+.sb-item {
+  border-bottom: 1px solid #eee;
+}
+
+.sb-title {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sb-sub {
+  padding-left: 15px;
+  padding-bottom: 10px;
+}
+
+.sb-sub li {
+  list-style: none;
+  padding: 6px 0;
+  font-size: 14px;
+  cursor: pointer;
 }

@@ -8,10 +8,14 @@ const NorContainer4 = ({
   border = false,
 }) => {
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform.allNews);
+const { allNews, translatedNews, language } = useSelector(
+  (state) => state.newsform
+);
 
-  const news = allNews.find((n) => n.id === newsId);
+const newsToShow = language === "en" ? translatedNews : allNews;
 
+  const news = newsToShow.find((n) => n.id === newsId);
+  const width= 290;
   const DEFAULT_DATA = {
     image: jwt,
     content:
@@ -50,9 +54,9 @@ const NorContainer4 = ({
     {
         `
         .ep-nm-news-7 {
-  width: 300px;
+  width: ${width}px;
   height: 100px;
-  max-width: 300px;
+  max-width: ${width}px;
   max-height: 100px;
   // border: solid;
   flex: 0 0 300px;
@@ -92,9 +96,9 @@ const NorContainer4 = ({
 
 /// normal news container 8
 .ep-nm-news-8 {
-  width: 300px;
+  width: ${width}px;
   height: 100px;
-  max-width: 300px;
+  max-width: ${width}px;
   max-height: 100px;
   // border: solid;
   flex: 0 0 300px;

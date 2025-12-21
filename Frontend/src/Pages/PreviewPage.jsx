@@ -9,7 +9,9 @@ import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { useParams } from "react-router-dom";
-
+import Footer from "./Newspaper/Components/Footer";
+import AutoScrollContainer from "./Newspaper/Components/AutoScrollContainer";
+import BigNewsContainer4A from "./Newspaper/Containers_/BigContainer4A";
 
 export default function PreviewPage() {
   const { id } = useParams();
@@ -173,6 +175,7 @@ const currentNews = allNews.find(
                 position: "relative",
                 overflow: "visible", // IMPORTANT FIX
                 display: "block", // IMPORTANT FIX
+                border: "none"
               }}
             >
               {fullContent.map((box) =>
@@ -189,7 +192,30 @@ const currentNews = allNews.find(
           {MLayout === 1 && <div className="hr-line"></div>}
           {MLayout === 1 && <Melumnews />}
         </div>
+        
       </div>
+
+       <div className="footer-overlay"  style={{display: "flex",flexDirection: "column" ,justifyContent: "center", alignItems: "center", width: "1500px"}}>
+                        <div
+            className="npmc-c3"
+            style={{
+              width: "1250px",
+              display: "flex",
+              gap: "15px",
+              margin: "15px 0px",
+            }}
+          >
+            <AutoScrollContainer>
+              <BigNewsContainer4A />
+              <BigNewsContainer4A />
+              <BigNewsContainer4A />
+              <BigNewsContainer4A />
+              <BigNewsContainer4A />
+            </AutoScrollContainer>
+          </div>
+        <Footer/>
+       </div>
+      
     </div>
   );
 }

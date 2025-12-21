@@ -6,11 +6,16 @@ const BigNewsContainer4A = ({
   newsId = null,
   version = 1,
   border = false,
+  size=280
 }) => {
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform.allNews);
+const { allNews, translatedNews, language } = useSelector(
+  (state) => state.newsform
+);
 
-  const news = allNews.find((n) => n.id === newsId);
+const newsToShow = language === "en" ? translatedNews : allNews;
+
+  const news = newsToShow.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -39,7 +44,7 @@ const BigNewsContainer4A = ({
     if (!newsId) return;
     navigate(`/preview/${newsId}`);
   };
-  const width= 301;
+  const width= size;
   return (
     <div
       className="ep-bg-news-4"

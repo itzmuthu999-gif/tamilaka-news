@@ -8,9 +8,13 @@ const NorContainer3 = ({
   border = false,
 }) => {
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform.allNews);
+const { allNews, translatedNews, language } = useSelector(
+  (state) => state.newsform
+);
 
-  const news = allNews.find((n) => n.id === newsId);
+const newsToShow = language === "en" ? translatedNews : allNews;
+
+  const news = newsToShow.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -53,6 +57,8 @@ const NorContainer3 = ({
 .ep-nm-news-5 {
   width: 395px;
   height: 100px;
+    min-width: 395px;
+  min-height: 100px;
   // border: solid;
   margin: 5px;
   overflow: hidden;
@@ -71,6 +77,8 @@ const NorContainer3 = ({
 .epnn5-img {
   max-width: 200px;
   max-height: 100px;
+  width: 200px;
+  height: 100px;
   border-radius: 5px;
   overflow: hidden;
 }

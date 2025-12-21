@@ -7,7 +7,34 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { IoSunnySharp } from "react-icons/io5";
 
-export default function Navbar({setIsOn,isOn} ) {
+import { useDispatch, useSelector } from "react-redux";
+import { setLanguage, setTranslatedNews } from "../../Slice/newsformslice.js";
+import { translateToEnglish } from "../../Slice/translate.js";
+
+export default function Navbar({ setIsOn, isOn, openSidebar }) {
+  const dispatch = useDispatch();
+const { allNews, translatedNews, language } = useSelector(
+  (state) => state.newsform
+);
+const handleLanguageToggle = async () => {
+  if (language === "ta") {
+    // Translate ALL news to English
+    const translated = await Promise.all(
+      allNews.map(async (news) => ({
+        ...news,
+        title: await translateToEnglish(news.title),
+        content: await translateToEnglish(news.content),
+      }))
+    );
+
+    dispatch(setTranslatedNews(translated));
+    dispatch(setLanguage("en"));
+  } else {
+    // Switch back to Tamil (original data)
+    dispatch(setLanguage("ta"));
+  }
+};
+
   return (
 
           <div className="navcon1">
@@ -120,13 +147,18 @@ export default function Navbar({setIsOn,isOn} ) {
             </div>
             <div className="nav-c1-links">
               <div>
-                <IoSearchSharp />
+                <IoSearchSharp className="nav-c1-link" />
               </div>
               <div>
-                <IoMdNotificationsOutline />
+                <IoMdNotificationsOutline className="nav-c1-link"/>
               </div>
               <div>
-                <BiWorld />
+<BiWorld
+  className="nav-c1-link"
+  onClick={handleLanguageToggle}
+  style={{ cursor: "pointer" }}
+/>
+
               </div>
             </div>
           </div>
@@ -134,9 +166,10 @@ export default function Navbar({setIsOn,isOn} ) {
           <div className="nav-c2-line"></div>
 
           <div className="nav-c3">
-            <div className="nav-c3-ham">
-              <GiHamburgerMenu />
-            </div>
+<div className="nav-c3-ham" onClick={openSidebar}>
+  <GiHamburgerMenu />
+</div>
+
             <div className="nav-c3-sections">
               <div>அரசியல்</div>
               <div>உலகம்</div>
