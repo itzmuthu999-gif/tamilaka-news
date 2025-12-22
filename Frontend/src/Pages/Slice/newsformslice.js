@@ -5,7 +5,7 @@ const initialState = {
   allNews: [],      // multiple saved news
   trash: [],        // deleted news
   currentNews: null,
-  language: "ta", 
+  language: "ta",
   translatedNews: [] // news being edited (full object)
 };
 
@@ -28,8 +28,8 @@ const newsFormSlice = createSlice({
       state.currentNews = action.payload;
     },
     setLayout: (state, action) => {
-  state.MLayout = action.payload; // payload is 1 or 2
-},
+      state.MLayout = action.payload; // payload is 1 or 2
+    },
 
     // Update an existing news item (in-place)
     updateNews: (state, action) => {
@@ -73,12 +73,12 @@ const newsFormSlice = createSlice({
       state.trash = state.trash.filter(n => n.id !== id);
     },
     setLanguage: (state, action) => {
-  state.language = action.payload; // "ta" or "en"
-},
+      state.language = action.payload; // "ta" or "en"
+    },
 
-setTranslatedNews: (state, action) => {
-  state.translatedNews = action.payload;
-}
+    setTranslatedNews: (state, action) => {
+      state.translatedNews = action.payload;
+    }
 
   },
 });
@@ -90,9 +90,9 @@ export const {
   restoreNews,
   permanentDelete,
   setCurrentNews,
-  setLayout, 
-    setLanguage,          // 👈 ADD
-  setTranslatedNews 
+  setLayout,
+  setLanguage,          // 👈 ADD
+  setTranslatedNews
 } = newsFormSlice.actions;
 
 export default newsFormSlice.reducer;

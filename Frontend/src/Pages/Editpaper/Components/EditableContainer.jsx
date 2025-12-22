@@ -16,11 +16,16 @@ import NorContainer5 from "../Containers_/NorContainer5";
 import jwt from "../../../assets/jwt.jpg";
 
 export function EditableContainer({ id, onDelete, initialPosition }) {
-  const [showSettings, setShowSettings] = useState(false);
-  const [columns, setColumns] = useState(2);
-  const [gap, setGap] = useState(10);
-  const [droppedContainers, setDroppedContainers] = useState([]);
 
+
+  const [showSettings, setShowSettings] = useState(false);
+
+
+  // const [columns, setColumns] = useState(2);
+  // const [gap, setGap] = useState(10);
+  // const [droppedContainers, setDroppedContainers] = useState([]);
+
+  
   const handleDelete = (e) => {
     if (e.detail === 2) {
       onDelete(id);

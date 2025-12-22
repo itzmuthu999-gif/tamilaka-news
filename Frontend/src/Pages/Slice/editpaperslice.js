@@ -52,10 +52,23 @@ const pageLayoutSlice = createSlice({
       if (page) page.height = height;
       logState(state, "setPageHeight");
     },
+    deletePage(state, action) {
+  const catName = action.payload;
+  state.pages = state.pages.filter(p => p.catName !== catName);
+
+  // Safety: reset activePage
+  if (state.activePage === catName) {
+    state.activePage = state.pages[0]?.catName || null;
+  }
+
+  logState(state, "deletePage");
+}
+,
 
     /* -------------------- CONTAINERS -------------------- */
 
-    addContainer: {
+    addContainer: 
+    {
       reducer(state, action) {
         const { catName, container } = action.payload;
         const page = state.pages.find(p => p.catName === catName);
@@ -111,6 +124,24 @@ const pageLayoutSlice = createSlice({
       }
       logState(state, "deleteContainer");
     },
+    updateContainerSize(state, action) {
+  const { catName, containerId, size } = action.payload;
+  const cont = state.pages
+    .find(p => p.catName === catName)
+    ?.containers.find(c => c.id === containerId);
+
+  if (cont) cont.size = size;
+}
+,
+addItemToContainer(state, action) {
+  const { catName, containerId, item } = action.payload;
+  const cont = state.pages
+    .find(p => p.catName === catName)
+    ?.containers.find(c => c.id === containerId);
+
+  if (cont) cont.items.push(item);
+}
+,
 
     /* -------------------- NEWS SLOTS -------------------- */
 
@@ -159,6 +190,7 @@ export const {
   addPage,
   setActivePage,
   setPageHeight,
+  deletePage,
 
   addContainer,
   updateContainerPosition,

@@ -13,6 +13,10 @@ import logo from "../../assets/logo.png";
 // import jwt from "./../../assets/jwt.jpg";
 import BigNewsContainer1 from "./Containers_/BigContainer1";
 
+
+import { useDispatch, useSelector } from "react-redux";
+
+
 import "./editpapercss.scss";
 import { BiCube } from "react-icons/bi";
 import PerfectSlider from "./Containers_/PerfectSlider";

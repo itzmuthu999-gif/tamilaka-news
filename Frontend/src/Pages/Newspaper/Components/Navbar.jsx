@@ -13,7 +13,7 @@ import { translateToEnglish } from "../../Slice/translate.js";
 
 export default function Navbar({ setIsOn, isOn, openSidebar }) {
   const dispatch = useDispatch();
-const { allNews, translatedNews, language } = useSelector(
+const { allNews, language } = useSelector(
   (state) => state.newsform
 );
 const handleLanguageToggle = async () => {
