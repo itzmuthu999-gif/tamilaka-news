@@ -15,6 +15,7 @@ import BigNewsContainer1 from "./Containers_/BigContainer1";
 
 
 import { useDispatch, useSelector } from "react-redux";
+import { addContainer,deleteContainer  } from "../Slice/editpaperslice";
 
 
 import "./editpapercss.scss";
@@ -31,24 +32,33 @@ import NorContainer4 from "./Containers_/NorContainer4";
 import NorContainer5 from "./Containers_/NorContainer5";
 
 export default function Editpaper() {
+  const dispatch = useDispatch();
+const { pages, activePage } = useSelector(state => state.editpaper);
+
+const currentPage = pages.find(p => p.catName === activePage);
+const containers = currentPage?.containers || [];
+
+
   const categories = ["Politics", "Sports", "Cinema", "Weather", "Astrology", "Kids"];
   const [showEditor, setShowEditor] = useState(false);
   const [edContHeight, setEdContHeight] = useState(600);
-  const [containers, setContainers] = useState([]);
+  // const [containers, setContainers] = useState([]);
   const [nextId, setNextId] = useState(1);
   const [showNewsFilter, setShowNewsFilter] = useState(false);
 
   const handleAddContainer = () => {
-    const newContainer = {
-      id: nextId,
-      position: { x: 50, y: 50 + containers.length * 50 }
-    };
-    setContainers([...containers, newContainer]);
+    // const newContainer = {
+    //   id: nextId,
+    //   position: { x: 50, y: 50 + containers.length * 50 }
+    // };
+    dispatch(addContainer(activePage, { x: 50, y: 50 }));
+
     setNextId(nextId + 1);
   };
 
   const handleDeleteContainer = (id) => {
-    setContainers(containers.filter((c) => c.id !== id));
+dispatch(deleteContainer({ catName: activePage, containerId: id }));
+
   };
 
   return (
@@ -126,14 +136,18 @@ export default function Editpaper() {
       <div className="ep-main-ed-cont">
         
         <div className="ep-ed-cont" style={{ height: `${edContHeight}px` }}>
-          {containers.map((container) => (
-            <EditableContainer
-              key={container.id}
-              id={container.id}
-              initialPosition={container.position}
-              onDelete={handleDeleteContainer}
-            />
-          ))}
+{containers.map((container) => (
+  <EditableContainer
+    key={container.id}
+    id={container.id}
+    catName={activePage}
+    position={container.position}
+    size={container.size}
+    grid={container.grid}
+    items={container.items}
+  />
+))}
+
           {containers.length === 0 && (
             <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}></div>
           )}

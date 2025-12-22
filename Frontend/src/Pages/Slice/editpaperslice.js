@@ -196,6 +196,7 @@ export const {
   updateContainerPosition,
   updateContainerGrid,
   deleteContainer,
+  updateContainerSize,
 
   addEmptySlot,
   dropNewsIntoSlot,
