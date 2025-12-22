@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { X, Plus, Edit2, Grid3x3, Space } from "lucide-react";
 import { GrRevert } from "react-icons/gr";
 import './pageeditor.scss';
-import { addPage, deletePage, setActivePage } from "../../Slice/editpaperslice.js";
-import { useDispatch, useSelector } from "react-redux";
+
 import bcont1 from "../../../assets/Containers/bcont1.png";
 import bcont2 from "../../../assets/Containers/bcont2.png";
 import bcont3 from "../../../assets/Containers/bcont3.png";
@@ -17,13 +16,12 @@ import ncont5 from "../../../assets/Containers/ncont5.png";
 export default function PageEditor({
   open = false,
   onClose = () => {},
+  categories: initialCategories = [],
   onHeightChange = () => {},
   onAddContainer = () => {},
 }) {
- const dispatch = useDispatch();
-
-  const pages = useSelector(state => state.editpaper.pages);
-  const activePage = useSelector(state => state.editpaper.activePage);
+  const [categories, setCategories] = useState(initialCategories);
+  const [activeCategory, setActiveCategory] = useState(initialCategories[0] || "");
   const [showAddInput, setShowAddInput] = useState(false);
   const [showDeleteInput, setShowDeleteInput] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -36,25 +34,29 @@ export default function PageEditor({
 
   if (!open) return null;
 
-const handleAddCategory = () => {
-  if (!newCategory.trim()) return;
+  const handleAddCategory = () => {
+    if (newCategory.trim() !== "") {
+      setCategories([...categories, newCategory.trim()]);
+      setNewCategory("");
+      setShowAddInput(false);
+    }
+  };
 
-  dispatch(addPage(newCategory.trim()));
-  dispatch(setActivePage(newCategory.trim()));
-
-  setNewCategory("");
-  setShowAddInput(false);
-};
-
-const handleDeleteCategory = () => {
-  if (!deleteCategory.trim()) return;
-
-  dispatch(deletePage(deleteCategory.trim()));
-
-  setDeleteCategory("");
-  setShowDeleteInput(false);
-};
-
+  const handleDeleteCategory = () => {
+    const categoryToDelete = deleteCategory.trim();
+    
+    if (categoryToDelete && categories.includes(categoryToDelete)) {
+      const updatedCategories = categories.filter(cat => cat !== categoryToDelete);
+      setCategories(updatedCategories);
+      
+      if (activeCategory === categoryToDelete) {
+        setActiveCategory(updatedCategories[0] || "");
+      }
+    }
+    
+    setDeleteCategory("");
+    setShowDeleteInput(false);
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -153,15 +155,15 @@ const handleDeleteCategory = () => {
           <button className="save-changes-btn">Save changes</button>
           <div className="section-title">switch pages</div>
           <div className="categories-container">
-            {pages.map(page => (
-  <button
-    key={page.catName}
-    onClick={() => dispatch(setActivePage(page.catName))}
-    className={`category-btn ${activePage === page.catName ? "active" : ""}`}
-  >
-    {page.catName.toLowerCase()}
-  </button>
-))}
+            {categories.map((cat, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveCategory(cat)}
+                className={`category-btn ${activeCategory === cat ? "active" : ""}`}
+              >
+                {cat.toLowerCase()}
+              </button>
+            ))}
           </div>
 
           {!showAddInput && !showDeleteInput && (
