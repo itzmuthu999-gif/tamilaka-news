@@ -9,7 +9,7 @@ import {
   updateContainerGrid,
   addEmptySlot,
   dropNewsIntoSlot,
-  deleteContainer
+  deleteContainer,
 } from "../../Slice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
@@ -44,15 +44,15 @@ export function EditableContainer({
   position,
   size,
   grid,
-  items,
-  catName
+  // items,
+  catName,
 }) {
   const dispatch = useDispatch();
   /* ---------- EXISTING LOCAL EDITOR STATE (KEPT) ---------- */
   const [showSettings, setShowSettings] = useState(false);
   const [columns, setColumns] = useState(grid?.columns ?? 2);
   const [gap, setGap] = useState(grid?.gap ?? 10);
-  
+
   const [droppedContainers, setDroppedContainers] = useState([]);
 
   /* ---------- DELETE CONTAINER ---------- */
@@ -71,11 +71,12 @@ export function EditableContainer({
 
     if (!type) return;
 
-    const localId = Date.now();
+    // ✅ Generate consistent ID
+    const slotId = `slot_${Date.now()}`;
 
-    /* local editor rendering (unchanged) */
+    /* local editor rendering */
     const newContainer = {
-      id: localId,
+      id: slotId, // ✅ Use the same slotId
       type,
       data: {
         image: jwt,
@@ -87,22 +88,24 @@ export function EditableContainer({
 
     setDroppedContainers((prev) => [...prev, newContainer]);
 
-    /* redux persistence */
+    /* ✅ Create slot in Redux with the SAME slotId */
     dispatch(
       addEmptySlot({
         catName,
         containerId: id,
         containerType: type,
+        slotId: slotId, // Pass the slotId explicitly
       })
     );
 
+    // If news was dropped directly, assign it
     if (newsId) {
       dispatch(
         dropNewsIntoSlot({
           catName,
           containerId: id,
-          slotId: localId.toString(),
-          newsId,
+          slotId: slotId,
+          newsId: Number(newsId),
         })
       );
     }
@@ -111,9 +114,7 @@ export function EditableContainer({
   const handleDragOver = (e) => e.preventDefault();
 
   const handleDeleteDroppedContainer = (containerId) => {
-    setDroppedContainers((prev) =>
-      prev.filter((c) => c.id !== containerId)
-    );
+    setDroppedContainers((prev) => prev.filter((c) => c.id !== containerId));
   };
 
   /* ---------- RENDER ---------- */
@@ -320,9 +321,10 @@ export function EditableContainer({
                 <Component
                   {...container.data}
                   border
-                  onDelete={() =>
-                    handleDeleteDroppedContainer(container.id)
-                  }
+                  slotId={container.id} // ✅ Pass slotId
+                  catName={catName} // ✅ Pass catName
+                  containerId={id} // ✅ Pass containerId
+                  onDelete={() => handleDeleteDroppedContainer(container.id)}
                 />
               </div>
             );

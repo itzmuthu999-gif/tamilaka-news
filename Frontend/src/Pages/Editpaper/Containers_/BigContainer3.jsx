@@ -2,25 +2,40 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
-import { useSelector } from "react-redux";
+import {dropNewsIntoSlot, removeNewsFromSlot,} from "../../Slice/editpaperslice";
+import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg"
 
 const BigNewsContainer3 = ({
   border = false,
   onDelete,
+  slotId,
+  catName,
+  containerId,
 }) => {
-const [version, setVersion] = useState(1);
-  const [newsId, setNewsId] = useState(null);
+  const [version, setVersion] = useState(1);
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Add this
 
-  const allNews = useSelector(state => state.newsform.allNews);
-  const news = allNews.find(n => n.id === newsId);
+  // Read newsId from Redux instead of local state
+  const allNews = useSelector((state) => state.newsform.allNews);
+  const slot = useSelector((state) => {
+    const page = state.editpaper.pages.find((p) => p.catName === catName);
+    const container = page?.containers.find((c) => c.id === containerId);
+    return container?.items.find((i) => i.slotId === slotId);
+  });
+
+  const newsId = slot?.newsId; // Get newsId from Redux
+  const news = allNews.find((n) => n.id === newsId);
+
+  console.log("BigContainer1 Props:", { slotId, catName, containerId });
 
   const DEFAULT_DATA = {
     image: jwt,
     headline: "Breaking News Headline Comes Here",
-    content: "This is a short description of the news. Drop a news card to replace this content.",
-    time: "Just now"
+    content:
+      "This is a short description of the news. Drop a news card to replace this content.",
+    time: "Just now",
   };
 
   const renderData = news
@@ -36,7 +51,7 @@ const [version, setVersion] = useState(1);
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: news.time || DEFAULT_DATA.time
+        time: news.time || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 
@@ -46,27 +61,43 @@ const [version, setVersion] = useState(1);
 
     const droppedId = e.dataTransfer.getData("newsId");
     if (droppedId) {
-      setNewsId(Number(droppedId));
+      // ✅ Dispatch to Redux instead of local state
+      dispatch(
+        dropNewsIntoSlot({
+          catName,
+          containerId,
+          slotId,
+          newsId: Number(droppedId),
+        })
+      );
     }
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    // ✅ Remove from Redux
+    dispatch(
+      removeNewsFromSlot({
+        catName,
+        containerId,
+        slotId,
+      })
+    );
+    onDelete?.();
   };
 
   const handleDragOver = (e) => e.preventDefault();
 
   const handleChange = (e) => {
     e.stopPropagation();
-    setVersion(prev => (prev === 3 ? 1 : prev + 1));
+    setVersion((prev) => (prev === 3 ? 1 : prev + 1));
   };
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    setNewsId(null); // reset to default template
-    onDelete?.();
+  const handleNavigate = () => {
+    if (!newsId) return; // don't navigate for default template
+    navigate(`/preview/${newsId}`);
   };
 
-const handleNavigate = () => {
-  if (!newsId) return; // don't navigate for default template
-  navigate(`/preview/${newsId}`);
-};
   return (
     <div
       className="ep-bg-news-3"

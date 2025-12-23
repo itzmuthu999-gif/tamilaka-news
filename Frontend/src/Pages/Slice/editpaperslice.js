@@ -53,21 +53,21 @@ const pageLayoutSlice = createSlice({
       logState(state, "setPageHeight");
     },
     deletePage(state, action) {
-  const catName = action.payload;
-  state.pages = state.pages.filter(p => p.catName !== catName);
+      const catName = action.payload;
+      state.pages = state.pages.filter(p => p.catName !== catName);
 
-  // Safety: reset activePage
-  if (state.activePage === catName) {
-    state.activePage = state.pages[0]?.catName || null;
-  }
+      // Safety: reset activePage
+      if (state.activePage === catName) {
+        state.activePage = state.pages[0]?.catName || null;
+      }
 
-  logState(state, "deletePage");
-}
-,
+      logState(state, "deletePage");
+    }
+    ,
 
     /* -------------------- CONTAINERS -------------------- */
 
-    addContainer: 
+    addContainer:
     {
       reducer(state, action) {
         const { catName, container } = action.payload;
@@ -125,35 +125,35 @@ const pageLayoutSlice = createSlice({
       logState(state, "deleteContainer");
     },
     updateContainerSize(state, action) {
-  const { catName, containerId, size } = action.payload;
-  const cont = state.pages
-    .find(p => p.catName === catName)
-    ?.containers.find(c => c.id === containerId);
+      const { catName, containerId, size } = action.payload;
+      const cont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === containerId);
 
-  if (cont) cont.size = size;
-}
-,
-addItemToContainer(state, action) {
-  const { catName, containerId, item } = action.payload;
-  const cont = state.pages
-    .find(p => p.catName === catName)
-    ?.containers.find(c => c.id === containerId);
+      if (cont) cont.size = size;
+    }
+    ,
+    addItemToContainer(state, action) {
+      const { catName, containerId, item } = action.payload;
+      const cont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === containerId);
 
-  if (cont) cont.items.push(item);
-}
-,
+      if (cont) cont.items.push(item);
+    }
+    ,
 
     /* -------------------- NEWS SLOTS -------------------- */
 
     addEmptySlot(state, action) {
-      const { catName, containerId, containerType } = action.payload;
+      const { catName, containerId, containerType, slotId } = action.payload;
       const cont = state.pages
         .find(p => p.catName === catName)
         ?.containers.find(c => c.id === containerId);
 
       if (cont) {
         cont.items.push({
-          slotId: nanoid(),
+          slotId: slotId || nanoid(), // ✅ Use provided slotId if available
           newsId: null,
           containerType
         });
