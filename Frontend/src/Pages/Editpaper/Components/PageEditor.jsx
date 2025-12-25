@@ -81,12 +81,14 @@ export default function PageEditor({
     { id: 2, img: bcont2, label: "Big Container Type 2" },
     { id: 3, img: bcont3, label: "Big Container Type 3" },
     { id: 4, img: bcont4, label: "Big Container Type 4" },
-    { id: 5, img: bcont4, label: "Big Container Type 5" },
-    { id: 6, img: ncont1, label: "Normal Container Type 1" },
-    { id: 7, img: ncont2, label: "Normal Container Type 2" },
-    { id: 8, img: ncont3, label: "Normal Container Type 3" },
-    { id: 9, img: ncont4, label: "Normal Container Type 4" },
-    { id: 10, img: ncont5, label: "Normal Container Type 5" },
+    { id: 5, img: bcont4, label: "Big Container Type 4A" },
+    { id: 6, img: bcont4, label: "Big Container Type 5" },
+    { id: 7, img: ncont1, label: "Normal Container Type 1" },
+    { id: 8, img: ncont2, label: "Normal Container Type 2" },
+    { id: 9, img: ncont3, label: "Normal Container Type 3" },
+    { id: 10, img: ncont4, label: "Normal Container Type 4" },
+    { id: 11, img: ncont4, label: "Normal Container Type 4A" },
+    { id: 12, img: ncont5, label: "Normal Container Type 5" },
   ];
 
   const sliderTypes = [

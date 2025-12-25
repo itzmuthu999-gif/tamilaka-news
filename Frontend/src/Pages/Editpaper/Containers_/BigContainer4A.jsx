@@ -3,24 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
-import jwt from "../../../assets/jwt.jpg";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
 } from "../../Slice/editpaperslice";
+import jwt from "../../../assets/jwt.jpg";
 
-const BigNewsContainer5 = ({
+const BigNewsContainer4A = ({
   border = false,
   onDelete,
   slotId,
   catName,
   containerId,
+  size = 280,
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const { allNews, translatedNews, language } = useSelector(
+    (state) => state.newsform
+  );
+
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     const container = page?.containers.find((c) => c.id === containerId);
@@ -28,26 +32,26 @@ const BigNewsContainer5 = ({
   });
 
   const newsId = slot?.newsId;
-  const news = allNews.find((n) => n.id === newsId);
+  const newsSource = language === "en" ? translatedNews : allNews;
+  const news = newsSource.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
-    media: jwt,
-    mediaType: "image",
+    image: jwt,
     headline: "Breaking News Headline Comes Here",
-    content: "Drop a news card here",
+    content:
+      "This is a short description of the news. Drop a news card to replace this content.",
     time: "Just now",
   };
 
   const renderData = news
     ? {
-        media: (() => {
-          const thumb = news.data?.thumbnail || news.data?.video;
-          if (!thumb) return DEFAULT_DATA.media;
+        image: (() => {
+          const thumb = news.data?.thumbnail;
+          if (!thumb) return DEFAULT_DATA.image;
           if (typeof thumb === "string") return thumb;
           if (thumb instanceof File) return URL.createObjectURL(thumb);
-          return DEFAULT_DATA.media;
+          return DEFAULT_DATA.image;
         })(),
-        mediaType: news.data?.video ? "video" : "image",
         headline: news.data?.headline || DEFAULT_DATA.headline,
         content: news.data?.oneLiner || DEFAULT_DATA.content,
         time: news.time || DEFAULT_DATA.time,
@@ -70,8 +74,6 @@ const BigNewsContainer5 = ({
     }
   };
 
-  const handleDragOver = (e) => e.preventDefault();
-
   const handleDelete = (e) => {
     e.stopPropagation();
     dispatch(
@@ -84,9 +86,11 @@ const BigNewsContainer5 = ({
     onDelete?.();
   };
 
+  const handleDragOver = (e) => e.preventDefault();
+
   const handleChange = (e) => {
     e.stopPropagation();
-    setVersion((prev) => (prev === 2 ? 1 : 2));
+    setVersion((prev) => (prev === 2 ? 1 : prev + 1));
   };
 
   const handleNavigate = () => {
@@ -94,65 +98,47 @@ const BigNewsContainer5 = ({
     navigate(`/preview/${newsId}`);
   };
 
-  const renderMedia = () => {
-    if (renderData.mediaType === "video") {
-      return (
-        <video
-          src={renderData.media}
-          controls
-          muted
-          playsInline
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
-      );
-    }
-    return (
-      <img
-        src={renderData.media}
-        alt=""
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-      />
-    );
-  };
-
   return (
     <div
-      className="ep-bg-news5-1"
+      className="ep-bg-news-4"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onClick={handleNavigate}
       style={{
         border: border ? "2px dotted #999" : "none",
         position: "relative",
-        cursor: "pointer",
       }}
     >
-      <style>{`
-        .ep-bg-news5-1 {
-          width: fit-content;
+      <style>
+        {`
+        .ep-bg-news-4 {
+          width: ${size}px;
           height: fit-content;
           margin: 5px;
-          display: flex;
-          gap: 10px;
           transition: 0.5s ease-in-out;
+          cursor: pointer;
+          gap: 5px;
         }
-        .ep-bg-news5-1:hover {
+        .ep-bg-news-4:hover {
           color: rgb(237, 1, 141);
         }
-        .epbn51-img {
-          width: 500px;
-          height: 300px;
+        .epbn4-img {
+          width: ${size}px;
+          height: ${size}px;
           border-radius: 5px;
           overflow: hidden;
         }
-        .epbn51-hdln {
+        .epbn4-img img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .epbn4-hdln {
           font-size: 20px;
           font-weight: bold;
         }
-        .epbn51-onln {
-          font-size: 13px;
-        }
-      `}</style>
+      `}
+      </style>
 
       {border && (
         <div
@@ -176,23 +162,21 @@ const BigNewsContainer5 = ({
 
       {version === 1 && (
         <>
-          <div style={{ width: "400px" }}>
-            <div className="epbn51-hdln">{renderData.headline}</div>
-            <div className="epbn51-onln">{renderData.content}</div>
-            <div className="epn-tm">{renderData.time}</div>
+          <div className="epbn4-img">
+            <img src={renderData.image} alt="" />
           </div>
-          <div className="epbn51-img">{renderMedia()}</div>
+          <div className="epbn4-hdln">{renderData.headline}</div>
+          <div className="epn-tm">{renderData.time}</div>
         </>
       )}
 
       {version === 2 && (
         <>
-          <div className="epbn51-img">{renderMedia()}</div>
-          <div style={{ width: "400px" }}>
-            <div className="epbn51-hdln">{renderData.headline}</div>
-            <div className="epbn51-onln">{renderData.content}</div>
-            <div className="epn-tm">{renderData.time}</div>
+          <div className="epbn4-hdln">{renderData.headline}</div>
+          <div className="epbn4-img">
+            <img src={renderData.image} alt="" />
           </div>
+          <div className="epn-tm">{renderData.time}</div>
         </>
       )}
     </div>
@@ -204,6 +188,9 @@ const iconBtnStyle = {
   border: "none",
   cursor: "pointer",
   fontSize: "18px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 };
 
-export default BigNewsContainer5;
+export default BigNewsContainer4A;

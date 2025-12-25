@@ -16,12 +16,14 @@ import BigNewsContainer1 from "../Containers_/BigContainer1";
 import BigNewsContainer2 from "../Containers_/BigContainer2";
 import BigNewsContainer3 from "../Containers_/BigContainer3";
 import BigNewsContainer4 from "../Containers_/BigContainer4";
+import BigNewsContainer4A from "../Containers_/BigContainer4A";
 import BigNewsContainer5 from "../Containers_/BigContainer5";
 
 import NorContainer1 from "../Containers_/NorContainer1";
 import NorContainer2 from "../Containers_/NorContainer2";
 import NorContainer3 from "../Containers_/NorContainer3";
 import NorContainer4 from "../Containers_/NorContainer4";
+import NorContainer4A from "../Containers_/NorContainer4A";
 import NorContainer5 from "../Containers_/NorContainer5";
 
 import jwt from "../../../assets/jwt.jpg";
@@ -31,11 +33,13 @@ const COMPONENT_MAP = {
   "Big Container Type 2": BigNewsContainer2,
   "Big Container Type 3": BigNewsContainer3,
   "Big Container Type 4": BigNewsContainer4,
+  "Big Container Type 4A": BigNewsContainer4A,
   "Big Container Type 5": BigNewsContainer5,
   "Normal Container Type 1": NorContainer1,
   "Normal Container Type 2": NorContainer2,
   "Normal Container Type 3": NorContainer3,
   "Normal Container Type 4": NorContainer4,
+  "Normal Container Type 4A": NorContainer4A,
   "Normal Container Type 5": NorContainer5,
 };
 
@@ -128,8 +132,8 @@ export function EditableContainer({
         x: position?.x ?? 50,
         y: position?.y ?? 50,
       }}
-      minWidth={300}
-      minHeight={150}
+      minWidth={1}
+      minHeight={1}
       bounds="parent"
       enableResizing
       dragHandleClassName="drag-handle-container"
@@ -138,6 +142,8 @@ export function EditableContainer({
         background: "transparent",
         position: "absolute",
         cursor: "move",
+        overflowX: "none",
+        overflowy: "none",
       }}
       onDragStop={(e, d) => {
         dispatch(
@@ -233,7 +239,7 @@ export function EditableContainer({
               background: "white",
               border: "2px solid #666",
               borderRadius: "8px",
-              padding: "15px",
+              // padding: "15px",
               zIndex: 20,
               minWidth: "220px",
             }}
