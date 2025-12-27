@@ -16,7 +16,7 @@ import logo from "../../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { 
   addContainer,
-  deleteContainer,
+  // deleteContainer,
   addSlider,
 } from "../Slice/editpaperslice";
 
@@ -53,9 +53,9 @@ export default function Editpaper() {
     setNextId(nextId + 1);
   };
 
-  const handleDeleteContainer = (id) => {
-    dispatch(deleteContainer({ catName: activePage, containerId: id }));
-  };
+  // const handleDeleteContainer = (id) => {
+  //   dispatch(deleteContainer({ catName: activePage, containerId: id }));
+  // };
 
   return (
     <div>
