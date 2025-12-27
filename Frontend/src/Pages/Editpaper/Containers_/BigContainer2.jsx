@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 
-import {dropNewsIntoSlot, removeNewsFromSlot,} from "../../Slice/editpaperslice";
+import {
+  dropNewsIntoSlot,
+  removeNewsFromSlot,
+  dropNewsIntoSliderSlot,
+  removeNewsFromSliderSlot,
+} from "../../Slice/editpaperslice";
+
 import { useSelector, useDispatch } from "react-redux";
 
 import jwt from "../../../assets/jwt.jpg"
@@ -13,6 +19,8 @@ const BigNewsContainer2 = ({
   slotId,
   catName,
   containerId,
+    isSlider = false,
+  isSlider2 = false
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
@@ -22,8 +30,15 @@ const BigNewsContainer2 = ({
   const allNews = useSelector((state) => state.newsform.allNews);
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
-    const container = page?.containers.find((c) => c.id === containerId);
-    return container?.items.find((i) => i.slotId === slotId);
+    
+    // ✅ Both slider types now use the same sliders array
+    if (isSlider || isSlider2) {
+      const slider = page?.sliders.find((s) => s.id === containerId);
+      return slider?.items.find((i) => i.slotId === slotId);
+    } else {
+      const container = page?.containers.find((c) => c.id === containerId);
+      return container?.items.find((i) => i.slotId === slotId);
+    }
   });
 
   const newsId = slot?.newsId; // Get newsId from Redux
@@ -56,38 +71,62 @@ const BigNewsContainer2 = ({
       }
     : DEFAULT_DATA;
 
-  const handleDrop = (e) => {
+const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     const droppedId = e.dataTransfer.getData("newsId");
     if (droppedId) {
-      // ✅ Dispatch to Redux instead of local state
-      dispatch(
-        dropNewsIntoSlot({
-          catName,
-          containerId,
-          slotId,
-          newsId: Number(droppedId),
-        })
-      );
+      // ✅ Use unified slider action for both slider types
+      if (isSlider || isSlider2) {
+        dispatch(
+          dropNewsIntoSliderSlot({
+            catName,
+            sliderId: containerId,
+            slotId,
+            newsId: Number(droppedId),
+          })
+        );
+      } else {
+        dispatch(
+          dropNewsIntoSlot({
+            catName,
+            containerId,
+            slotId,
+            newsId: Number(droppedId),
+          })
+        );
+      }
     }
   };
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    // ✅ Remove from Redux
-    dispatch(
-      removeNewsFromSlot({
-        catName,
-        containerId,
-        slotId,
-      })
-    );
+    
+    // ✅ Use unified slider action for both slider types
+    if (isSlider || isSlider2) {
+      dispatch(
+        removeNewsFromSliderSlot({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        removeNewsFromSlot({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
+    
     onDelete?.();
   };
 
-  const handleDragOver = (e) => e.preventDefault();
+ 
+const handleDragOver = (e) => e.preventDefault();
 
   const handleChange = (e) => {
     e.stopPropagation();

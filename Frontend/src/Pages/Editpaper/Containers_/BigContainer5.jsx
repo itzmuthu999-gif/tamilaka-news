@@ -7,7 +7,10 @@ import jwt from "../../../assets/jwt.jpg";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
+  dropNewsIntoSliderSlot,
+  removeNewsFromSliderSlot,
 } from "../../Slice/editpaperslice";
+
 
 const BigNewsContainer5 = ({
   border = false,
@@ -15,6 +18,8 @@ const BigNewsContainer5 = ({
   slotId,
   catName,
   containerId,
+    isSlider = false,
+  isSlider2 = false,
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
@@ -23,10 +28,16 @@ const BigNewsContainer5 = ({
   const allNews = useSelector((state) => state.newsform.allNews);
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
-    const container = page?.containers.find((c) => c.id === containerId);
-    return container?.items.find((i) => i.slotId === slotId);
+    
+    // ✅ Both slider types now use the same sliders array
+    if (isSlider || isSlider2) {
+      const slider = page?.sliders.find((s) => s.id === containerId);
+      return slider?.items.find((i) => i.slotId === slotId);
+    } else {
+      const container = page?.containers.find((c) => c.id === containerId);
+      return container?.items.find((i) => i.slotId === slotId);
+    }
   });
-
   const newsId = slot?.newsId;
   const news = allNews.find((n) => n.id === newsId);
 
@@ -53,36 +64,61 @@ const BigNewsContainer5 = ({
         time: news.time || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
-
-  const handleDrop = (e) => {
+  const handleDragOver = (e) => e.preventDefault();
+const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
     const droppedId = e.dataTransfer.getData("newsId");
     if (droppedId) {
-      dispatch(
-        dropNewsIntoSlot({
-          catName,
-          containerId,
-          slotId,
-          newsId: Number(droppedId),
-        })
-      );
+      // ✅ Use unified slider action for both slider types
+      if (isSlider || isSlider2) {
+        dispatch(
+          dropNewsIntoSliderSlot({
+            catName,
+            sliderId: containerId,
+            slotId,
+            newsId: Number(droppedId),
+          })
+        );
+      } else {
+        dispatch(
+          dropNewsIntoSlot({
+            catName,
+            containerId,
+            slotId,
+            newsId: Number(droppedId),
+          })
+        );
+      }
     }
   };
 
-  const handleDragOver = (e) => e.preventDefault();
-
   const handleDelete = (e) => {
     e.stopPropagation();
-    dispatch(
-      removeNewsFromSlot({
-        catName,
-        containerId,
-        slotId,
-      })
-    );
+    
+    // ✅ Use unified slider action for both slider types
+    if (isSlider || isSlider2) {
+      dispatch(
+        removeNewsFromSliderSlot({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        removeNewsFromSlot({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
+    
     onDelete?.();
   };
+
 
   const handleChange = (e) => {
     e.stopPropagation();

@@ -8,68 +8,66 @@ import { AiFillGitlab } from "react-icons/ai";
 import NewsFilter from "./Components/NewsFilter";
 import PageEditor from "./Components/PageEditor";
 import { EditableContainer } from "./Components/EditableContainer";
+import { EditableSlider } from "./Components/EditableSlider";
+import { EditableSlider2 } from "./Components/EditableSlider2";
+import  EditableLine  from "./Containers_/EditableLine"; // ✅ NEW
 import logo from "../../assets/logo.png";
-// import bcs from "./../../assets/bcs.jpg";
-// import jwt from "./../../assets/jwt.jpg";
-import BigNewsContainer1 from "./Containers_/BigContainer1";
-
 
 import { useDispatch, useSelector } from "react-redux";
-import { addContainer,deleteContainer  } from "../Slice/editpaperslice";
-
+import { 
+  addContainer,
+  deleteContainer,
+  addSlider,
+} from "../Slice/editpaperslice";
 
 import "./editpapercss.scss";
 import { BiCube } from "react-icons/bi";
-import PerfectSlider from "./Containers_/PerfectSlider";
-import BigNewsContainer3 from "./Containers_/BigContainer3";
-import BigNewsContainer2 from "./Containers_/BigContainer2";
-import BigNewsContainer4 from "./Containers_/BigContainer4";
-import BigNewsContainer5 from "./Containers_/BigContainer5";
-import NorContainer1 from "./Containers_/NorContainer1";
-import NorContainer2 from "./Containers_/NorContainer2";
-import NorContainer3 from "./Containers_/NorContainer3";
-import NorContainer4 from "./Containers_/NorContainer4";
-import NorContainer5 from "./Containers_/NorContainer5";
 
 export default function Editpaper() {
   const dispatch = useDispatch();
-const { pages, activePage } = useSelector(state => state.editpaper);
+  const { pages, activePage, activeLineId } = useSelector(state => state.editpaper);
 
-const currentPage = pages.find(p => p.catName === activePage);
-const containers = currentPage?.containers || [];
-
+  const currentPage = pages.find(p => p.catName === activePage);
+  const containers = currentPage?.containers || [];
+  const sliders = currentPage?.sliders || [];
+  const lines = currentPage?.lines || []; // ✅ NEW
 
   const categories = ["Politics", "Sports", "Cinema", "Weather", "Astrology", "Kids"];
   const [showEditor, setShowEditor] = useState(false);
   const [edContHeight, setEdContHeight] = useState(600);
-  // const [containers, setContainers] = useState([]);
   const [nextId, setNextId] = useState(1);
   const [showNewsFilter, setShowNewsFilter] = useState(false);
 
   const handleAddContainer = () => {
-    // const newContainer = {
-    //   id: nextId,
-    //   position: { x: 50, y: 50 + containers.length * 50 }
-    // };
     dispatch(addContainer(activePage, { x: 50, y: 50 }));
+    setNextId(nextId + 1);
+  };
 
+  const handleAddSlider = () => {
+    dispatch(addSlider(activePage, { x: 50, y: 100 }, "type1"));
+    setNextId(nextId + 1);
+  };
+
+  const handleAddSlider2 = () => {
+    dispatch(addSlider(activePage, { x: 50, y: 150 }, "type2"));
     setNextId(nextId + 1);
   };
 
   const handleDeleteContainer = (id) => {
-dispatch(deleteContainer({ catName: activePage, containerId: id }));
-
+    dispatch(deleteContainer({ catName: activePage, containerId: id }));
   };
 
   return (
     <div>
-<PageEditor 
-  open={showEditor} 
-  onClose={() => setShowEditor(false)} 
-  categories={categories}
-  onHeightChange={setEdContHeight}
-  onAddContainer={handleAddContainer}
-/>
+      <PageEditor 
+        open={showEditor} 
+        onClose={() => setShowEditor(false)} 
+        categories={categories}
+        onHeightChange={setEdContHeight}
+        onAddContainer={handleAddContainer}
+        onAddSlider={handleAddSlider}
+        onAddSlider2={handleAddSlider2}
+      />
 
       {!showEditor && (
         <button className="pageeditorbtn" onClick={() => setShowEditor(true)}>
@@ -88,7 +86,7 @@ dispatch(deleteContainer({ catName: activePage, containerId: id }));
       <div className="navcon1">
         <div className="navcon2">
           <div className="nav-c1">
-            <div className="nav-c1-date">வியாக்ழன் அக்டோபர் 30 2025</div>
+            <div className="nav-c1-date">வியாழன் அக்டோபர் 30 2025</div>
             <div className="nav-c1-logo">
               <img src={logo} alt="alt" />
             </div>
@@ -127,28 +125,68 @@ dispatch(deleteContainer({ catName: activePage, containerId: id }));
         </div>
       </div>
 
-      {/* <div className="break-news">
-        <p>
-          சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம் | டெல்லியில் மழை வெள்ளம் – போக்குவரத்து பாதிப்பு | பெங்களூருவில் பெரிய IT நிறுவனத்தில் திடீர் பணிநீக்கம் | தமிழகத்தில் இன்று மின்தடை அறிவிப்பு | கோவை அருகே வெடிகுண்டு பரபரப்பு – போலீஸ் விசாரணை தொடக்கம் | பங்குச்சந்தை சரிவு – முதலீட்டாளர்கள் அதிர்ச்சி
-        </p>
-      </div> */}
-
       <div className="ep-main-ed-cont">
-        
         <div className="ep-ed-cont" style={{ height: `${edContHeight}px` }}>
-{containers.map((container) => (
-  <EditableContainer
-    key={container.id}
-    id={container.id}
-    catName={activePage}
-    position={container.position}
-    size={container.size}
-    grid={container.grid}
-    items={container.items}
-  />
-))}
+          {/* RENDER CONTAINERS */}
+          {containers.map((container) => (
+            <EditableContainer
+              key={container.id}
+              id={container.id}
+              catName={activePage}
+              position={container.position}
+              size={container.size}
+              grid={container.grid}
+              items={container.items}
+            />
+          ))}
 
-          {containers.length === 0 && (
+          {/* RENDER SLIDERS */}
+          {sliders.map((slider) => {
+            if (slider.type === "type1") {
+              return (
+                <EditableSlider
+                  key={slider.id}
+                  id={slider.id}
+                  catName={activePage}
+                  position={slider.position}
+                  size={slider.size}
+                  gap={slider.gap}
+                />
+              );
+            }
+            
+            if (slider.type === "type2") {
+              return (
+                <EditableSlider2
+                  key={slider.id}
+                  id={slider.id}
+                  catName={activePage}
+                  position={slider.position}
+                  size={slider.size}
+                  gap={slider.gap}
+                />
+              );
+            }
+            
+            return null;
+          })}
+
+          {/* ✅ RENDER LINES */}
+          {lines.map((line) => (
+            <EditableLine
+              key={line.id}
+              id={line.id}
+              lineType={line.lineType}
+              orientation={line.orientation}
+              length={line.length}
+              x={line.x}
+              y={line.y}
+              catName={activePage}
+              isActive={line.id === activeLineId}
+            />
+          ))}
+
+          {containers.length === 0 && sliders.length === 0 && lines.length === 0 && (
             <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}></div>
           )}
 

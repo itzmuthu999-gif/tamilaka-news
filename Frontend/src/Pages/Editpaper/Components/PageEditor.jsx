@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { X, Plus, Edit2, Grid3x3, Space } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, Plus } from "lucide-react";
 import { GrRevert } from "react-icons/gr";
+import { useSelector, useDispatch } from "react-redux";
+import { addLine, updateLineArguments } from "../../Slice/editpaperslice";
 import './pageeditor.scss';
 
 import bcont1 from "../../../assets/Containers/bcont1.png";
@@ -19,7 +21,20 @@ export default function PageEditor({
   categories: initialCategories = [],
   onHeightChange = () => {},
   onAddContainer = () => {},
+  onAddSlider = () => {},
+  onAddSlider2 = () => {},
 }) {
+  const dispatch = useDispatch();
+  const activePage = useSelector(state => state.editpaper.activePage);
+  const activeLineId = useSelector(state => state.editpaper.activeLineId);
+  
+  // Get active line data
+  const activeLine = useSelector(state => {
+    if (!activeLineId) return null;
+    const page = state.editpaper.pages.find(p => p.catName === activePage);
+    return page?.lines.find(l => l.id === activeLineId);
+  });
+
   const [categories, setCategories] = useState(initialCategories);
   const [activeCategory, setActiveCategory] = useState(initialCategories[0] || "");
   const [showAddInput, setShowAddInput] = useState(false);
@@ -31,6 +46,18 @@ export default function PageEditor({
   const [showLines, setShowLines] = useState(true);
   const [height, setHeight] = useState(600);
   const [switchpos, setSwitchpos] = useState([1080, 10]);
+  
+  // Line arguments state
+  const [lineArguments, setLineArguments] = useState("");
+
+  // Update line arguments when active line changes
+  useEffect(() => {
+    if (activeLine) {
+      setLineArguments(`${activeLine.length}-${activeLine.x}-${activeLine.y}`);
+    } else {
+      setLineArguments("");
+    }
+  }, [activeLine]);
 
   if (!open) return null;
 
@@ -76,6 +103,39 @@ export default function PageEditor({
     onHeightChange(newHeight);
   };
 
+  // Handle line arguments input
+  const handleLineArgumentsChange = (e) => {
+    const value = e.target.value;
+    setLineArguments(value);
+
+    // Parse format: length-x-y
+    const parts = value.split("-");
+    if (parts.length === 3 && activeLineId) {
+      const length = parseInt(parts[0]);
+      const x = parseInt(parts[1]);
+      const y = parseInt(parts[2]);
+
+      if (!isNaN(length) && !isNaN(x) && !isNaN(y)) {
+        dispatch(
+          updateLineArguments({
+            catName: activePage,
+            lineId: activeLineId,
+            length,
+            x,
+            y,
+          })
+        );
+      }
+    }
+  };
+
+  // Handle dropping lines
+  const handleLineClick = (lineType, orientation) => {
+    dispatch(
+      addLine(activePage, lineType, orientation, { x: 100, y: 100 })
+    );
+  };
+
   const containerTypes = [
     { id: 1, img: bcont1, label: "Big Container Type 1" },
     { id: 2, img: bcont2, label: "Big Container Type 2" },
@@ -92,13 +152,15 @@ export default function PageEditor({
   ];
 
   const sliderTypes = [
-    { id: 4, label: "Slider type 1" },
-    { id: 5, label: "Slider type 2" },
+    { id: 1, label: "Slider Type 1 (Carousel)", action: onAddSlider },
+    { id: 2, label: "Slider Type 2 (Horizontal)", action: onAddSlider2 },
   ];
 
   const lineTypes = [
-    { id: 6, label: "Line style 1" },
-    { id: 7, label: "Line style 2" },
+    { id: 1, type: "pink-bold", orientation: "horizontal", label: "pink bold line (hr)" },
+    { id: 2, type: "pink-bold", orientation: "vertical", label: "pink bold line (vr)" },
+    { id: 3, type: "light-grey", orientation: "horizontal", label: "light grey line (hr)" },
+    { id: 4, type: "light-grey", orientation: "vertical", label: "light grey line (vr)" },
   ];
 
   const headerTypes = [
@@ -120,8 +182,6 @@ export default function PageEditor({
     switch (activeTab) {
       case "containers":
         return containerTypes;
-      case "sliders":
-        return sliderTypes;
       case "lines":
         return lineTypes;
       case "headers":
@@ -244,10 +304,12 @@ export default function PageEditor({
         <div className="drag-drop-section">
           <div className="section-title">Drag and Drop the containers</div>
 
-          <button onClick={onAddContainer} className="dds-add-cont-btn">
-            <Plus size={18} />
-            Add Container Overlay
-          </button>
+          {activeTab === "containers" && (
+            <button onClick={onAddContainer} className="dds-add-cont-btn">
+              <Plus size={18} />
+              Add Container Overlay
+            </button>
+          )}
 
           <div className="dds-add-ht">
             <div>Height</div>
@@ -265,30 +327,155 @@ export default function PageEditor({
           </div>
 
           <div className="drag-box">
-            {getActiveItems().map((item) => (
-              <div
-                key={item.id}
-                draggable
-                onDragStart={(e) => {
-                  // Set the data to be transferred
-                  e.dataTransfer.setData("text/plain", item.label);
-                  // Set effect to copy (shows + cursor icon)
-                  e.dataTransfer.effectAllowed = "copy";
-                }}
-                onDragEnd={(e) => {
-                  // This ensures the original stays in place
-                  e.preventDefault();
-                }}
-                className="draggable-item"
-                style={{ cursor: "grab" }}
-              >
-                {item.img && (
-                  <img src={item.img} alt={item.label} className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`} />
-                )}
-                {!item.img && <div className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`}></div>}
-                <div className="draggable-item-label">{item.label}</div>
+            {/* SLIDERS TAB */}
+            {activeTab === "sliders" ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "15px", padding: "20px" }}>
+                {sliderTypes.map((slider) => (
+                  <button
+                    key={slider.id}
+                    onClick={slider.action}
+                    className="dds-add-cont-btn"
+                    style={{
+                      width: "100%",
+                      padding: "15px",
+                      fontSize: "14px",
+                      fontWeight: "500"
+                    }}
+                  >
+                    <Plus size={18} />
+                    {slider.label}
+                  </button>
+                ))}
               </div>
-            ))}
+            ) : activeTab === "lines" ? (
+              /* ✅ LINES TAB - EXACT DESIGN FROM IMAGE */
+              <div style={{ padding: "20px" }}>
+                <div style={{ 
+                  display: "grid", 
+                  gridTemplateColumns: "repeat(4, 1fr)", 
+                  gap: "15px",
+                  marginBottom: "20px"
+                }}>
+                  {lineTypes.map((line) => (
+                    <div
+                      key={line.id}
+                      onClick={() => handleLineClick(line.type, line.orientation)}
+                      style={{
+                        border: "2px solid #ddd",
+                        borderRadius: "8px",
+                        padding: "20px 10px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "15px",
+                        cursor: "pointer",
+                        background: "white",
+                        minHeight: "120px",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = "#2196F3";
+                        e.currentTarget.style.background = "#f5f5f5";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = "#ddd";
+                        e.currentTarget.style.background = "white";
+                      }}
+                    >
+                      {/* Line preview */}
+                      <div style={{
+                        width: line.orientation === "horizontal" ? "80px" : "4px",
+                        height: line.orientation === "horizontal" ? (line.type === "pink-bold" ? "4px" : "2px") : "80px",
+                        backgroundColor: line.type === "pink-bold" ? "#e91e63" : "#d0d0d0",
+                      }} />
+                      
+                      {/* Label */}
+                      <div style={{
+                        fontSize: "11px",
+                        color: "#666",
+                        textAlign: "center",
+                        fontWeight: "500"
+                      }}>
+                        {line.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Line Arguments Input */}
+                <div style={{
+                  marginTop: "20px",
+                  padding: "15px",
+                  background: "#f9f9f9",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd"
+                }}>
+                  <label style={{
+                    display: "block",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    marginBottom: "8px",
+                    color: "#333"
+                  }}>
+                    Choose Line Arguments:
+                    <br />
+                    <span style={{ fontSize: "11px", fontWeight: "normal", color: "#666" }}>
+                      (length-Xpos-Ypos)
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={lineArguments}
+                    onChange={handleLineArgumentsChange}
+                    placeholder="500-0-0"
+                    disabled={!activeLineId}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                      fontSize: "13px",
+                      fontFamily: "monospace",
+                      background: activeLineId ? "white" : "#f0f0f0",
+                      cursor: activeLineId ? "text" : "not-allowed"
+                    }}
+                  />
+                  {!activeLineId && (
+                    <div style={{
+                      fontSize: "11px",
+                      color: "#999",
+                      marginTop: "5px"
+                    }}>
+                      Click on a line in the canvas to edit its properties
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* OTHER TABS */
+              getActiveItems().map((item) => (
+                <div
+                  key={item.id}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("text/plain", item.label);
+                    e.dataTransfer.effectAllowed = "copy";
+                  }}
+                  onDragEnd={(e) => {
+                    e.preventDefault();
+                  }}
+                  className="draggable-item"
+                  style={{ cursor: "grab" }}
+                >
+                  {item.img && (
+                    <img src={item.img} alt={item.label} className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`} />
+                  )}
+                  {!item.img && <div className={`draggable-item-img ${showBorders ? "with-border" : "no-border"}`}></div>}
+                  <div className="draggable-item-label">{item.label}</div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

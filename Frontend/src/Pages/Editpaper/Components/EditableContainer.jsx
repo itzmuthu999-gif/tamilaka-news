@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import { X, Edit2, Grid3x3, Space } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   updateContainerPosition,
   updateContainerSize,
   updateContainerGrid,
+  updateContainerHeader,
   addEmptySlot,
   dropNewsIntoSlot,
   deleteContainer,
@@ -48,14 +49,25 @@ export function EditableContainer({
   position,
   size,
   grid,
-  // items,
   catName,
 }) {
   const dispatch = useDispatch();
+  
+  // ✅ Get header state from Redux
+  const container = useSelector(state => 
+    state.editpaper.pages
+      .find(p => p.catName === catName)
+      ?.containers.find(c => c.id === id)
+  );
+
+  const headerEnabled = container?.header?.enabled || false;
+  const headerTitle = container?.header?.title || "";
+
   /* ---------- EXISTING LOCAL EDITOR STATE (KEPT) ---------- */
   const [showSettings, setShowSettings] = useState(false);
   const [columns, setColumns] = useState(grid?.columns ?? 2);
   const [gap, setGap] = useState(grid?.gap ?? 10);
+  const [localHeaderTitle, setLocalHeaderTitle] = useState(headerTitle);
 
   const [droppedContainers, setDroppedContainers] = useState([]);
 
@@ -64,6 +76,32 @@ export function EditableContainer({
     if (e.detail === 2) {
       dispatch(deleteContainer({ catName, containerId: id }));
     }
+  };
+
+  /* ---------- TOGGLE HEADER ---------- */
+  const handleToggleHeader = (enabled) => {
+    dispatch(
+      updateContainerHeader({
+        catName,
+        containerId: id,
+        enabled,
+        title: enabled ? localHeaderTitle : ""
+      })
+    );
+  };
+
+  /* ---------- UPDATE HEADER TITLE ---------- */
+  const handleHeaderTitleChange = (e) => {
+    const newTitle = e.target.value;
+    setLocalHeaderTitle(newTitle);
+    dispatch(
+      updateContainerHeader({
+        catName,
+        containerId: id,
+        enabled: headerEnabled,
+        title: newTitle
+      })
+    );
   };
 
   /* ---------- DROP NEWS / CONTAINER TYPE ---------- */
@@ -75,12 +113,10 @@ export function EditableContainer({
 
     if (!type) return;
 
-    // ✅ Generate consistent ID
     const slotId = `slot_${Date.now()}`;
 
-    /* local editor rendering */
     const newContainer = {
-      id: slotId, // ✅ Use the same slotId
+      id: slotId,
       type,
       data: {
         image: jwt,
@@ -92,17 +128,15 @@ export function EditableContainer({
 
     setDroppedContainers((prev) => [...prev, newContainer]);
 
-    /* ✅ Create slot in Redux with the SAME slotId */
     dispatch(
       addEmptySlot({
         catName,
         containerId: id,
         containerType: type,
-        slotId: slotId, // Pass the slotId explicitly
+        slotId: slotId,
       })
     );
 
-    // If news was dropped directly, assign it
     if (newsId) {
       dispatch(
         dropNewsIntoSlot({
@@ -182,9 +216,9 @@ export function EditableContainer({
           position: "relative",
           pointerEvents: "auto",
           overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
         }}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
       >
         {/* ---------- CONTROLS ---------- */}
         <div
@@ -239,11 +273,46 @@ export function EditableContainer({
               background: "white",
               border: "2px solid #666",
               borderRadius: "8px",
-              // padding: "15px",
+              padding: "15px",
               zIndex: 20,
               minWidth: "220px",
             }}
           >
+            {/* ✅ ENABLE HEADER TOGGLE */}
+            <div style={{ marginBottom: "12px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={headerEnabled}
+                  onChange={(e) => handleToggleHeader(e.target.checked)}
+                  style={{ cursor: "pointer" }}
+                />
+                <span style={{ fontSize: "14px", fontWeight: "500" }}>Enable Header</span>
+              </label>
+            </div>
+
+            {/* ✅ HEADER TITLE INPUT (only visible when header enabled) */}
+            {headerEnabled && (
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "block" }}>
+                  Header Title
+                </label>
+                <input
+                  type="text"
+                  value={localHeaderTitle}
+                  onChange={handleHeaderTitleChange}
+                  placeholder="Enter header title..."
+                  style={{
+                    width: "100%",
+                    padding: "6px 8px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    fontSize: "13px"
+                  }}
+                />
+              </div>
+            )}
+
             <div style={{ marginBottom: "12px" }}>
               <Grid3x3 size={16} /> Column Count
               <input
@@ -290,51 +359,80 @@ export function EditableContainer({
           </div>
         )}
 
-        {/* ---------- EMPTY STATE ---------- */}
-        {droppedContainers.length === 0 && (
+        {/* ✅ HEADER SECTION (rendered when enabled) */}
+        {headerEnabled && (
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-              color: "#999",
-              fontSize: "14px",
-              textAlign: "center",
-              padding: "20px",
+              background: "linear-gradient(90deg, #e74c3c 0%, #c0392b 100%)",
+              color: "white",
+              padding: "12px 20px",
+              fontSize: "18px",
+              fontWeight: "bold",
+              borderBottom: "3px solid #c0392b",
+              flexShrink: 0,
+              pointerEvents: "none",
             }}
           >
-            Drop containers here
+            {headerTitle || "header"}
           </div>
         )}
 
-        {/* ---------- RENDER DROPPED NEWS ---------- */}
+        {/* ✅ DROP ZONE (below header) */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${columns}, 1fr)`,
-            gap: `${gap}px`,
-            padding: "10px",
-            pointerEvents: "none",
+            flex: 1,
+            position: "relative",
+            overflow: "auto",
           }}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
         >
-          {droppedContainers.map((container) => {
-            const Component = COMPONENT_MAP[container.type];
-            if (!Component) return null;
+          {/* ---------- EMPTY STATE ---------- */}
+          {droppedContainers.length === 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                color: "#999",
+                fontSize: "14px",
+                textAlign: "center",
+                padding: "20px",
+              }}
+            >
+              Drop containers here
+            </div>
+          )}
 
-            return (
-              <div key={container.id} style={{ pointerEvents: "auto" }}>
-                <Component
-                  {...container.data}
-                  border
-                  slotId={container.id} // ✅ Pass slotId
-                  catName={catName} // ✅ Pass catName
-                  containerId={id} // ✅ Pass containerId
-                  onDelete={() => handleDeleteDroppedContainer(container.id)}
-                />
-              </div>
-            );
-          })}
+          {/* ---------- RENDER DROPPED NEWS ---------- */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${columns}, 1fr)`,
+              gap: `${gap}px`,
+              padding: "10px",
+              pointerEvents: "none",
+            }}
+          >
+            {droppedContainers.map((container) => {
+              const Component = COMPONENT_MAP[container.type];
+              if (!Component) return null;
+
+              return (
+                <div key={container.id} style={{ pointerEvents: "auto" }}>
+                  <Component
+                    {...container.data}
+                    border
+                    slotId={container.id}
+                    catName={catName}
+                    containerId={id}
+                    onDelete={() => handleDeleteDroppedContainer(container.id)}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </Rnd>
