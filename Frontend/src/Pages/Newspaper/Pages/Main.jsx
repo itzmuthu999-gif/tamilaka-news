@@ -20,19 +20,32 @@ import Line from "../Components/Line";
 import Newsheader from "../Components/Newsheader";
 import WeatherBox from "../Components/WeatherBox";
 
+import { useState,useEffect } from "react";
 export default function Main() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth > 768);
+    };
+  
+    window.addEventListener("resize", handleResize);
+  
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  
   return (
     <div className="np-main-cont">
       <div
         className="npmc-c1"
-        style={{
-          display: "flex",
-          gap: "5px",
-        }}
+
       >
         <BigNewsContainer1 newsId={1766221597943} />
-        <Line direction="V" length="630px" thickness="1px" color="#e80d8c" />
-
+        {isMobile && <Line direction="V" length="630px" thickness="1px" color="#e80d8c" />}
+        {/* {!isMobile && <Line direction="H" length="100%" thickness="1px" color="#e80d8c" />} */}
+         {!isMobile && 
+         <div>
+          <br /><br />
+         </div>}
         <div
           className="npmcc1-s1"
           style={{
@@ -82,7 +95,7 @@ export default function Main() {
           />
         </div>
       </div>
-      <Line direction="H" length="100%" thickness="1px" color="#e80d8c" />
+   <Line direction="H" length="100%" thickness="1px" color="#e80d8c" />
       <AdBox width="100%" height="150px" />
       <div
         className="npmc-c2"
@@ -442,7 +455,7 @@ export default function Main() {
           </div>
         </div>
       </div>
-      <br /> <AdBox width="100%" height="150px" /> <br />
+      <br /> <AdBox width="100%" height="150px" /> <br /> 
     </div>
   );
 }

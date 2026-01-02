@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+// import timeFun  from "./timeFun";
 
 const BigNewsContainer5 = ({
   image,

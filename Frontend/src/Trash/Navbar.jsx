@@ -6,16 +6,27 @@ import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { IoSunnySharp } from "react-icons/io5";
-
+import { useState,useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { setLanguage, setTranslatedNews } from "../../Slice/newsformslice.js";
 import { translateToEnglish } from "../../Slice/translate.js";
 
 export default function Navbar({ setIsOn, isOn, openSidebar }) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
+
   const dispatch = useDispatch();
 const { allNews, language } = useSelector(
   (state) => state.newsform
 );
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth > 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
 const handleLanguageToggle = async () => {
   if (language === "ta") {
     // Translate ALL news to English
@@ -38,7 +49,7 @@ const handleLanguageToggle = async () => {
   return (
 
           <div className="navcon1">
-            <style>
+            {/* <style>
 
             {
                 `
@@ -132,20 +143,19 @@ const handleLanguageToggle = async () => {
  position: relative;
   overflow: visible !important;
 
-
 }
 
                 `
             }
-            </style>
+            </style> */}
         <div className="navcon2">
           <div className="nav-c1">
-            <div className="nav-c1-date">வியாக்ழன் அக்டோபர் 30 2025</div>
+            { isMobile && <div className="nav-c1-date">வியாக்ழன் அக்டோபர் 30 2025</div> }
             <div className="nav-c1-logo" style={{position: "relative"}}>
                <div className="nav-c1l-t1" > <img src={logo}/></div>
                <div className="nav-c1l-t2" style={{position: "absolute", transform: "translateY(20px)"}}>நடுநிலை நாளிதழ்</div>
             </div>
-            <div className="nav-c1-links">
+           {isMobile &&             <div className="nav-c1-links">
               <div>
                 <IoSearchSharp className="nav-c1-link" />
               </div>
@@ -160,7 +170,7 @@ const handleLanguageToggle = async () => {
 />
 
               </div>
-            </div>
+            </div>}
           </div>
 
           <div className="nav-c2-line"></div>
@@ -174,10 +184,10 @@ const handleLanguageToggle = async () => {
               <div>அரசியல்</div>
               <div>உலகம்</div>
               <div>இந்தியா</div>
-              <div>தமிழக நியூஸ்</div>
-              <div>மாவட்டம்</div>
-              <div>விளையாட்டு</div>
-              <div>ட்ரெண்டிங்</div>
+              {isMobile &&  <div>தமிழக நியூஸ்</div>}
+              {isMobile &&  <div>மாவட்டம்</div>}
+             {isMobile &&   <div>விளையாட்டு</div>}
+            {isMobile &&    <div>ட்ரெண்டிங்</div>}
             </div>
             <div className="nav-c3-dm">
           {isOn ?   <IoSunnySharp onClick={() => setIsOn(!isOn)} />:<HiMiniMoon onClick={() => setIsOn(!isOn)} />}

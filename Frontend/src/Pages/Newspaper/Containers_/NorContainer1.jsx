@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
+import timeFun  from "./timeFun";
 
 const NorContainer1 = ({
   newsId = null,
@@ -35,7 +36,7 @@ const newsToShow = language === "en" ? translatedNews : allNews;
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: news.time || DEFAULT_DATA.time,
+        time: timeFun(news.time) || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 
@@ -54,7 +55,14 @@ const newsToShow = language === "en" ? translatedNews : allNews;
     >
             <style>
         {`
-
+.epnn1-img,
+.epnn2-img {
+  width: 250px;      /* FIXED */
+  height: 200px;
+  flex-shrink: 0;    /*  PREVENT FLEX RESIZE */
+  border-radius: 6px;
+  overflow: hidden;
+}
 
         .ep-nm-news-1 {
   width: 800px;
@@ -68,13 +76,7 @@ const newsToShow = language === "en" ? translatedNews : allNews;
 .ep-nm-news-1:hover {
   color: rgb(237, 1, 141);
 }
-.epnn1-img {
-  width: 390px;height: 200px;
-  max-width: 700px;
-  max-height: 200px;
-  border-radius: 5px;
-  overflow: hidden;
-}
+
 .epnn1-img img {
   width: 100%;
   height: 100%;
@@ -104,13 +106,6 @@ const newsToShow = language === "en" ? translatedNews : allNews;
   color: rgb(237, 1, 141);
 }
 
-.epnn2-img {
-  width: 1000px;
-  height: 200px;
-
-  border-radius: 5px;
-  overflow: hidden;
-}
 .epnn2-img img {
   width: 100%;
   height: 100%;
@@ -124,6 +119,21 @@ const newsToShow = language === "en" ? translatedNews : allNews;
 .epnn2-onln {
   font-size: 13px;
 }
+  @media (max-width: 575px) {
+    .ep-nm-news-1 {
+  width: 420px;
+
+}
+  .epnn1-img,
+.epnn2-img {
+  width: 140px;      /* FIXED */
+  height: 140px;
+  flex-shrink: 0;    /*  PREVENT FLEX RESIZE */
+  border-radius: 6px;
+  overflow: hidden;
+}
+}
+
 
         `}
       </style>

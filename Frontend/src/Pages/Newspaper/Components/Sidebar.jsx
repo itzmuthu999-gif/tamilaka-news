@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
-
+import logo from "../../../assets/logo1.png";
+import { IoSearchSharp } from "react-icons/io5";
 export default function Sidebar({ open, onClose }) {
   const [active, setActive] = useState(null);
 
@@ -17,19 +18,22 @@ export default function Sidebar({ open, onClose }) {
 
       {/* Sidebar */}
       <div className="sb-container">
+                    <div className="nav-c1-logo-v2" style={{position: "relative"}}>
+                       <div className="nav-c1l-t1-v2" > <img src={logo}/></div>
+                       <div className="nav-c1l-t2-v2" style={{position: "absolute", transform: "translateY(20px)"}}>நடுநிலை நாளிதழ்</div>
+                    </div>
         <div className="sb-header">
-          <h2>பிரிவுகள்</h2>
-          <IoClose className="sb-close" onClick={onClose} />
+          <div className="search-bar">
+  <input
+    type="text"
+    placeholder="Search..."
+    className="search-input"
+  />
+  <IoSearchSharp className="search-icon" />
+</div>
         </div>
 
         <div className="sb-content">
-
-          <SidebarItem title="செய்திகள்" active={active} toggle={toggle}>
-            <li>தமிழ்நாடு</li>
-            <li>இந்தியா</li>
-            <li>உலகம்</li>
-            <li>முக்கிய செய்திகள்</li>
-          </SidebarItem>
 
           <SidebarItem title="அரசியல்" active={active} toggle={toggle}>
             <li>தமிழ்நாடு அரசியல்</li>

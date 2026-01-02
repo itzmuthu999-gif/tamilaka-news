@@ -7,7 +7,7 @@ import Newsbund from './Pages/Newsbund';
 import Templatepage from './Pages/TemplatePage/Templatepage';
 import Newspaper from "./Trash/Newspaper";
 import ResizableDragPage from './Trash/ResizableDragPage';
-import PreviewPage from './Pages/PreviewPage';
+import PreviewPage from './Pages/PreviewPage/PreviewPage';
 import NewsPaperM from './Pages/Newspaper/NewsPaperM';
 import Editpaper from './Pages/Editpaper/Editpaper';
 import Tryout from './Tryout';

@@ -2,49 +2,72 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   MLayout: 1,
-  allNews: [],      // multiple saved news
-  trash: [],        // deleted news
+  allNews: [],
+  trash: [],
   currentNews: null,
   language: "ta",
-  translatedNews: [] // news being edited (full object)
+  translatedNews: []
 };
 
 const newsFormSlice = createSlice({
   name: "newsform",
   initialState,
   reducers: {
-    // Create a new news item
     saveNews: (state, action) => {
       const news = {
         id: Date.now(),
         ...action.payload,
         time: new Date().toLocaleString(),
+        comments: [] // Initialize empty comments array
       };
       state.allNews.push(news);
     },
 
-    // Set current news to be edited/viewed
     setCurrentNews: (state, action) => {
       state.currentNews = action.payload;
     },
+
     setLayout: (state, action) => {
-      state.MLayout = action.payload; // payload is 1 or 2
+      state.MLayout = action.payload;
     },
 
-    // Update an existing news item (in-place)
     updateNews: (state, action) => {
       const { id, updatedNews } = action.payload;
       const index = state.allNews.findIndex(n => n.id === id);
       if (index !== -1) {
         state.allNews[index] = { ...state.allNews[index], ...updatedNews };
       }
-      // if currentNews is the same id, update it too
       if (state.currentNews && state.currentNews.id === id) {
         state.currentNews = { ...state.currentNews, ...updatedNews };
       }
     },
 
-    // Move to trash
+    // NEW: Add comment to specific news
+    addComment: (state, action) => {
+      const { newsId, comment } = action.payload;
+      const news = state.allNews.find(n => n.id === newsId);
+      if (news) {
+        if (!news.comments) {
+          news.comments = [];
+        }
+        news.comments.push({
+          id: Date.now(),
+          name: comment.name,
+          text: comment.text,
+          timestamp: new Date().toLocaleString()
+        });
+      }
+    },
+
+    // NEW: Delete comment from specific news
+    deleteComment: (state, action) => {
+      const { newsId, commentId } = action.payload;
+      const news = state.allNews.find(n => n.id === newsId);
+      if (news && news.comments) {
+        news.comments = news.comments.filter(c => c.id !== commentId);
+      }
+    },
+
     deleteNews: (state, action) => {
       const id = action.payload;
       const news = state.allNews.find(n => n.id === id);
@@ -57,7 +80,6 @@ const newsFormSlice = createSlice({
       }
     },
 
-    // Restore from trash
     restoreNews: (state, action) => {
       const id = action.payload;
       const restored = state.trash.find(n => n.id === id);
@@ -67,19 +89,18 @@ const newsFormSlice = createSlice({
       state.trash = state.trash.filter(n => n.id !== id);
     },
 
-    // Permanently delete
     permanentDelete: (state, action) => {
       const id = action.payload;
       state.trash = state.trash.filter(n => n.id !== id);
     },
+
     setLanguage: (state, action) => {
-      state.language = action.payload; // "ta" or "en"
+      state.language = action.payload;
     },
 
     setTranslatedNews: (state, action) => {
       state.translatedNews = action.payload;
     }
-
   },
 });
 
@@ -91,9 +112,10 @@ export const {
   permanentDelete,
   setCurrentNews,
   setLayout,
-  setLanguage,          // 👈 ADD
-  setTranslatedNews
+  setLanguage,
+  setTranslatedNews,
+  addComment,      // NEW
+  deleteComment    // NEW
 } = newsFormSlice.actions;
 
 export default newsFormSlice.reducer;
-

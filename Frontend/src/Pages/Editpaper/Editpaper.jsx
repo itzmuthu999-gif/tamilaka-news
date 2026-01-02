@@ -7,10 +7,11 @@ import { HiMiniMoon } from "react-icons/hi2";
 import { AiFillGitlab } from "react-icons/ai";
 import NewsFilter from "./Components/NewsFilter";
 import PageEditor from "./Components/PageEditor";
-import { EditableContainer } from "./Components/EditableContainer";
+import  EditableContainer  from "./Components/EditableContainer";
+
 import { EditableSlider } from "./Components/EditableSlider";
 import { EditableSlider2 } from "./Components/EditableSlider2";
-import  EditableLine  from "./Containers_/EditableLine"; // ✅ NEW
+import EditableLine from "./Containers_/EditableLine";
 import logo from "../../assets/logo.png";
 
 import { useDispatch, useSelector } from "react-redux";

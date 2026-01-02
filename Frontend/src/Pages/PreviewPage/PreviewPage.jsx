@@ -1,17 +1,21 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import logo from "../assets/logo.png";
-import luffy from "../assets/luffy.webp";
-import newsimg from "../assets/newsimg.avif";
+
+import luffy from "../../assets/luffy.webp";
+import newsimg from "../../assets/newsimg.avif";
 import { IoSearchSharp } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { useParams } from "react-router-dom";
-import Footer from "./Newspaper/Components/Footer";
-import AutoScrollContainer from "./Newspaper/Components/AutoScrollContainer";
-import BigNewsContainer4A from "./Newspaper/Containers_/BigContainer4A";
+import Footer from "../Newspaper/Components/Footer";
+import AutoScrollContainer from "../Newspaper/Components/AutoScrollContainer";
+import BigNewsContainer4A from "../Newspaper/Containers_/BigContainer4A";
+import CommentSection from "./CommentSection";
+import Navbarr from "../Newspaper/Components/Navbarr";
+import "./Previewpge.scss";
+
 
 export default function PreviewPage() {
   const { id } = useParams();
@@ -52,7 +56,7 @@ const currentNews = allNews.find(
   })();
 
   return (
-    <div>
+    <div className="prepge-main">
       <style>
         {`
   .ele-news {
@@ -70,58 +74,14 @@ const currentNews = allNews.find(
       </style>
 
       {/* ------------------------------- NAVBAR ------------------------------- */}
-      <div className="navcon1">
-        <div className="navcon2">
-          <div className="nav-c1">
-            <div className="nav-c1-date">வியாழன் அக்டோபர் 30 2025</div>
-            <div className="nav-c1-logo">
-              <img src={logo} alt="alt" />
-            </div>
-            <div className="nav-c1-links">
-              <div>
-                <IoSearchSharp />
-              </div>
-              <div>
-                <IoMdNotificationsOutline />
-              </div>
-              <div>
-                <BiWorld />
-              </div>
-            </div>
-          </div>
+       <div className="pp-nav-ov">
+        <Navbarr/>
+       </div>
+       <div>
 
-          <div className="nav-c2-line"></div>
+        <br /><br /><br />
+       </div>
 
-          <div className="nav-c3">
-            <div className="nav-c3-ham">
-              <GiHamburgerMenu />
-            </div>
-            <div className="nav-c3-sections">
-              <div>அரசியல்</div>
-              <div>உலகம்</div>
-              <div>இந்தியா</div>
-              <div>தமிழக நியூஸ்</div>
-              <div>மாவட்டம்</div>
-              <div>விளையாட்டு</div>
-              <div>ட்ரெண்டிங்</div>
-            </div>
-            <div className="nav-c3-dm">
-              <HiMiniMoon />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ---------------------------- BREAKING NEWS ---------------------------- */}
-      <div className="break-news">
-        <p>
-          சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம் | டெல்லியில் மழை
-          வெள்ளம் – போக்குவரத்து பாதிப்பு | பெங்களூருவில் பெரிய IT நிறுவனத்தில்
-          திடீர் பணிநீக்கம் | தமிழகத்தில் இன்று மின்தடை அறிவிப்பு | கோவை அருகே
-          வெடிகுண்டு பரபரப்பு – போலீஸ் விசாரணை தொடக்கம் | பங்குச்சந்தை சரிவு –
-          முதலீட்டாளர்கள் அதிர்ச்சி
-        </p>
-      </div>
 
       {/* ------------------------------- MAIN NEWS ------------------------------ */}
       <div className="news-m-cont">
@@ -193,6 +153,12 @@ const currentNews = allNews.find(
           {MLayout === 1 && <Melumnews />}
         </div>
         
+      </div>
+      <div className="comment-sec">
+        <CommentSection 
+          newsId={currentNews.id} 
+          comments={currentNews.comments || []} 
+        />
       </div>
 
        <div className="footer-overlay"  style={{display: "flex",flexDirection: "column" ,justifyContent: "center", alignItems: "center", width: "1500px"}}>

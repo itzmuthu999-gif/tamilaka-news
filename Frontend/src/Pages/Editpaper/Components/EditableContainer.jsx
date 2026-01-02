@@ -44,7 +44,7 @@ const COMPONENT_MAP = {
   "Normal Container Type 5": NorContainer5,
 };
 
-export function EditableContainer({
+export default function EditableContainer({
   id,
   position,
   size,

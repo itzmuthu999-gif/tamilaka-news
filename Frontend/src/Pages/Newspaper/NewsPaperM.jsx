@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "./Components/Navbar";
+import Navbar from "./Components/Navbarr";
 import { useState } from "react";
 import "./newspaper.scss";
 import BigNewsContainer1 from "./Containers_/BigContainer1";
@@ -25,17 +25,16 @@ import Main from "./Pages/Main";
 export default function NewsPaperM() {
   const [isOn, setIsOn] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
   const themeStyle = {
     backgroundColor: isOn ? "#141414" : "#ffffffff",
     color: isOn ? "#ffffffff" : "#141414",
-    minHeight: "100vh",
-    width: "100vw",
     transition: "all 0.3s ease",
     fontFamily: "Noto Sans Tamil",
   };
 
   return (
-    <div style={themeStyle}>
+    <div style={themeStyle} className="main-screen">
 <Navbar
   setIsOn={setIsOn}
   isOn={isOn}

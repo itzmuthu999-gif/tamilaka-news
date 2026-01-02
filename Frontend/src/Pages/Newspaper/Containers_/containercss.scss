@@ -1,0 +1,229 @@
+
+$gap1: 5px;
+$gap2: 5px;
+
+//Big ContaINER 1
+.ep-bg-news-1 {
+  width: 100%;
+  max-width: 800px;
+  height: fit-content;
+  margin: 5px auto;
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+
+.epbn1-img {
+  width: 100%;
+  height: 500px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.epbn1-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.epbn1-hdln {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.epbn1-onln {
+  font-size: 14px;
+}
+  
+@media (max-width: 575px) {
+  .ep-bg-news-1 {
+
+    max-width: 100%;
+    width: 400px;
+    margin: 5px 0;
+  }
+
+  .epbn1-img {
+    height: 220px;
+  }
+
+  .epbn1-hdln {
+    font-size: 18px;
+  }
+
+  .epbn1-onln {
+    font-size: 13px;
+  }
+}
+//Normal News 5
+////normal container phase 2 - 2
+.ep-nm2-news-2 {
+  width: 425px;
+  height: fit-content;
+  // border: solid 1px;
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm2-news-2:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn22-img {
+  width: 100px; /* fixed width */
+  height: 70px; /* fixed height */
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0; /* IMPORTANT if inside a flex container */
+}
+
+.epnn22-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.epbn22-hdln {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.epnn22-onln {
+  font-size: 11px;
+  height: 53px;
+  overflow: hidden;
+}
+.ep-nm22-sbc {
+  display: flex;
+}
+.ep-nm23sbc-c1,.ep-nm22sbc-c1
+{
+  display: flex;flex-direction: column;gap: 2px;
+  width: 320px;
+
+}
+////normal container phase 2 - 3
+.ep-nm2-news-3 {
+  width: 425px;
+  height: fit-content;
+  margin: 5px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm2-news-3:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn23-img {
+  width: 100px; /* fixed width */
+  height: 70px; /* fixed height */
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0; /* IMPORTANT if inside a flex container */
+}
+
+.epnn23-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.epbn23-hdln {
+  font-size: 15px;
+  font-weight: bold;
+}
+.epnn23-onln {
+  font-size: 11px;
+  height: 53px;
+  overflow: hidden;
+}
+.ep-nm23-sbc {
+  display: flex;
+  gap: $gap2;
+}
+.ep-nm23sbc-c1
+{
+  display: flex;flex-direction: column;gap: 2px;
+}
+
+ 
+@media (max-width: 575px) {
+    .ep-nm2-news-2 {
+  width: 400px;
+}
+}
+
+
+.ep-nm-news-1 {
+  width: 800px;
+  height: fit-content;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-1:hover {
+  color: rgb(237, 1, 141);
+}
+.epnn1-img {
+  width: 390px;height: 200px;
+  max-width: 700px;
+  max-height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn1-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epnn1-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epnn1-onln {
+  font-size: 13px;
+}
+
+/// normal news container 2
+.ep-nm-news-2 {
+  width: 800px;
+  height: fit-content;
+  // border: solid;
+  margin: 5px;
+  display: flex;
+  gap: $gap2;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+}
+.ep-nm-news-2:hover {
+  color: rgb(237, 1, 141);
+}
+
+.epnn2-img {
+  width: 1000px;
+  height: 200px;
+
+  border-radius: 5px;
+  overflow: hidden;
+}
+.epnn2-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will make the image fill the box nicely */
+}
+.epnn2-hdln {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.epnn2-onln {
+  font-size: 13px;
+}
+
+ 
+@media (max-width: 575px) {
+    .ep-nm-news-1 {
+  width: 100px;
+
+}
+}

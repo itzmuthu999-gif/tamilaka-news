@@ -9,10 +9,12 @@ export default function Footer() {
     <div className='foot-con'>
     <Line direction="H" length="100%" thickness="2px" color="#e80d8c"/>
     <div className="foot-con-c1">
-                        <div className="nav-c1-logo" style={{position: "relative"}}>
+       <div className="foot-con-inn">
+                                <div className="nav-c1-logo" style={{position: "relative"}}>
                    <div className="nav-c1l-t1" > <img src={logo}/></div>
                    <div className="nav-c1l-t2" style={{position: "absolute", transform: "translateY(20px)"}}>நடுநிலை நாளிதழ்</div>
                 </div>
+       </div>
     <div className="foot-con-c11" style={{display: "flex", padding: "0px 150px",justifyContent: "space-between"}}>
 
     <div className="foot-con-c111">

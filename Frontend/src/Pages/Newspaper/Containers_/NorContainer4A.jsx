@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import timeFun  from "./timeFun";
 
 const NorContainer4A = ({ newsId = null, border = false }) => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const newsToShow = language === "en" ? translatedNews : allNews;
   const renderData = news
     ? {
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: news.time || DEFAULT_DATA.time,
+        time: timeFun(news.time) || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 

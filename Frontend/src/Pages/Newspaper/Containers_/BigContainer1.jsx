@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
+import timeFun  from "./timeFun";
+import './containercss.scss'
 
 const BigNewsContainer1 = ({ newsId = null, version = 1, border = false }) => {
   const navigate = useNavigate();
@@ -32,11 +34,12 @@ const newsToShow = language === "en" ? translatedNews : allNews;
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: news.time || DEFAULT_DATA.time,
+        time: timeFun(news.time) || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 
-  const handleNavigate = () => {
+  const handleNavigate = () =>
+  {
     if (!newsId) return;
     navigate(`/preview/${newsId}`);
   };
@@ -51,37 +54,7 @@ const newsToShow = language === "en" ? translatedNews : allNews;
     >
             <style>
         {`
-     .ep-bg-news-1 {
-  width: 800px; 
-  height: fit-content;
-  // border: solid;
-  margin: 5px;
-  transition: 0.5s ease-in-out;
-  cursor: pointer;
-}
-.ep-bg-news-1:hover {
-  color: rgb(237, 1, 141);
-}
 
-.epbn1-img {
-  width: 800px;
-  height: 500px;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.epbn1-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This will make the image fill the box nicely */
-}
-.epbn1-hdln {
-  font-size: 25px;
-  font-weight: bold;
-}
-
-.epbn1-onln {
-  font-size: 14px;
-}
 
 
 `}
