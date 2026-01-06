@@ -19,8 +19,6 @@ export default function PageEditor({
   open = false,
   onClose = () => {},
   categories: initialCategories = [],
-  onHeightChange = () => {},
-  onAddContainer = () => {},
   onAddSlider = () => {},
   onAddSlider2 = () => {},
 }) {
@@ -44,7 +42,6 @@ export default function PageEditor({
   const [activeTab, setActiveTab] = useState("containers");
   const [showBorders, setShowBorders] = useState(true);
   const [showLines, setShowLines] = useState(true);
-  const [height, setHeight] = useState(600);
   const [switchpos, setSwitchpos] = useState([1080, 10]);
   
   // Line arguments state
@@ -95,12 +92,6 @@ export default function PageEditor({
     if (e.key === "Enter") {
       handleDeleteCategory();
     }
-  };
-
-  const handleHeightChange = (e) => {
-    const newHeight = parseInt(e.target.value) || 600;
-    setHeight(newHeight);
-    onHeightChange(newHeight);
   };
 
   // Handle line arguments input
@@ -304,19 +295,42 @@ export default function PageEditor({
         <div className="drag-drop-section">
           <div className="section-title">Drag and Drop the containers</div>
 
+          {/* ✅ DRAGGABLE CONTAINER OVERLAY */}
           {activeTab === "containers" && (
-            <button onClick={onAddContainer} className="dds-add-cont-btn">
-              <Plus size={18} />
-              Add Container Overlay
-            </button>
-          )}
-
-          <div className="dds-add-ht">
-            <div>Height</div>
-            <div className="div">
-              <input type="number" value={height} onChange={handleHeightChange} />
+            <div
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("containerOverlay", "true");
+                e.dataTransfer.effectAllowed = "copy";
+              }}
+              style={{
+                padding: "15px",
+                margin: "10px 0",
+                border: "2px dashed #2196F3",
+                borderRadius: "8px",
+                background: "#e3f2fd",
+                cursor: "grab",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                fontWeight: "600",
+                color: "#1976d2",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#bbdefb";
+                e.currentTarget.style.borderColor = "#1976d2";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#e3f2fd";
+                e.currentTarget.style.borderColor = "#2196F3";
+              }}
+            >
+              <Plus size={20} />
+              Container Overlay (Drag to Canvas)
             </div>
-          </div>
+          )}
 
           <div className="tabs-container">
             {["containers", "sliders", "lines", "headers", "ad", "layouts"].map((tab) => (
@@ -348,7 +362,7 @@ export default function PageEditor({
                 ))}
               </div>
             ) : activeTab === "lines" ? (
-              /* ✅ LINES TAB - EXACT DESIGN FROM IMAGE */
+              /* LINES TAB */
               <div style={{ padding: "20px" }}>
                 <div style={{ 
                   display: "grid", 

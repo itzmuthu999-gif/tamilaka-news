@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 import luffy from "../../assets/luffy.webp";
@@ -12,23 +12,80 @@ import { useParams } from "react-router-dom";
 import Footer from "../Newspaper/Components/Footer";
 import AutoScrollContainer from "../Newspaper/Components/AutoScrollContainer";
 import BigNewsContainer4A from "../Newspaper/Containers_/BigContainer4A";
+import BigNewsContainer4 from "../Newspaper/Containers_/BigContainer4";
 import CommentSection from "./CommentSection";
 import Navbarr from "../Newspaper/Components/Navbarr";
 import "./Previewpge.scss";
 
+import timeFun from "../Newspaper/Containers_/timeFun";
+import AdBox from '../Newspaper/Components/AdBox';
+import Newsheader from '../Newspaper/Components/Newsheader';
+import NorContainer5 from "../Newspaper/Containers_/NorContainer5";
+import Line from "../Newspaper/Components/Line";
+import { useEffect } from "react";
+import { RxFontSize } from "react-icons/rx";
+import { BiFontSize } from "react-icons/bi";
+import {
+  FaFacebookF,
+  FaWhatsapp,
+  FaTelegramPlane,
+  FaEnvelope,
+  FaLink,
+} from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import BigNewsContainer4B from "../Newspaper/Containers_/BigContainer4B";
 
 export default function PreviewPage() {
   const { id } = useParams();
-const allNews = useSelector((state) => state.newsform.allNews);
+  const allNews = useSelector((state) => state.newsform.allNews);
+  
+  // Font size state - starts at 100% (base size)
+  const [fontSize, setFontSize] = useState(100);
+  
+  const icons = [
+    { icon: <FaWhatsapp />, href: "#" },
+    { icon: <FaFacebookF />, href: "#" },
+    { icon: <FaXTwitter />, href: "#" },
+    { icon: <FaLink />, href: "#" },
+  ];
+  
+  const styles = {
+    container: {
+      display: "flex",
+      gap: "12px",
+      margin: "15px 0px",
+    },
+    icon: {
+      width: "40px",
+      height: "40px",
+      borderRadius: "50%",
+      border: "1px solid #000",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#000",
+      fontSize: "18px",
+      textDecoration: "none",
+      transition: "0.2s ease",
+    },
+  };
 
-const currentNews = allNews.find(
-  (news) => news.id === Number(id)
-);
+  const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth > 768);
+    };
 
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const currentNews = allNews.find((news) => news.id === Number(id));
   const MLayout = useSelector((state) => state.newsform.MLayout);
+  
   if (!currentNews) 
     return <div style={{ padding: 40 }}>No news selected for preview.</div>;
-  
 
   const { data, fullContent } = currentNews;
 
@@ -55,62 +112,39 @@ const currentNews = allNews.find(
     };
   })();
 
+  // Font size control functions
+  const increaseFontSize = () => {
+    setFontSize(prev => Math.min(prev + 10, 150)); // Max 150%
+  };
+
+  const decreaseFontSize = () => {
+    setFontSize(prev => Math.max(prev - 10, 70)); // Min 70%
+  };
+
   return (
     <div className="prepge-main">
-      <style>
-        {`
-  .ele-news {
-    overflow: visible !important;
-    position: relative;
-  }
-  .el-full-news {
-    overflow: visible !important;
-    position: relative;
-  }
-  .news-m-cont2 {
-    display: flex !important; /* remove flex clipping effect */
-  }
-`}
-      </style>
-
-      {/* ------------------------------- NAVBAR ------------------------------- */}
-       <div className="pp-nav-ov">
+      <div className="pp-nav-ov">
         <Navbarr/>
-       </div>
-       <div>
+      </div>
+      <div>
+        <br />
+      </div>
 
-        <br /><br /><br />
-       </div>
-
-
-      {/* ------------------------------- MAIN NEWS ------------------------------ */}
-      <div className="news-m-cont">
-        <div className="news-m-cont2">
-          <div className="ele-news2">
-            <div className="ele-const-news">
-              {!currentNews.hiddenElements?.zonar && (
-                <div className="ele-const-zonar">{data.zonal}</div>
-              )}
-              {!currentNews.hiddenElements?.author && (
-                <div className="ele-const-author">
-                  {" "}
-                  By: {data.author || "Unknown Author"}{" "}
-                </div>
-              )}
-              <div className="ele-const-time">
-                {currentNews.time || "No date available"}
-              </div>
-              <div className="ele-con-ne-head">{data.headline}</div>
-              <div className="ele-con-ne-oneliner">
+      <div className="Prevpge-main-con1">
+        <div className="premain-con1-sub">
+          <div className="main-news-cont">
+            <div className="main-news-sbcon1" style={{ fontSize: `${fontSize}%` }}>
+              <div className="mannsw-sc-head">{data.headline}</div>
+              <div className="mannsw-sc-oneliner">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{data.oneLiner}
               </div>
               {!currentNews.hiddenElements?.thumbnail && (
-                <div className="ele-con-tmbnl">
+                <div className="mannsw-sc-tmbnl">
                   {thumb.isVideo ? (
                     <video
                       src={thumb.url}
                       controls
-                      controlsList="nodownload" // Optional: prevent download
+                      controlsList="nodownload"
                       style={{
                         width: "100%",
                         height: "100%",
@@ -125,68 +159,98 @@ const currentNews = allNews.find(
                   )}
                 </div>
               )}
+              <div className="mannsw-sc-time">
+                {timeFun(currentNews.time) || "No date available"}
+              </div>
+              <div className="mannsw-lnksz">
+                <div style={styles.container}>
+                  {icons.map((item, index) => (
+                    <a
+                      key={index}
+                      href={item.href}
+                      style={styles.icon}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.icon}
+                    </a>
+                  ))}
+                </div>
+                <div className="mannsw-ls-c2">
+                  <div 
+                    className="mannswls-c11-dec mannswbtn" 
+                    onClick={decreaseFontSize}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <RxFontSize />
+                  </div>
+                  <div 
+                    className="mannswls-c11-inc mannswbtn" 
+                    onClick={increaseFontSize}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <BiFontSize />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* ------------------------- FULL NEWS AREA ------------------------- */}
             <div
-              className="el-full-news"
+              className="main-news-sbcon1"
               style={{
-                height: `${currentNews.divHeight || 900}px`,
                 position: "relative",
-                overflow: "visible", // IMPORTANT FIX
-                display: "block", // IMPORTANT FIX
-                border: "none"
+                overflow: "visible",
+                display: "block",
+                border: "none",
+                fontSize: `${fontSize}%`, // Apply font size here too
               }}
             >
-              {fullContent.map((box) =>
-                box.type === "paragraph" ? (
-                  <ParagraphStatic key={box.id} box={box} />
-                ) : (
-                  <ImageStatic key={box.id} box={box} />
-                )
-              )}
+              {fullContent
+                .filter(box => box.type === "paragraph")
+                .map(box => (
+                  <ParagraphResponsive key={box.id} box={box} />
+                ))}
+
+              {fullContent
+                .filter(box => box.type === "image")
+                .map(box => (
+                  <ImageResponsive key={box.id} box={box} />
+                ))}
             </div>
+            
+            <div className="comment-sec">
+              <CommentSection 
+                newsId={currentNews.id} 
+                comments={currentNews.comments || []} 
+              />
+            </div>  
           </div>
 
-          {/* ------------------------- SIDE NEWS (LAYOUT 1) ------------------------ */}
-          {MLayout === 1 && <div className="hr-line"></div>}
+          {MLayout === 1 && isMobile && <Line direction="V" length="1250px" thickness="1px" color="#e80d8c" />}
           {MLayout === 1 && <Melumnews />}
         </div>
+      </div>
+       <div className="mannsw-ns-header"><div className="mannswns-nd-o2"><Newsheader name={"Top news"} /></div></div>
+      <div className="footer-overlay">
         
-      </div>
-      <div className="comment-sec">
-        <CommentSection 
-          newsId={currentNews.id} 
-          comments={currentNews.comments || []} 
-        />
-      </div>
+        <div className="npmc-c3">
+          <AutoScrollContainer gap={0} autoScrollDelay={10000} autoTranslateX={310} manualTranslateX={310}>
+            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
+            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
+            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
+            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
+            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
+            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
 
-       <div className="footer-overlay"  style={{display: "flex",flexDirection: "column" ,justifyContent: "center", alignItems: "center", width: "1500px"}}>
-                        <div
-            className="npmc-c3"
-            style={{
-              width: "1250px",
-              display: "flex",
-              gap: "15px",
-              margin: "15px 0px",
-            }}
-          >
-            <AutoScrollContainer>
-              <BigNewsContainer4A />
-              <BigNewsContainer4A />
-              <BigNewsContainer4A />
-              <BigNewsContainer4A />
-              <BigNewsContainer4A />
-            </AutoScrollContainer>
-          </div>
+
+          </AutoScrollContainer>
+        </div>
         <Footer/>
-       </div>
-      
+      </div>
     </div>
   );
 }
 
-/* ----------------------------- STATIC PARAGRAPH ---------------------------- */
 function ParagraphStatic({ box }) {
   return (
     <div
@@ -206,7 +270,6 @@ function ParagraphStatic({ box }) {
   );
 }
 
-/* ------------------------------- STATIC IMAGE ------------------------------ */
 function ImageStatic({ box }) {
   return (
     <img
@@ -225,7 +288,6 @@ function ImageStatic({ box }) {
   );
 }
 
-/* ------------------------------ SIDE NEWS CARD ----------------------------- */
 function NewsCard({
   title = "Sample title",
   image = newsimg,
@@ -247,23 +309,6 @@ function NewsCard({
   );
 }
 
-function Line({
-  width = "100%",
-  height = "1px",
-  color = "#ffb1ffff",
-  orientation = "horizontal",
-  margin = "10px 0",
-}) {
-  const style = {
-    backgroundColor: color,
-    margin,
-    width: orientation === "horizontal" ? width : height,
-    height: orientation === "horizontal" ? height : width,
-  };
-  return <div style={style}></div>;
-}
-
-/* ---------------------------- SIDE ABOUT NEWS ----------------------------- */
 function AdvertisementBox({ width = "300px", height = "250px" }) {
   return (
     <div
@@ -288,33 +333,42 @@ function AdvertisementBox({ width = "300px", height = "250px" }) {
 function Melumnews() {
   return (
     <>
-      <div className="side-news">
+      <div className="mens-side-news">
         <div>
           <AdvertisementBox width="100%" height="100px" />
         </div>
-        <div className="morenews">
-          <div className="mn-txt">மேலும் செய்திகள்</div>
-          <Line height="2px" width="100%" />
+        <div className="mens-morenews">
+          <Newsheader name={"Top news"} />
         </div>
-        <div className="mrn-in-cont">
-          <NewsCard
-            image={newsimg}
-            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
-          />
-          <NewsCard
-            image={newsimg}
-            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
-          />
-          <NewsCard
-            image={newsimg}
-            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
-          />
-          <NewsCard
-            image={newsimg}
-            title="பைடன் நிர்வாகம் புதிய குடியேற்றக் கொள்கையை அறிவிப்பு – அதிருப்தியில் எல்லை மாநிலங்கள்"
-          />
+        <div className="mens-in-cont">
+          <NorContainer5/>
+          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
+          <NorContainer5/>
+          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
+          <NorContainer5/>
+          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
+          <NorContainer5/>
+          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
+          <NorContainer5/>
+          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
         </div>
       </div>
     </>
+  );
+}
+
+function ParagraphResponsive({ box }) {
+  return (
+    <p className="news-paragraph">
+      {box.content}
+    </p>
+  );
+}
+
+function ImageResponsive({ box }) {
+  return (
+    <div className="news-image-wrapper">
+      <img src={box.content} alt="news" />
+    </div>
   );
 }

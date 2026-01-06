@@ -146,7 +146,8 @@ $gap2: 5px;
  
 @media (max-width: 575px) {
     .ep-nm2-news-2 {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
 }
 }
 

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addComment } from "../Slice/newsformslice.js";
 import "./Previewpge.scss";
+import timeFun from "../Newspaper/Containers_/timeFun.js";
+import Line from "../Newspaper/Components/Line.jsx";
 
 export default function CommentSection({ newsId, comments = [] }) {
   const dispatch = useDispatch();
@@ -43,16 +45,21 @@ export default function CommentSection({ newsId, comments = [] }) {
         <div className="comments-display-box">
           <div className="comments-list">
             {displayedComments.map((comment, index) => (
-              <div key={comment.id || index} className="comment-item">
+             <div>
+                            <div key={comment.id || index} className="comment-item">
                 <div className="comment-avatar">
                   {comment.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="comment-content">
                   <div className="comment-name">{comment.name}</div>
                   <div className="comment-text">{comment.text}</div>
-                  <div className="comment-time">{comment.timestamp}</div>
+                  <div className="comment-time">{ timeFun(comment.timestamp)}</div>
                 </div>
+                                     
               </div>
+              <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff"/>
+             </div>
+              
             ))}
           </div>
 

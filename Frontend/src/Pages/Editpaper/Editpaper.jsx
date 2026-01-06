@@ -1,28 +1,22 @@
 import React, { useState } from "react";
-import { IoSearchSharp } from "react-icons/io5";
-import { IoMdNotificationsOutline } from "react-icons/io";
-import { BiWorld } from "react-icons/bi";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { HiMiniMoon } from "react-icons/hi2";
 import { AiFillGitlab } from "react-icons/ai";
+import { BiCube } from "react-icons/bi";
 import NewsFilter from "./Components/NewsFilter";
 import PageEditor from "./Components/PageEditor";
-import  EditableContainer  from "./Components/EditableContainer";
-
+import EditableContainer from "./Components/EditableContainer";
+import EditorSettings from "./Components/EditorSettings";
 import { EditableSlider } from "./Components/EditableSlider";
 import { EditableSlider2 } from "./Components/EditableSlider2";
 import EditableLine from "./Containers_/EditableLine";
-import logo from "../../assets/logo.png";
+import Navbarr from "../Newspaper/Components/Navbarr";
 
 import { useDispatch, useSelector } from "react-redux";
 import { 
   addContainer,
-  // deleteContainer,
   addSlider,
 } from "../Slice/editpaperslice";
 
 import "./editpapercss.scss";
-import { BiCube } from "react-icons/bi";
 
 export default function Editpaper() {
   const dispatch = useDispatch();
@@ -31,18 +25,13 @@ export default function Editpaper() {
   const currentPage = pages.find(p => p.catName === activePage);
   const containers = currentPage?.containers || [];
   const sliders = currentPage?.sliders || [];
-  const lines = currentPage?.lines || []; // ✅ NEW
+  const lines = currentPage?.lines || [];
+  const pageSettings = currentPage?.settings || { height: 600, gridColumns: 12, gap: 10, padding: 20 };
 
   const categories = ["Politics", "Sports", "Cinema", "Weather", "Astrology", "Kids"];
   const [showEditor, setShowEditor] = useState(false);
-  const [edContHeight, setEdContHeight] = useState(600);
   const [nextId, setNextId] = useState(1);
   const [showNewsFilter, setShowNewsFilter] = useState(false);
-
-  const handleAddContainer = () => {
-    dispatch(addContainer(activePage, { x: 50, y: 50 }));
-    setNextId(nextId + 1);
-  };
 
   const handleAddSlider = () => {
     dispatch(addSlider(activePage, { x: 50, y: 100 }, "type1"));
@@ -54,9 +43,27 @@ export default function Editpaper() {
     setNextId(nextId + 1);
   };
 
-  // const handleDeleteContainer = (id) => {
-  //   dispatch(deleteContainer({ catName: activePage, containerId: id }));
-  // };
+  // ✅ Handle drop for container overlay on ep-ed-cont
+  const handleCanvasDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const isContainerOverlay = e.dataTransfer.getData("containerOverlay");
+    
+    if (isContainerOverlay === "true") {
+      dispatch(addContainer(activePage));
+      setNextId(nextId + 1);
+      
+      console.log("Container added to grid flow");
+    }
+  };
+
+  // ✅ Allow drop event
+  const handleCanvasDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "copy";
+  };
 
   return (
     <div>
@@ -64,8 +71,6 @@ export default function Editpaper() {
         open={showEditor} 
         onClose={() => setShowEditor(false)} 
         categories={categories}
-        onHeightChange={setEdContHeight}
-        onAddContainer={handleAddContainer}
         onAddSlider={handleAddSlider}
         onAddSlider2={handleAddSlider2}
       />
@@ -83,65 +88,50 @@ export default function Editpaper() {
           <BiCube />
         </button>
       )}
-
-      <div className="navcon1">
-        <div className="navcon2">
-          <div className="nav-c1">
-            <div className="nav-c1-date">வியாழன் அக்டோபர் 30 2025</div>
-            <div className="nav-c1-logo">
-              <img src={logo} alt="alt" />
-            </div>
-            <div className="nav-c1-links">
-              <div>
-                <IoSearchSharp />
-              </div>
-              <div>
-                <IoMdNotificationsOutline />
-              </div>
-              <div>
-                <BiWorld />
-              </div>
-            </div>
-          </div>
-
-          <div className="nav-c2-line"></div>
-
-          <div className="nav-c3">
-            <div className="nav-c3-ham">
-              <GiHamburgerMenu />
-            </div>
-            <div className="nav-c3-sections">
-              <div>அரசியல்</div>
-              <div>உலகம்</div>
-              <div>இந்தியா</div>
-              <div>தமிழக நியூஸ்</div>
-              <div>மாவட்டம்</div>
-              <div>விளையாட்டு</div>
-              <div>ட்ரெண்டிங்</div>
-            </div>
-            <div className="nav-c3-dm">
-              <HiMiniMoon />
-            </div>
-          </div>
-        </div>
+      
+      <div style={{marginLeft: "70px", width:"1400px"}}>
+        <Navbarr/>
       </div>
 
       <div className="ep-main-ed-cont">
-        <div className="ep-ed-cont" style={{ height: `${edContHeight}px` }}>
-          {/* RENDER CONTAINERS */}
-          {containers.map((container) => (
-            <EditableContainer
-              key={container.id}
-              id={container.id}
-              catName={activePage}
-              position={container.position}
-              size={container.size}
-              grid={container.grid}
-              items={container.items}
-            />
-          ))}
+        {/* ✅ CRITICAL: Main canvas with drop handlers */}
+        <div 
+          className="ep-ed-cont" 
+          style={{ 
+            height: `${pageSettings.height}px`,
+            padding: `${pageSettings.padding}px`,
+            position: 'relative',
+            overflow: 'auto'
+          }}
+          onDrop={handleCanvasDrop}
+          onDragOver={handleCanvasDragOver}
+        >
+          {/* ✅ EDITOR SETTINGS BUTTON */}
+          <EditorSettings />
 
-          {/* RENDER SLIDERS */}
+          {/* ✅ GRID CONTAINER FOR CONTAINERS - This is the key fix */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${pageSettings.gridColumns}, 1fr)`,
+              gap: `${pageSettings.gap}px`,
+              width: '100%',
+              marginBottom: `${pageSettings.gap}px`
+            }}
+          >
+            {/* RENDER CONTAINERS IN GRID */}
+            {containers.map((container) => (
+              <EditableContainer
+                key={container.id}
+                id={container.id}
+                catName={activePage}
+                grid={container.grid}
+                items={container.items}
+              />
+            ))}
+          </div>
+
+          {/* RENDER SLIDERS - Outside grid, positioned absolutely */}
           {sliders.map((slider) => {
             if (slider.type === "type1") {
               return (
@@ -172,7 +162,7 @@ export default function Editpaper() {
             return null;
           })}
 
-          {/* ✅ RENDER LINES */}
+          {/* RENDER LINES - Outside grid, positioned absolutely */}
           {lines.map((line) => (
             <EditableLine
               key={line.id}
@@ -187,11 +177,17 @@ export default function Editpaper() {
             />
           ))}
 
+          {/* Empty state message */}
           {containers.length === 0 && sliders.length === 0 && lines.length === 0 && (
-            <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}></div>
+            <div style={{ 
+              padding: "40px", 
+              textAlign: "center",
+              color: "#999",
+              fontSize: "16px"
+            }}>
+              Drop containers here or add sliders/lines from the Page Editor
+            </div>
           )}
-
-          <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}></div>
         </div>
       </div>
     </div>

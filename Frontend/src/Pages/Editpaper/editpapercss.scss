@@ -710,3 +710,171 @@ $gap2: 15px;
 }
 
 
+
+
+/////settings button 
+/* Editor Settings Button */
+.editor-settings-btn {
+  position: absolute;
+  transform: translate(-10px,-30px);
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.editor-settings-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #d0d0d0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.editor-settings-btn:active {
+  transform: translate(-10px,-30px) scale(0.95);
+}
+
+/* Settings Panel */
+.editor-settings-panel {
+  position: absolute;
+  transform: translate(-10px,-30px);
+  top: 60px;
+  right: 10px;
+  width: 320px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 101;
+  overflow: hidden;
+}
+
+/* Settings Header */
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.settings-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Settings Content */
+.settings-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Setting Item */
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setting-item label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setting-item label .hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: #666;
+}
+
+.setting-item input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.setting-item input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.setting-item input:hover {
+  border-color: #b0b0b0;
+}
+
+/* Settings Footer */
+.settings-footer {
+  padding: 7px 20px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.info-text {
+  font-size: 13px;
+  color: #666;
+}
+
+.info-text strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Scrollbar Styling */
+.settings-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 3px;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
