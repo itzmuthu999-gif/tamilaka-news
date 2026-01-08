@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
+import { MdHorizontalRule } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
 import {
@@ -9,8 +10,9 @@ import {
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  toggleContainerSeparator,
+  toggleSliderSeparator,
 } from "../../Slice/editpaperslice";
-
 
 const BigNewsContainer5 = ({
   border = false,
@@ -18,7 +20,7 @@ const BigNewsContainer5 = ({
   slotId,
   catName,
   containerId,
-    isSlider = false,
+  isSlider = false,
   isSlider2 = false,
 }) => {
   const [version, setVersion] = useState(1);
@@ -29,7 +31,6 @@ const BigNewsContainer5 = ({
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
-    // ✅ Both slider types now use the same sliders array
     if (isSlider || isSlider2) {
       const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
@@ -38,7 +39,9 @@ const BigNewsContainer5 = ({
       return container?.items.find((i) => i.slotId === slotId);
     }
   });
+  
   const newsId = slot?.newsId;
+  const showSeparator = slot?.showSeparator || false;
   const news = allNews.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
@@ -64,14 +67,15 @@ const BigNewsContainer5 = ({
         time: news.time || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
+
   const handleDragOver = (e) => e.preventDefault();
-const handleDrop = (e) => {
+
+  const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     const droppedId = e.dataTransfer.getData("newsId");
     if (droppedId) {
-      // ✅ Use unified slider action for both slider types
       if (isSlider || isSlider2) {
         dispatch(
           dropNewsIntoSliderSlot({
@@ -97,7 +101,6 @@ const handleDrop = (e) => {
   const handleDelete = (e) => {
     e.stopPropagation();
     
-    // ✅ Use unified slider action for both slider types
     if (isSlider || isSlider2) {
       dispatch(
         removeNewsFromSliderSlot({
@@ -119,10 +122,31 @@ const handleDrop = (e) => {
     onDelete?.();
   };
 
-
   const handleChange = (e) => {
     e.stopPropagation();
     setVersion((prev) => (prev === 2 ? 1 : 2));
+  };
+
+  const handleToggleSeparator = (e) => {
+    e.stopPropagation();
+    
+    if (isSlider || isSlider2) {
+      dispatch(
+        toggleSliderSeparator({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        toggleContainerSeparator({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
   };
 
   const handleNavigate = () => {
@@ -152,85 +176,196 @@ const handleDrop = (e) => {
   };
 
   return (
-    <div
-      className="ep-bg-news5-1"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onClick={handleNavigate}
-      style={{
-        border: border ? "2px dotted #999" : "none",
-        position: "relative",
-        cursor: "pointer",
-      }}
-    >
-      <style>{`
-        .ep-bg-news5-1 {
-          width: fit-content;
-          height: fit-content;
-          margin: 5px;
-          display: flex;
-          gap: 10px;
-          transition: 0.5s ease-in-out;
-        }
-        .ep-bg-news5-1:hover {
-          color: rgb(237, 1, 141);
-        }
-        .epbn51-img {
-          width: 500px;
-          height: 300px;
-          border-radius: 5px;
-          overflow: hidden;
-        }
-        .epbn51-hdln {
-          font-size: 20px;
-          font-weight: bold;
-        }
-        .epbn51-onln {
-          font-size: 13px;
-        }
-      `}</style>
+    <div style={{ position: "relative", width: "100%" }}>
+      <div
+        className="ep-bg-news5-1"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onClick={handleNavigate}
+        style={{
+          border: border ? "2px dotted #999" : "none",
+          position: "relative",
+          cursor: "pointer",
+        }}
+      >
+        <style>{`
+          .ep-bg-news5-1 {
+            width: 910px;
+            height: fit-content;
+            margin: 5px;
+            display: flex;
+            gap: 10px;
+            transition: 0.5s ease-in-out;
+          }
+          
+          .ep-bg-news5-1:hover {
+            color: rgb(237, 1, 141);
+          }
+          
+          .epbn51-img {
+            width: 500px;
+            height: 300px;
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
+          }
+          
+          .epbn51-content {
+            width: 400px;
+            flex-shrink: 0;
+          }
+          
+          .epbn51-hdln {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+          }
+          
+          .epbn51-onln {
+            font-size: 13px;
+            margin-bottom: 8px;
+          }
+          
+          .separator-btn-wrapper {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+          }
+          
+          .separator-line {
+            width: 100%;
+            height: 1px;
+            background-color: #999;
+            margin-top: 10px;
+          }
 
+          /* Responsive Styles */
+          @media (max-width: 1200px) {
+            .ep-bg-news5-1 {
+              width: 100%;
+              max-width: 910px;
+            }
+            
+            .epbn51-img {
+              width: 55%;
+              min-width: 300px;
+            }
+            
+            .epbn51-content {
+              width: 45%;
+              min-width: 250px;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .ep-bg-news5-1 {
+              flex-direction: column;
+              width: 100%;
+            }
+            
+            .epbn51-img {
+              width: 100%;
+              height: 250px;
+            }
+            
+            .epbn51-content {
+              width: 100%;
+            }
+            
+            .epbn51-hdln {
+              font-size: 18px;
+            }
+            
+            .epbn51-onln {
+              font-size: 12px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .epbn51-img {
+              height: 200px;
+            }
+            
+            .epbn51-hdln {
+              font-size: 16px;
+            }
+            
+            .epbn51-onln {
+              font-size: 11px;
+            }
+          }
+        `}</style>
+
+        {border && (
+          <div
+            style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              display: "flex",
+              gap: "6px",
+              zIndex: 10,
+            }}
+          >
+            <button onClick={handleChange} style={iconBtnStyle}>
+              <TbArrowsExchange />
+            </button>
+            <button onDoubleClick={handleDelete} style={iconBtnStyle}>
+              <IoIosClose />
+            </button>
+          </div>
+        )}
+
+        {version === 1 && (
+          <>
+            <div className="epbn51-content">
+              <div className="epbn51-hdln">{renderData.headline}</div>
+              <div className="epbn51-onln">{renderData.content}</div>
+              <div className="epn-tm">{renderData.time}</div>
+            </div>
+            <div className="epbn51-img">{renderMedia()}</div>
+          </>
+        )}
+
+        {version === 2 && (
+          <>
+            <div className="epbn51-img">{renderMedia()}</div>
+            <div className="epbn51-content">
+              <div className="epbn51-hdln">{renderData.headline}</div>
+              <div className="epbn51-onln">{renderData.content}</div>
+              <div className="epn-tm">{renderData.time}</div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Separator Toggle Button */}
       {border && (
-        <div
-          style={{
-            position: "absolute",
-            top: "8px",
-            right: "8px",
-            display: "flex",
-            gap: "6px",
-            zIndex: 10,
-          }}
-        >
-          <button onClick={handleChange} style={iconBtnStyle}>
-            <TbArrowsExchange />
-          </button>
-          <button onDoubleClick={handleDelete} style={iconBtnStyle}>
-            <IoIosClose />
+        <div className="separator-btn-wrapper">
+          <button
+            onClick={handleToggleSeparator}
+            style={{
+              ...iconBtnStyle,
+              backgroundColor: showSeparator ? "#666" : "#ccc",
+              borderRadius: "50%",
+              width: "28px",
+              height: "28px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1px solid #999",
+            }}
+            title="Toggle separator line"
+          >
+            <MdHorizontalRule size={20} color={showSeparator ? "#fff" : "#666"} />
           </button>
         </div>
       )}
 
-      {version === 1 && (
-        <>
-          <div style={{ width: "400px" }}>
-            <div className="epbn51-hdln">{renderData.headline}</div>
-            <div className="epbn51-onln">{renderData.content}</div>
-            <div className="epn-tm">{renderData.time}</div>
-          </div>
-          <div className="epbn51-img">{renderMedia()}</div>
-        </>
-      )}
-
-      {version === 2 && (
-        <>
-          <div className="epbn51-img">{renderMedia()}</div>
-          <div style={{ width: "400px" }}>
-            <div className="epbn51-hdln">{renderData.headline}</div>
-            <div className="epbn51-onln">{renderData.content}</div>
-            <div className="epn-tm">{renderData.time}</div>
-          </div>
-        </>
-      )}
+      {/* Separator Line */}
+      {showSeparator && <div className="separator-line" />}
     </div>
   );
 };

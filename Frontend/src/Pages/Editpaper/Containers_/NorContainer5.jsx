@@ -2,11 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
+import { RxDividerHorizontal } from "react-icons/rx";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  toggleContainerSeparator,
+  toggleSliderSeparator,
 } from "../../Slice/editpaperslice";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -18,19 +21,18 @@ const NorContainer5 = ({
   slotId,
   catName,
   containerId,
-    isSlider = false,
+  isSlider = false,
   isSlider2 = false,
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Add this
+  const dispatch = useDispatch();
 
-  // Read newsId from Redux instead of local state
+  // Read newsId and showSeparator from Redux
   const allNews = useSelector((state) => state.newsform.allNews);
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
-    // ✅ Both slider types now use the same sliders array
     if (isSlider || isSlider2) {
       const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
@@ -39,10 +41,10 @@ const NorContainer5 = ({
       return container?.items.find((i) => i.slotId === slotId);
     }
   });
-  const newsId = slot?.newsId; // Get newsId from Redux
+  
+  const newsId = slot?.newsId;
+  const showSeparator = slot?.showSeparator || false;
   const news = allNews.find((n) => n.id === newsId);
-
-  console.log("BigContainer1 Props:", { slotId, catName, containerId });
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -69,13 +71,12 @@ const NorContainer5 = ({
       }
     : DEFAULT_DATA;
 
-const handleDrop = (e) => {
+  const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     const droppedId = e.dataTransfer.getData("newsId");
     if (droppedId) {
-      // ✅ Use unified slider action for both slider types
       if (isSlider || isSlider2) {
         dispatch(
           dropNewsIntoSliderSlot({
@@ -101,7 +102,6 @@ const handleDrop = (e) => {
   const handleDelete = (e) => {
     e.stopPropagation();
     
-    // ✅ Use unified slider action for both slider types
     if (isSlider || isSlider2) {
       dispatch(
         removeNewsFromSliderSlot({
@@ -130,91 +130,139 @@ const handleDrop = (e) => {
     setVersion((prev) => (prev === 3 ? 1 : prev + 1));
   };
 
+  const handleToggleSeparator = (e) => {
+    e.stopPropagation();
+    
+    if (isSlider || isSlider2) {
+      dispatch(
+        toggleSliderSeparator({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        toggleContainerSeparator({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
+  };
+
   const handleNavigate = () => {
-    if (!newsId) return; // don't navigate for default template
+    if (!newsId) return;
     navigate(`/preview/${newsId}`);
   };
 
-
-
   return (
-    <div
-      className={version === 1 ? "ep-nm2-news-2" : "ep-nm2-news-3"}
-  onDrop={handleDrop}
-  onDragOver={handleDragOver}
-  onClick={handleNavigate}
-  style={{
-    border: border ? "2px dotted #999" : "none",
-    position: "relative"
-  }}
-    >
+    <div style={{ position: "relative" }}>
+      <div
+        className={version === 1 ? "ep-nm2-news-2" : "ep-nm2-news-3"}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onClick={handleNavigate}
+        style={{
+          border: border ? "2px dotted #999" : "none",
+          position: "relative"
+        }}
+      >
+        {/* Top Action buttons */}
+        {border && (
+          <div
+            style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              display: "flex",
+              gap: "6px",
+              zIndex: 10,
+            }}
+          >
+            {/* Change layout */}
+            <button
+              onClick={handleChange}
+              style={iconBtnStyle}
+              title="Change layout"
+            >
+              <TbArrowsExchange />
+            </button>
 
-      {/* Action buttons */}
-      {border && (
+            {/* Delete (double click) */}
+            <button
+              onDoubleClick={handleDelete}
+              style={iconBtnStyle}
+              title="Double click to delete"
+            >
+              <IoIosClose />
+            </button>
+          </div>
+        )}
+
+        {/* VERSION 1 */}
+        {version === 1 && (
+          <>
+            <div className="epbn22-hdln">{renderData.headline}</div>
+
+            <div className="ep-nm22-sbc">
+              <div className="ep-nm22sbc-c1">
+                <div className="epnn22-onln">{renderData.content}</div>
+                <div className="epn-tm">{renderData.time}</div>
+              </div>
+
+              <div className="epnn22-img">
+                <img src={renderData.image} alt="" />
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* VERSION 2 */}
+        {version === 2 && (
+          <>
+            <div className="epbn23-hdln">{renderData.headline}</div>
+
+            <div className="ep-nm23-sbc">
+              <div className="epnn23-img">
+                <img src={renderData.image} alt="" />
+              </div>
+
+              <div className="ep-nm23sbc-c1">
+                <div className="epnn23-onln">{renderData.content}</div>
+                <div className="epn-tm">{renderData.time}</div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Bottom Separator Toggle Button */}
+        {border && (
+          <button
+            onClick={handleToggleSeparator}
+            style={{
+              ...separatorBtnStyle,
+              backgroundColor: showSeparator ? "#666" : "#ddd",
+              color: showSeparator ? "#fff" : "#666",
+            }}
+            title={showSeparator ? "Remove separator" : "Add separator"}
+          >
+            <RxDividerHorizontal />
+          </button>
+        )}
+      </div>
+
+      {/* Separator Line */}
+      {showSeparator && (
         <div
           style={{
-            position: "absolute",
-            top: "8px",
-            right: "8px",
-            display: "flex",
-            gap: "6px",
-            zIndex: 10,
+            width: "100%",
+            height: "1px",
+            backgroundColor: "#999",
+            marginTop: "8px",
           }}
-        >
-          {/* Change layout */}
-          <button
-            onClick={handleChange}
-            style={iconBtnStyle}
-            title="Change layout"
-          >
-            <TbArrowsExchange />
-          </button>
-
-          {/* Delete (double click) */}
-          <button
-            onDoubleClick={handleDelete}
-            style={iconBtnStyle}
-            title="Double click to delete"
-          >
-            <IoIosClose />
-          </button>
-        </div>
-      )}
-
-      {/* VERSION 1 */}
-      {version === 1 && (
-        <>
-          <div className="epbn22-hdln">{renderData.headline}</div>
-
-          <div className="ep-nm22-sbc">
-            <div className="ep-nm22sbc-c1" >
-              <div className="epnn22-onln">{renderData.content}</div>
-              <div className="epn-tm">{renderData.time}</div>
-            </div>
-
-            <div className="epnn22-img">
-              <img src={renderData.image} alt="" />
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* VERSION 2 */}
-      {version === 2 && (
-        <>
-          <div className="epbn23-hdln">{renderData.headline}</div>
-
-          <div className="ep-nm23-sbc">
-            <div className="epnn23-img">
-              <img src={renderData.image} alt="" />
-            </div>
-
-            <div className="ep-nm23sbc-c1" >
-              <div className="epnn23-onln">{renderData.content}</div>
-              <div className="epn-tm">{renderData.time}</div>
-            </div>
-          </div>
-        </>
+        />
       )}
     </div>
   );
@@ -228,6 +276,25 @@ const iconBtnStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+};
+
+const separatorBtnStyle = {
+  position: "absolute",
+  bottom: "-12px",
+  left: "50%",
+  transform: "translateX(-50%)",
+  background: "#ddd",
+  border: "1px solid #ccc",
+  borderRadius: "50%",
+  width: "24px",
+  height: "24px",
+  cursor: "pointer",
+  fontSize: "16px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 10,
+  transition: "all 0.2s ease",
 };
 
 export default NorContainer5;

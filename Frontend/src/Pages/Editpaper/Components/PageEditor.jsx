@@ -154,20 +154,13 @@ export default function PageEditor({
     { id: 4, type: "light-grey", orientation: "vertical", label: "light grey line (vr)" },
   ];
 
-  const headerTypes = [
-    { id: 8, label: "Header type 1" },
-    { id: 9, label: "Header type 2" },
-  ];
+
 
   const adTypes = [
     { id: 10, label: "Ad banner 1" },
     { id: 11, label: "Ad banner 2" },
   ];
 
-  const layoutTypes = [
-    { id: 12, label: "Layout 1" },
-    { id: 13, label: "Layout 2" },
-  ];
 
   const getActiveItems = () => {
     switch (activeTab) {
@@ -175,12 +168,10 @@ export default function PageEditor({
         return containerTypes;
       case "lines":
         return lineTypes;
-      case "headers":
-        return headerTypes;
+
       case "ad":
         return adTypes;
-      case "layouts":
-        return layoutTypes;
+
       default:
         return containerTypes;
     }
@@ -333,7 +324,7 @@ export default function PageEditor({
           )}
 
           <div className="tabs-container">
-            {["containers", "sliders", "lines", "headers", "ad", "layouts"].map((tab) => (
+            {["containers", "sliders", "lines", "ad"].map((tab) => (
               <div key={tab} onClick={() => setActiveTab(tab)} className={`tab-item ${activeTab === tab ? "active" : ""}`}>
                 {tab}
               </div>

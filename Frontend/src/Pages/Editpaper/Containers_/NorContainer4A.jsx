@@ -2,11 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
+import { HiOutlineMinus } from "react-icons/hi";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  toggleContainerSeparator,
+  toggleSliderSeparator,
 } from "../../Slice/editpaperslice";
 
 
@@ -16,7 +19,7 @@ const NorContainer4A = ({
   slotId,
   catName,
   containerId,
-    isSlider = false,
+  isSlider = false,
   isSlider2 = false,
 }) => {
   const navigate = useNavigate();
@@ -25,6 +28,21 @@ const NorContainer4A = ({
   const { allNews, translatedNews, language } = useSelector(
     (state) => state.newsform
   );
+
+  // Get separator state from Redux
+  const showSeparator = useSelector((state) => {
+    const page = state.editpaper.pages.find((p) => p.catName === catName);
+    
+    if (isSlider || isSlider2) {
+      const slider = page?.sliders.find((s) => s.id === containerId);
+      const item = slider?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    } else {
+      const container = page?.containers.find((c) => c.id === containerId);
+      const item = container?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    }
+  });
 
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
@@ -55,7 +73,7 @@ const NorContainer4A = ({
       }
     : DEFAULT_DATA;
 
-const handleDrop = (e) => {
+  const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -109,12 +127,33 @@ const handleDrop = (e) => {
     onDelete?.();
   };
 
-
   const handleDragOver = (e) => e.preventDefault();
 
   const handleNavigate = () => {
     if (!newsId) return;
     navigate(`/preview/${newsId}`);
+  };
+
+  const toggleSeparator = (e) => {
+    e.stopPropagation();
+    
+    if (isSlider || isSlider2) {
+      dispatch(
+        toggleSliderSeparator({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        toggleContainerSeparator({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
   };
 
   return (
@@ -159,6 +198,87 @@ const handleDrop = (e) => {
             font-size: 10px;
             color: gray;
           }
+
+          .separator-line {
+            width: 100%;
+            height: 1px;
+            background-color: #999;
+            margin-top: 10px;
+          }
+
+          .separator-btn {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.2s;
+            z-index: 10;
+          }
+
+          .separator-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            color: #333;
+            border-color: #999;
+          }
+
+          .separator-btn.active {
+            background: rgba(153, 153, 153, 0.9);
+            color: white;
+            border-color: #666;
+          }
+
+          /* Responsive styles */
+          @media (max-width: 1024px) {
+            .ep-nm-news {
+              width: 100%;
+              max-width: 300px;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .ep-nm-news {
+              width: 100%;
+              max-width: 280px;
+              height: auto;
+              min-height: 80px;
+            }
+
+            .ep-nm-headline {
+              font-size: 14px;
+            }
+
+            .ep-nm-time {
+              font-size: 9px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .ep-nm-news {
+              width: 100%;
+              max-width: 260px;
+              padding: 5px;
+            }
+
+            .ep-nm-headline {
+              font-size: 13px;
+              max-height: 42px;
+            }
+
+            .ep-nm-time {
+              font-size: 8px;
+            }
+          }
         `}
       </style>
 
@@ -183,8 +303,20 @@ const handleDrop = (e) => {
         </div>
       )}
 
+      {border && (
+        <button
+          onClick={toggleSeparator}
+          className={`separator-btn ${showSeparator ? 'active' : ''}`}
+          title="Toggle separator line"
+        >
+          <HiOutlineMinus />
+        </button>
+      )}
+
       <div className="ep-nm-headline">{renderData.content}</div>
       <div className="ep-nm-time">{renderData.time}</div>
+
+      {showSeparator && <div className="separator-line"></div>}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
+import { HiOutlineMinus } from "react-icons/hi";
 import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
 import {
@@ -9,6 +10,8 @@ import {
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  toggleContainerSeparator,
+  toggleSliderSeparator,
 } from "../../Slice/editpaperslice";
 
 const BigNewsContainer1 = ({
@@ -22,14 +25,28 @@ const BigNewsContainer1 = ({
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Add this
+  const dispatch = useDispatch();
 
-  // Read newsId from Redux instead of local state
-const allNews = useSelector((state) => state.newsform.allNews);
+  const allNews = useSelector((state) => state.newsform.allNews);
+  
+  // Get separator state from Redux
+  const showSeparator = useSelector((state) => {
+    const page = state.editpaper.pages.find((p) => p.catName === catName);
+    
+    if (isSlider || isSlider2) {
+      const slider = page?.sliders.find((s) => s.id === containerId);
+      const item = slider?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    } else {
+      const container = page?.containers.find((c) => c.id === containerId);
+      const item = container?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    }
+  });
+
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
-    // ✅ Both slider types now use the same sliders array
     if (isSlider || isSlider2) {
       const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
@@ -39,10 +56,8 @@ const allNews = useSelector((state) => state.newsform.allNews);
     }
   });
   
-  const newsId = slot?.newsId; // Get newsId from Redux
+  const newsId = slot?.newsId;
   const news = allNews.find((n) => n.id === newsId);
-
-  console.log("BigContainer1 Props:", { slotId, catName, containerId });
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -69,13 +84,12 @@ const allNews = useSelector((state) => state.newsform.allNews);
       }
     : DEFAULT_DATA;
 
- const handleDrop = (e) => {
+  const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     const droppedId = e.dataTransfer.getData("newsId");
     if (droppedId) {
-      // ✅ Use unified slider action for both slider types
       if (isSlider || isSlider2) {
         dispatch(
           dropNewsIntoSliderSlot({
@@ -101,7 +115,6 @@ const allNews = useSelector((state) => state.newsform.allNews);
   const handleDelete = (e) => {
     e.stopPropagation();
     
-    // ✅ Use unified slider action for both slider types
     if (isSlider || isSlider2) {
       dispatch(
         removeNewsFromSliderSlot({
@@ -122,7 +135,8 @@ const allNews = useSelector((state) => state.newsform.allNews);
     
     onDelete?.();
   };
- const handleDragOver = (e) => e.preventDefault();
+
+  const handleDragOver = (e) => e.preventDefault();
 
   const handleChange = (e) => {
     e.stopPropagation();
@@ -130,8 +144,30 @@ const allNews = useSelector((state) => state.newsform.allNews);
   };
 
   const handleNavigate = () => {
-    if (!newsId) return; // don't navigate for default template
+    if (!newsId) return;
     navigate(`/preview/${newsId}`);
+  };
+
+  const toggleSeparator = (e) => {
+    e.stopPropagation();
+    
+    if (isSlider || isSlider2) {
+      dispatch(
+        toggleSliderSeparator({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        toggleContainerSeparator({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
   };
 
   return (
@@ -147,42 +183,126 @@ const allNews = useSelector((state) => state.newsform.allNews);
     >
       <style>
         {`
-     .ep-bg-news-1 {
-  width: 800px; 
-  height: fit-content;
-  // border: solid;
-  margin: 5px;
-  transition: 0.5s ease-in-out;
-  cursor: pointer;
-}
-.ep-bg-news-1:hover {
-  color: rgb(237, 1, 141);
-}
+          .ep-bg-news-1 {
+            width: 800px; 
+            height: fit-content;
+            margin: 5px;
+            transition: 0.5s ease-in-out;
+            cursor: pointer;
+          }
+          
+          .ep-bg-news-1:hover {
+            color: rgb(237, 1, 141);
+          }
 
-.epbn1-img {
-  width: 800px;
-  height: 500px;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.epbn1-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This will make the image fill the box nicely */
-}
-.epbn1-hdln {
-  font-size: 25px;
-  font-weight: bold;
-}
+          .epbn1-img {
+            width: 800px;
+            height: 500px;
+            border-radius: 5px;
+            overflow: hidden;
+          }
+          
+          .epbn1-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          
+          .epbn1-hdln {
+            font-size: 25px;
+            font-weight: bold;
+          }
 
-.epbn1-onln {
-  font-size: 14px;
-}
+          .epbn1-onln {
+            font-size: 14px;
+          }
 
+          .separator-line {
+            width: 100%;
+            height: 1px;
+            background-color: #999;
+            margin-top: 10px;
+          }
 
-`}
+          .separator-btn {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.2s;
+            z-index: 10;
+          }
+
+          .separator-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            color: #333;
+            border-color: #999;
+          }
+
+          .separator-btn.active {
+            background: rgba(153, 153, 153, 0.9);
+            color: white;
+            border-color: #666;
+          }
+
+          @media (max-width: 1024px) {
+            .ep-bg-news-1 {
+              width: 100%;
+              max-width: 800px;
+            }
+            
+            .epbn1-img {
+              width: 100%;
+              height: auto;
+              aspect-ratio: 16/10;
+            }
+            
+            .epbn1-hdln {
+              font-size: 22px;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .ep-bg-news-1 {
+              width: 100%;
+            }
+            
+            .epbn1-img {
+              aspect-ratio: 16/10;
+            }
+            
+            .epbn1-hdln {
+              font-size: 20px;
+            }
+            
+            .epbn1-onln {
+              font-size: 13px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .epbn1-hdln {
+              font-size: 18px;
+            }
+            
+            .epbn1-onln {
+              font-size: 12px;
+            }
+          }
+        `}
       </style>
-      {/* Action Buttons */}
+
       {border && (
         <div
           style={{
@@ -191,9 +311,9 @@ const allNews = useSelector((state) => state.newsform.allNews);
             right: "8px",
             display: "flex",
             gap: "6px",
+            zIndex: 10,
           }}
         >
-          {/* Change Button */}
           <button
             onClick={handleChange}
             style={{
@@ -208,7 +328,6 @@ const allNews = useSelector((state) => state.newsform.allNews);
             <TbArrowsExchange />
           </button>
 
-          {/* Close Button (DOUBLE CLICK) */}
           <button
             onDoubleClick={handleDelete}
             title="Double click to delete"
@@ -226,7 +345,16 @@ const allNews = useSelector((state) => state.newsform.allNews);
         </div>
       )}
 
-      {/* VERSION 1 */}
+      {border && (
+        <button
+          onClick={toggleSeparator}
+          className={`separator-btn ${showSeparator ? 'active' : ''}`}
+          title="Toggle separator line"
+        >
+          <HiOutlineMinus />
+        </button>
+      )}
+
       {version === 1 && (
         <>
           <div className="epbn1-img">
@@ -238,7 +366,6 @@ const allNews = useSelector((state) => state.newsform.allNews);
         </>
       )}
 
-      {/* VERSION 2 */}
       {version === 2 && (
         <>
           <div className="epbn1-hdln">{renderData.headline}</div>
@@ -250,7 +377,6 @@ const allNews = useSelector((state) => state.newsform.allNews);
         </>
       )}
 
-      {/* VERSION 3 */}
       {version === 3 && (
         <>
           <div className="epbn1-hdln">{renderData.headline}</div>
@@ -261,6 +387,8 @@ const allNews = useSelector((state) => state.newsform.allNews);
           <div className="epn-tm">{renderData.time}</div>
         </>
       )}
+
+      {showSeparator && <div className="separator-line"></div>}
     </div>
   );
 };

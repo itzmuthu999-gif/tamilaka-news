@@ -2,15 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
+import { HiOutlineMinus } from "react-icons/hi";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  toggleContainerSeparator,
+  toggleSliderSeparator,
 } from "../../Slice/editpaperslice";
 
 import { useSelector, useDispatch } from "react-redux";
-import jwt from "../../../assets/jwt.jpg"
+import jwt from "../../../assets/jwt.jpg";
 
 const BigNewsContainer3 = ({
   border = false,
@@ -18,19 +21,30 @@ const BigNewsContainer3 = ({
   slotId,
   catName,
   containerId,
-    isSlider = false,
+  isSlider = false,
   isSlider2 = false,
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Add this
+  const dispatch = useDispatch();
 
-  // Read newsId from Redux instead of local state
   const allNews = useSelector((state) => state.newsform.allNews);
+
+  const showSeparator = useSelector((state) => {
+    const page = state.editpaper.pages.find((p) => p.catName === catName);
+    if (isSlider || isSlider2) {
+      const slider = page?.sliders.find((s) => s.id === containerId);
+      const item = slider?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    } else {
+      const container = page?.containers.find((c) => c.id === containerId);
+      const item = container?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    }
+  });
+
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
-    
-    // ✅ Both slider types now use the same sliders array
     if (isSlider || isSlider2) {
       const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
@@ -40,10 +54,8 @@ const BigNewsContainer3 = ({
     }
   });
 
-  const newsId = slot?.newsId; // Get newsId from Redux
+  const newsId = slot?.newsId;
   const news = allNews.find((n) => n.id === newsId);
-
-  console.log("BigContainer1 Props:", { slotId, catName, containerId });
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -58,10 +70,8 @@ const BigNewsContainer3 = ({
         image: (() => {
           const thumb = news.data?.thumbnail;
           if (!thumb) return DEFAULT_DATA.image;
-
           if (typeof thumb === "string") return thumb;
           if (thumb instanceof File) return URL.createObjectURL(thumb);
-
           return DEFAULT_DATA.image;
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
@@ -70,13 +80,12 @@ const BigNewsContainer3 = ({
       }
     : DEFAULT_DATA;
 
-const handleDrop = (e) => {
+  const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     const droppedId = e.dataTransfer.getData("newsId");
     if (droppedId) {
-      // ✅ Use unified slider action for both slider types
       if (isSlider || isSlider2) {
         dispatch(
           dropNewsIntoSliderSlot({
@@ -101,8 +110,7 @@ const handleDrop = (e) => {
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    
-    // ✅ Use unified slider action for both slider types
+
     if (isSlider || isSlider2) {
       dispatch(
         removeNewsFromSliderSlot({
@@ -120,7 +128,7 @@ const handleDrop = (e) => {
         })
       );
     }
-    
+
     onDelete?.();
   };
 
@@ -132,137 +140,266 @@ const handleDrop = (e) => {
   };
 
   const handleNavigate = () => {
-    if (!newsId) return; // don't navigate for default template
+    if (!newsId) return;
     navigate(`/preview/${newsId}`);
+  };
+
+  const toggleSeparator = (e) => {
+    e.stopPropagation();
+    if (isSlider || isSlider2) {
+      dispatch(
+        toggleSliderSeparator({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        toggleContainerSeparator({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
   };
 
   return (
     <div
-      className="ep-bg-news-3"
-  onDrop={handleDrop}
-  onDragOver={handleDragOver}
-  onClick={handleNavigate}
-  style={{
-    border: border ? "2px dotted #999" : "none",
-    position: "relative"
-  }}
+      className="ep-bg-news-3-wrapper"
+      style={{
+        position: "relative",
+        width: "fit-content",
+      }}
     >
       <style>
-    {
-        `
+        {`
+        .ep-bg-news-3-wrapper {
+          display: inline-block;
+        }
+
         .ep-bg-news-3 {
-  width: 400px;
-  height: fit-content;
-  margin: 5px;
-  transition: 0.5s ease-in-out;
-  cursor: pointer;
-}
-.ep-bg-news-3:hover {
-  color: rgb(237, 1, 141);
-}
-.epbn3-img {
-  width: 400px;
-  height: 350px;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.epbn3-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* This will make the image fill the box nicely */
-}
-.epbn3-hdln {
-  font-size: 20px;
-  font-weight: bold;
-}
+          width: 400px;
+          height: fit-content;
+          margin: 5px;
+          transition: 0.5s ease-in-out;
+          cursor: pointer;
+        }
 
-.epbn3-onln {
-  font-size: 13px;
-}
+        .ep-bg-news-3:hover {
+          color: rgb(237, 1, 141);
+        }
 
-        
-        `
-    }
-</style>
-      {/* Action Buttons */}
-      {border && (
-        <div
-          style={{
-            position: "absolute",
-            top: "8px",
-            right: "8px",
-            display: "flex",
-            gap: "6px",
-            zIndex: 10,
-          }}
-        >
-          {/* Change Layout */}
-          <button
-            onClick={handleChange}
-            style={iconBtnStyle}
-            title="Change layout"
+        .epbn3-img {
+          width: 400px;
+          height: 350px;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+
+        .epbn3-img img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .epbn3-hdln {
+          font-size: 20px;
+          font-weight: bold;
+          word-wrap: break-word;
+        }
+
+        .epbn3-onln {
+          font-size: 13px;
+          word-wrap: break-word;
+        }
+
+        .separator-line {
+          width: 100%;
+          height: 1px;
+          background-color: #999;
+          margin-top: 10px;
+        }
+
+        .separator-btn {
+          position: absolute;
+          bottom: -14px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid #ccc;
+          border-radius: 50%;
+          width: 28px;
+          height: 28px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 16px;
+          z-index: 10;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          transition: all 0.2s ease;
+        }
+
+        .separator-btn:hover {
+          background: rgba(240, 240, 240, 0.95);
+          border-color: #999;
+        }
+
+        .separator-btn.active {
+          background: rgba(153, 153, 153, 0.95);
+          color: #fff;
+          border-color: #666;
+        }
+
+        /* Tablet and below */
+        @media (max-width: 1024px) {
+          .ep-bg-news-3 {
+            width: 100%;
+            max-width: 400px;
+          }
+
+          .epbn3-img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 8 / 7;
+          }
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+          .ep-bg-news-3 {
+            margin: 3px;
+          }
+
+          .epbn3-img {
+            aspect-ratio: 16 / 9;
+            border-radius: 3px;
+          }
+
+          .epbn3-hdln {
+            font-size: 18px;
+          }
+
+          .epbn3-onln {
+            font-size: 12px;
+          }
+
+          .separator-btn {
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            bottom: -12px;
+          }
+        }
+
+        /* Small mobile */
+        @media (max-width: 480px) {
+          .epbn3-hdln {
+            font-size: 16px;
+          }
+
+          .epbn3-onln {
+            font-size: 11px;
+          }
+        }
+        `}
+      </style>
+
+      <div
+        className="ep-bg-news-3"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onClick={handleNavigate}
+        style={{
+          border: border ? "2px dotted #999" : "none",
+        }}
+      >
+        {border && (
+          <div
+            style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              display: "flex",
+              gap: "6px",
+              zIndex: 10,
+            }}
           >
-            <TbArrowsExchange />
-          </button>
+            <button onClick={handleChange} style={iconBtnStyle} title="Change layout">
+              <TbArrowsExchange />
+            </button>
 
-          {/* Delete (Double Click) */}
-          <button
-            onDoubleClick={handleDelete}
-            style={iconBtnStyle}
-            title="Double click to delete"
-          >
-            <IoIosClose />
-          </button>
-        </div>
-      )}
-
-      {/* VERSION 1 */}
-      {version === 1 && (
-        <>
-          <div className="epbn3-hdln">{renderData.headline}</div>
-          <div className="epbn3-img">
-            <img src={renderData.image} alt="" />
+            <button
+              onDoubleClick={handleDelete}
+              style={iconBtnStyle}
+              title="Double click to delete"
+            >
+              <IoIosClose />
+            </button>
           </div>
-          <div className="epbn3-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
-        </>
-      )}
+        )}
 
-      {/* VERSION 2 */}
-      {version === 2 && (
-        <>
-          <div className="epbn3-img">
-            <img src={renderData.image} alt="" />
-          </div>
-          <div className="epbn3-hdln">{renderData.headline}</div>
-          <div className="epbn3-onln">{renderData.content}</div>
-          <div className="epn-tm">{renderData.time}</div>
-        </>
-      )}
+        {version === 1 && (
+          <>
+            <div className="epbn3-hdln">{renderData.headline}</div>
+            <div className="epbn3-img">
+              <img src={renderData.image} alt="" />
+            </div>
+            <div className="epbn3-onln">{renderData.content}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </>
+        )}
 
-      {/* VERSION 3 */}
-      {version === 3 && (
-        <>
-          <div className="epbn3-hdln">{renderData.headline}</div>
-          <div className="epbn3-onln">{renderData.content}</div>
-          <div className="epbn3-img">
-            <img src={renderData.image} alt="" />
-          </div>
-          <div className="epn-tm">{renderData.time}</div>
-        </>
-      )}
+        {version === 2 && (
+          <>
+            <div className="epbn3-img">
+              <img src={renderData.image} alt="" />
+            </div>
+            <div className="epbn3-hdln">{renderData.headline}</div>
+            <div className="epbn3-onln">{renderData.content}</div>
+            <div className="epn-tm">{renderData.time}</div>
+          </>
+        )}
+
+        {version === 3 && (
+          <>
+            <div className="epbn3-hdln">{renderData.headline}</div>
+            <div className="epbn3-onln">{renderData.content}</div>
+            <div className="epbn3-img">
+              <img src={renderData.image} alt="" />
+            </div>
+            <div className="epn-tm">{renderData.time}</div>
+          </>
+        )}
+
+        {showSeparator && <div className="separator-line"></div>}
+      </div>
+
+      {/* Separator toggle button */}
+      <button
+        onClick={toggleSeparator}
+        className={`separator-btn ${showSeparator ? "active" : ""}`}
+        title={showSeparator ? "Remove separator" : "Add separator"}
+      >
+        <HiOutlineMinus />
+      </button>
     </div>
   );
 };
 
 const iconBtnStyle = {
-  background: "transparent",
-  border: "none",
+  background: "rgba(255, 255, 255, 0.9)",
+  border: "1px solid #ccc",
+  borderRadius: "4px",
   cursor: "pointer",
   fontSize: "18px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  padding: "4px",
+  transition: "all 0.2s ease",
 };
 
 export default BigNewsContainer3;

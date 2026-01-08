@@ -108,22 +108,12 @@ const pageLayoutSlice = createSlice({
                 padding: 10,
                 margin: 0
               },
-              nestedContainers: [] // ADD THIS LINE
+              nestedContainers: []
             }
           }
         };
       }
     },
-
-    // updateContainerPosition(state, action) {
-    //   const { catName, containerId, position } = action.payload;
-    //   const cont = state.pages
-    //     .find(p => p.catName === catName)
-    //     ?.containers.find(c => c.id === containerId);
-
-    //   if (cont) cont.position = position;
-    //   logState(state, "updateContainerPosition");
-    // },
 
     updateContainerGrid(state, action) {
       const { catName, containerId, columns, gap } = action.payload;
@@ -146,15 +136,6 @@ const pageLayoutSlice = createSlice({
       }
       logState(state, "deleteContainer");
     },
-
-    // updateContainerSize(state, action) {
-    //   const { catName, containerId, size } = action.payload;
-    //   const cont = state.pages
-    //     .find(p => p.catName === catName)
-    //     ?.containers.find(c => c.id === containerId);
-
-    //   if (cont) cont.size = size;
-    // },
 
     updateContainerHeader(state, action) {
       const { catName, containerId, enabled, title } = action.payload;
@@ -204,7 +185,8 @@ const pageLayoutSlice = createSlice({
         cont.items.push({
           slotId: slotId || nanoid(),
           newsId: null,
-          containerType
+          containerType,
+          showSeparator: false
         });
       }
       logState(state, "addEmptySlot");
@@ -230,6 +212,19 @@ const pageLayoutSlice = createSlice({
 
       if (slot) slot.newsId = null;
       logState(state, "removeNewsFromSlot");
+    },
+
+    toggleContainerSeparator(state, action) {
+      const { catName, containerId, slotId } = action.payload;
+      const slot = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === containerId)
+        ?.items.find(i => i.slotId === slotId);
+
+      if (slot) {
+        slot.showSeparator = !slot.showSeparator;
+      }
+      logState(state, "toggleContainerSeparator");
     },
 
     /* -------------------- SLIDERS (UNIFIED - Type 1 & Type 2) -------------------- */
@@ -311,7 +306,8 @@ const pageLayoutSlice = createSlice({
         slider.items.push({
           slotId: slotId || nanoid(),
           newsId: null,
-          containerType
+          containerType,
+          showSeparator: false
         });
       }
       logState(state, "addSlotToSlider");
@@ -355,6 +351,19 @@ const pageLayoutSlice = createSlice({
       logState(state, "removeSlotFromSlider");
     },
 
+    toggleSliderSeparator(state, action) {
+      const { catName, sliderId, slotId } = action.payload;
+      const slot = state.pages
+        .find(p => p.catName === catName)
+        ?.sliders.find(s => s.id === sliderId)
+        ?.items.find(i => i.slotId === slotId);
+
+      if (slot) {
+        slot.showSeparator = !slot.showSeparator;
+      }
+      logState(state, "toggleSliderSeparator");
+    },
+
     /* -------------------- LINES -------------------- */
 
     addLine: {
@@ -370,8 +379,8 @@ const pageLayoutSlice = createSlice({
             catName,
             line: {
               id: nanoid(),
-              lineType, // "pink-bold" or "light-grey"
-              orientation, // "horizontal" or "vertical"
+              lineType,
+              orientation,
               length: orientation === "horizontal" ? 500 : 300,
               x: position?.x ?? 100,
               y: position?.y ?? 100
@@ -431,135 +440,153 @@ const pageLayoutSlice = createSlice({
       const { lineId } = action.payload;
       state.activeLineId = lineId;
       logState(state, "setActiveLine");
-    }
-  },
-  addNestedContainer: {
-    reducer(state, action) {
-      const { catName, parentContainerId, container } = action.payload;
+    },
+
+    /* -------------------- NESTED CONTAINERS -------------------- */
+
+    addNestedContainer: {
+      reducer(state, action) {
+        const { catName, parentContainerId, container } = action.payload;
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+
+        if (parentCont) {
+          if (!parentCont.nestedContainers) {
+            parentCont.nestedContainers = [];
+          }
+          parentCont.nestedContainers.push(container);
+        }
+        logState(state, "addNestedContainer");
+      },
+      prepare(catName, parentContainerId) {
+        return {
+          payload: {
+            catName,
+            parentContainerId,
+            container: {
+              id: nanoid(),
+              grid: {
+                columns: 2,
+                gap: 10
+              },
+              items: [],
+              header: {
+                enabled: false,
+                title: ""
+              },
+              spacing: {
+                padding: 10,
+                margin: 0
+              },
+              nestedContainers: []
+            }
+          }
+        };
+      }
+    },
+
+    deleteNestedContainer(state, action) {
+      const { catName, parentContainerId, nestedContainerId } = action.payload;
       const parentCont = state.pages
         .find(p => p.catName === catName)
         ?.containers.find(c => c.id === parentContainerId);
 
-      if (parentCont) {
-        if (!parentCont.nestedContainers) {
-          parentCont.nestedContainers = [];
-        }
-        parentCont.nestedContainers.push(container);
+      if (parentCont && parentCont.nestedContainers) {
+        parentCont.nestedContainers = parentCont.nestedContainers.filter(
+          c => c.id !== nestedContainerId
+        );
       }
-      logState(state, "addNestedContainer");
+      logState(state, "deleteNestedContainer");
     },
-    prepare(catName, parentContainerId) {
-      return {
-        payload: {
-          catName,
-          parentContainerId,
-          container: {
-            id: nanoid(),
-            grid: {
-              columns: 2,
-              gap: 10
-            },
-            items: [],
-            header: {
-              enabled: false,
-              title: ""
-            },
-            spacing: {
-              padding: 10,
-              margin: 0
-            },
-            nestedContainers: [] // Nested containers can also have nested containers
-          }
-        }
-      };
+
+    updateNestedContainerGrid(state, action) {
+      const { catName, parentContainerId, nestedContainerId, columns, gap } = action.payload;
+      const nestedCont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
+
+      if (nestedCont) {
+        nestedCont.grid.columns = columns;
+        nestedCont.grid.gap = gap;
+      }
+      logState(state, "updateNestedContainerGrid");
+    },
+
+    updateNestedContainerHeader(state, action) {
+      const { catName, parentContainerId, nestedContainerId, enabled, title } = action.payload;
+      const nestedCont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
+
+      if (nestedCont) {
+        if (enabled !== undefined) nestedCont.header.enabled = enabled;
+        if (title !== undefined) nestedCont.header.title = title;
+      }
+      logState(state, "updateNestedContainerHeader");
+    },
+
+    updateNestedContainerSpacing(state, action) {
+      const { catName, parentContainerId, nestedContainerId, padding, margin } = action.payload;
+      const nestedCont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
+
+      if (nestedCont) {
+        if (!nestedCont.spacing) nestedCont.spacing = { padding: 10, margin: 0 };
+        if (padding !== undefined) nestedCont.spacing.padding = padding;
+        if (margin !== undefined) nestedCont.spacing.margin = margin;
+      }
+      logState(state, "updateNestedContainerSpacing");
+    },
+
+    addEmptySlotToNested(state, action) {
+      const { catName, parentContainerId, nestedContainerId, containerType, slotId } = action.payload;
+      const nestedCont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
+
+      if (nestedCont) {
+        nestedCont.items.push({
+          slotId: slotId || nanoid(),
+          newsId: null,
+          containerType,
+          showSeparator: false
+        });
+      }
+      logState(state, "addEmptySlotToNested");
+    },
+
+    dropNewsIntoNestedSlot(state, action) {
+      const { catName, parentContainerId, nestedContainerId, slotId, newsId } = action.payload;
+      const slot = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId)
+        ?.items.find(i => i.slotId === slotId);
+
+      if (slot) slot.newsId = newsId;
+      logState(state, "dropNewsIntoNestedSlot");
+    },
+
+    toggleNestedSeparator(state, action) {
+      const { catName, parentContainerId, nestedContainerId, slotId } = action.payload;
+      const slot = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId)
+        ?.items.find(i => i.slotId === slotId);
+
+      if (slot) {
+        slot.showSeparator = !slot.showSeparator;
+      }
+      logState(state, "toggleNestedSeparator");
     }
-  },
-
-  deleteNestedContainer(state, action) {
-    const { catName, parentContainerId, nestedContainerId } = action.payload;
-    const parentCont = state.pages
-      .find(p => p.catName === catName)
-      ?.containers.find(c => c.id === parentContainerId);
-
-    if (parentCont && parentCont.nestedContainers) {
-      parentCont.nestedContainers = parentCont.nestedContainers.filter(
-        c => c.id !== nestedContainerId
-      );
-    }
-    logState(state, "deleteNestedContainer");
-  },
-
-  updateNestedContainerGrid(state, action) {
-    const { catName, parentContainerId, nestedContainerId, columns, gap } = action.payload;
-    const nestedCont = state.pages
-      .find(p => p.catName === catName)
-      ?.containers.find(c => c.id === parentContainerId)
-      ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
-
-    if (nestedCont) {
-      nestedCont.grid.columns = columns;
-      nestedCont.grid.gap = gap;
-    }
-    logState(state, "updateNestedContainerGrid");
-  },
-
-  updateNestedContainerHeader(state, action) {
-    const { catName, parentContainerId, nestedContainerId, enabled, title } = action.payload;
-    const nestedCont = state.pages
-      .find(p => p.catName === catName)
-      ?.containers.find(c => c.id === parentContainerId)
-      ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
-
-    if (nestedCont) {
-      if (enabled !== undefined) nestedCont.header.enabled = enabled;
-      if (title !== undefined) nestedCont.header.title = title;
-    }
-    logState(state, "updateNestedContainerHeader");
-  },
-
-  updateNestedContainerSpacing(state, action) {
-    const { catName, parentContainerId, nestedContainerId, padding, margin } = action.payload;
-    const nestedCont = state.pages
-      .find(p => p.catName === catName)
-      ?.containers.find(c => c.id === parentContainerId)
-      ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
-
-    if (nestedCont) {
-      if (!nestedCont.spacing) nestedCont.spacing = { padding: 10, margin: 0 };
-      if (padding !== undefined) nestedCont.spacing.padding = padding;
-      if (margin !== undefined) nestedCont.spacing.margin = margin;
-    }
-    logState(state, "updateNestedContainerSpacing");
-  },
-
-  addEmptySlotToNested(state, action) {
-    const { catName, parentContainerId, nestedContainerId, containerType, slotId } = action.payload;
-    const nestedCont = state.pages
-      .find(p => p.catName === catName)
-      ?.containers.find(c => c.id === parentContainerId)
-      ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
-
-    if (nestedCont) {
-      nestedCont.items.push({
-        slotId: slotId || nanoid(),
-        newsId: null,
-        containerType
-      });
-    }
-    logState(state, "addEmptySlotToNested");
-  },
-
-  dropNewsIntoNestedSlot(state, action) {
-    const { catName, parentContainerId, nestedContainerId, slotId, newsId } = action.payload;
-    const slot = state.pages
-      .find(p => p.catName === catName)
-      ?.containers.find(c => c.id === parentContainerId)
-      ?.nestedContainers?.find(nc => nc.id === nestedContainerId)
-      ?.items.find(i => i.slotId === slotId);
-
-    if (slot) slot.newsId = newsId;
-    logState(state, "dropNewsIntoNestedSlot");
-  },
+  }
 });
 
 /* ---------- exports ---------- */
@@ -580,6 +607,7 @@ export const {
   addEmptySlot,
   dropNewsIntoSlot,
   removeNewsFromSlot,
+  toggleContainerSeparator,
 
   addSlider,
   updateSliderPosition,
@@ -590,6 +618,7 @@ export const {
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
   removeSlotFromSlider,
+  toggleSliderSeparator,
 
   addNestedContainer,
   deleteNestedContainer,
@@ -598,6 +627,7 @@ export const {
   updateNestedContainerSpacing,
   addEmptySlotToNested,
   dropNewsIntoNestedSlot,
+  toggleNestedSeparator,
 
   addLine,
   updateLinePosition,

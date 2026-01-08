@@ -9,7 +9,6 @@ import {
   addEmptySlot,
   dropNewsIntoSlot,
   deleteContainer,
-  // ✅ NEW: Import nested container actions
   addNestedContainer,
   deleteNestedContainer,
   updateNestedContainerGrid,
@@ -33,7 +32,7 @@ import NorContainer4 from "../Containers_/NorContainer4";
 import NorContainer4A from "../Containers_/NorContainer4A";
 import NorContainer5 from "../Containers_/NorContainer5";
 
-import jwt from "../../../assets/jwt.jpg";
+// import jwt from "../../../assets/jwt.jpg";
 import Newsheader from "../../Newspaper/Components/Newsheader";
 
 const COMPONENT_MAP = {
@@ -51,345 +50,187 @@ const COMPONENT_MAP = {
   "Normal Container Type 5": NorContainer5,
 };
 
-// ✅ NEW: Recursive NestedContainer component
-function NestedContainer({ 
+// ✅ SIMPLE RECURSIVE COMPONENT - Same behavior everywhere
+export default function EditableContainer({ 
   id, 
-  catName, 
-  parentContainerId,
-  grid,
-  header,
-  spacing,
-  items,
-  nestedContainers = []
+  catName,
+  isNested = false,
+  parentContainerId = null,
 }) {
   const dispatch = useDispatch();
+  
+  // ✅ Get container data from Redux
+  const containerData = useSelector(state => {
+    const page = state.editpaper.pages.find(p => p.catName === catName);
+    
+    if (isNested && parentContainerId) {
+      const findNested = (containers) => {
+        for (const cont of containers) {
+          if (cont.id === parentContainerId) {
+            return cont.nestedContainers?.find(nc => nc.id === id);
+          }
+          if (cont.nestedContainers?.length > 0) {
+            const found = findNested(cont.nestedContainers);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      return findNested(page?.containers || []);
+    } else {
+      return page?.containers.find(c => c.id === id);
+    }
+  });
+
+  const grid = containerData?.grid || { columns: 2, gap: 10 };
+  const headerEnabled = containerData?.header?.enabled || false;
+  const headerTitle = containerData?.header?.title || "";
+  const spacing = containerData?.spacing || { padding: 10, margin: 0 };
+  const nestedContainers = containerData?.nestedContainers || [];
+  const items = containerData?.items || [];
+
   const [showSettings, setShowSettings] = useState(false);
-  const [columns, setColumns] = useState(grid?.columns ?? 2);
-  const [gap, setGap] = useState(grid?.gap ?? 10);
-  const [localHeaderTitle, setLocalHeaderTitle] = useState(header?.title || "");
-  const [padding, setPadding] = useState(spacing?.padding || 10);
-  const [margin, setMargin] = useState(spacing?.margin || 0);
+  const [columns, setColumns] = useState(grid.columns);
+  const [gap, setGap] = useState(grid.gap);
+  const [localHeaderTitle, setLocalHeaderTitle] = useState(headerTitle);
+  const [padding, setPadding] = useState(spacing.padding);
+  const [margin, setMargin] = useState(spacing.margin);
   const [gridColumnSpan, setGridColumnSpan] = useState(1);
-  const [droppedContainers, setDroppedContainers] = useState([]);
 
-  const headerEnabled = header?.enabled || false;
-
+  // ✅ Delete handler
   const handleDelete = (e) => {
     if (e.detail === 2) {
-      dispatch(deleteNestedContainer({ 
-        catName, 
-        parentContainerId, 
-        nestedContainerId: id 
-      }));
+      e.stopPropagation();
+      if (isNested && parentContainerId) {
+        dispatch(deleteNestedContainer({ 
+          catName, 
+          parentContainerId, 
+          nestedContainerId: id 
+        }));
+      } else {
+        dispatch(deleteContainer({ catName, containerId: id }));
+      }
     }
   };
 
+  // ✅ Header toggle
   const handleToggleHeader = (enabled) => {
-    dispatch(
-      updateNestedContainerHeader({
+    if (isNested && parentContainerId) {
+      dispatch(updateNestedContainerHeader({
         catName,
         parentContainerId,
         nestedContainerId: id,
         enabled,
         title: enabled ? localHeaderTitle : ""
-      })
-    );
+      }));
+    } else {
+      dispatch(updateContainerHeader({ 
+        catName, 
+        containerId: id, 
+        enabled, 
+        title: enabled ? localHeaderTitle : "" 
+      }));
+    }
   };
 
+  // ✅ Header title change
   const handleHeaderTitleChange = (e) => {
     const newTitle = e.target.value;
     setLocalHeaderTitle(newTitle);
-    dispatch(
-      updateNestedContainerHeader({
+    
+    if (isNested && parentContainerId) {
+      dispatch(updateNestedContainerHeader({
         catName,
         parentContainerId,
         nestedContainerId: id,
         enabled: headerEnabled,
         title: newTitle
-      })
-    );
+      }));
+    } else {
+      dispatch(updateContainerHeader({ 
+        catName, 
+        containerId: id, 
+        enabled: headerEnabled, 
+        title: newTitle 
+      }));
+    }
   };
 
+  // ✅ Padding change
   const handlePaddingChange = (e) => {
     const newPadding = parseInt(e.target.value) || 0;
     setPadding(newPadding);
-    dispatch(
-      updateNestedContainerSpacing({
+    
+    if (isNested && parentContainerId) {
+      dispatch(updateNestedContainerSpacing({
         catName,
         parentContainerId,
         nestedContainerId: id,
         padding: newPadding,
         margin
-      })
-    );
+      }));
+    } else {
+      dispatch(updateContainerSpacing({ 
+        catName, 
+        containerId: id, 
+        padding: newPadding, 
+        margin 
+      }));
+    }
   };
 
+  // ✅ Margin change
   const handleMarginChange = (e) => {
     const newMargin = parseInt(e.target.value) || 0;
     setMargin(newMargin);
-    dispatch(
-      updateNestedContainerSpacing({
+    
+    if (isNested && parentContainerId) {
+      dispatch(updateNestedContainerSpacing({
         catName,
         parentContainerId,
         nestedContainerId: id,
         padding,
         margin: newMargin
-      })
-    );
+      }));
+    } else {
+      dispatch(updateContainerSpacing({ 
+        catName, 
+        containerId: id, 
+        padding, 
+        margin: newMargin 
+      }));
+    }
   };
 
-  // ✅ Handle drops: both container overlays AND news containers
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const isContainerOverlay = e.dataTransfer.getData("containerOverlay");
-    const containerType = e.dataTransfer.getData("text/plain");
-    const newsId = e.dataTransfer.getData("newsId");
-
-    // ✅ If it's a container overlay, add nested container
-    if (isContainerOverlay === "true") {
-      dispatch(addNestedContainer(catName, id));
-      return;
-    }
-
-    // ✅ Otherwise, handle as news container drop
-    if (!containerType) return;
-
-    const slotId = `slot_${Date.now()}`;
-    const newContainer = {
-      id: slotId,
-      type: containerType,
-      data: {
-        image: jwt,
-        headline: `Sample Headline for ${containerType}`,
-        content: "This is sample content for the news container.",
-        time: "2 hours ago",
-      },
-    };
-
-    setDroppedContainers((prev) => [...prev, newContainer]);
-
-    dispatch(
-      addEmptySlotToNested({
+  // ✅ Grid changes
+  const handleGridChange = (type, value) => {
+    const v = parseInt(value) || (type === 'columns' ? 1 : 0);
+    
+    if (type === 'columns') setColumns(v);
+    else setGap(v);
+    
+    const newColumns = type === 'columns' ? v : columns;
+    const newGap = type === 'gap' ? v : gap;
+    
+    if (isNested && parentContainerId) {
+      dispatch(updateNestedContainerGrid({
         catName,
         parentContainerId,
         nestedContainerId: id,
-        containerType,
-        slotId,
-      })
-    );
-
-    if (newsId) {
-      dispatch(
-        dropNewsIntoNestedSlot({
-          catName,
-          parentContainerId,
-          nestedContainerId: id,
-          slotId,
-          newsId: Number(newsId),
-        })
-      );
+        columns: newColumns,
+        gap: newGap
+      }));
+    } else {
+      dispatch(updateContainerGrid({ 
+        catName, 
+        containerId: id, 
+        columns: newColumns, 
+        gap: newGap 
+      }));
     }
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDeleteDroppedContainer = (containerId) => {
-    setDroppedContainers((prev) => prev.filter((c) => c.id !== containerId));
-  };
-
-  return (
-    <div
-      style={{
-        border: "2px dashed #f57c00",
-        background: "rgba(255, 152, 0, 0.05)",
-        borderRadius: "8px",
-        gridColumn: `span ${gridColumnSpan}`,
-        width: "100%",
-        minHeight: droppedContainers.length === 0 && nestedContainers.length === 0 ? "200px" : "auto",
-        position: "relative",
-        margin: `${margin}px`,
-      }}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-    >
-      <div style={{ width: "100%", height: "100%", position: "relative", display: "flex", flexDirection: "column" }}>
-        {/* Controls */}
-        <div style={{ position: "absolute", top: "8px", right: "8px", display: "flex", gap: "8px", zIndex: 1000 }}>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            style={{ background: "orange", border: "none", borderRadius: "4px", padding: "6px", cursor: "pointer" }}
-          >
-            <Edit2 size={18} color="white" />
-          </button>
-          <button
-            onClick={handleDelete}
-            title="Double click to delete"
-            style={{ background: "red", border: "none", borderRadius: "4px", padding: "6px", cursor: "pointer" }}
-          >
-            <X size={18} color="white" />
-          </button>
-        </div>
-
-        {/* Settings Panel */}
-        {showSettings && (
-          <div style={{ position: "absolute", top: "50px", right: "8px", background: "white", border: "2px solid #f57c00", borderRadius: "8px", padding: "15px", zIndex: 20, minWidth: "220px", maxHeight: "500px", overflowY: "auto" }}>
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Grid3x3 size={16} /> Grid Column Span
-              </label>
-              <input type="number" value={gridColumnSpan} min="1" max="12" onChange={(e) => setGridColumnSpan(parseInt(e.target.value) || 1)} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-            </div>
-
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-                <input type="checkbox" checked={headerEnabled} onChange={(e) => handleToggleHeader(e.target.checked)} style={{ cursor: "pointer" }} />
-                <span style={{ fontSize: "14px", fontWeight: "500" }}>Enable Header</span>
-              </label>
-            </div>
-
-            {headerEnabled && (
-              <div style={{ marginBottom: "12px" }}>
-                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "block" }}>Header Title</label>
-                <input type="text" value={localHeaderTitle} onChange={handleHeaderTitleChange} placeholder="Enter header title..." style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-              </div>
-            )}
-
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Grid3x3 size={16} /> Internal Columns
-              </label>
-              <input type="number" value={columns} min="1" max="6" onChange={(e) => { const v = parseInt(e.target.value) || 1; setColumns(v); dispatch(updateNestedContainerGrid({ catName, parentContainerId, nestedContainerId: id, columns: v, gap })); }} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-            </div>
-
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Space size={16} /> Gap (px)
-              </label>
-              <input type="number" value={gap} min="0" max="50" onChange={(e) => { const v = parseInt(e.target.value) || 0; setGap(v); dispatch(updateNestedContainerGrid({ catName, parentContainerId, nestedContainerId: id, columns, gap: v })); }} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-            </div>
-
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Maximize2 size={16} /> Padding (px)
-              </label>
-              <input type="number" value={padding} min="0" max="100" onChange={handlePaddingChange} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-            </div>
-
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Move size={16} /> Margin (px)
-              </label>
-              <input type="number" value={margin} min="0" max="100" onChange={handleMarginChange} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-            </div>
-          </div>
-        )}
-
-        {/* Header */}
-        {headerEnabled && (
-          <div style={{ padding: `${padding}px`, fontSize: "16px", fontWeight: "bold", flexShrink: 0 }}>
-            <Newsheader name={localHeaderTitle || "nested header"} />
-          </div>
-        )}
-
-        {/* Drop Zone */}
-        <div style={{ flex: 1, position: "relative", padding: `${padding}px`, minHeight: droppedContainers.length === 0 && nestedContainers.length === 0 ? "150px" : "auto" }}>
-          {droppedContainers.length === 0 && nestedContainers.length === 0 && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#ff9800", fontSize: "13px", textAlign: "center", padding: "20px" }}>
-              Drop containers or news here (Nested)
-            </div>
-          )}
-
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: `${gap}px`, width: "100%" }}>
-            {/* Render nested containers FIRST */}
-            {nestedContainers && nestedContainers.map((nested) => (
-              <NestedContainer
-                key={nested.id}
-                id={nested.id}
-                catName={catName}
-                parentContainerId={id}
-                grid={nested.grid}
-                header={nested.header}
-                spacing={nested.spacing}
-                items={nested.items}
-                nestedContainers={nested.nestedContainers}
-              />
-            ))}
-
-            {/* Render dropped news containers */}
-            {droppedContainers.map((container) => {
-              const Component = COMPONENT_MAP[container.type];
-              if (!Component) return null;
-              return (
-                <div key={container.id}>
-                  <Component {...container.data} border slotId={container.id} catName={catName} containerId={id} onDelete={() => handleDeleteDroppedContainer(container.id)} />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ✅ Main EditableContainer component
-export default function EditableContainer({ id, grid, catName }) {
-  const dispatch = useDispatch();
-  
-  const container = useSelector(state => 
-    state.editpaper.pages
-      .find(p => p.catName === catName)
-      ?.containers.find(c => c.id === id)
-  );
-
-  const headerEnabled = container?.header?.enabled || false;
-  const headerTitle = container?.header?.title || "";
-  const spacing = container?.spacing || { padding: 10, margin: 0 };
-  const nestedContainers = container?.nestedContainers || [];
-
-  const [showSettings, setShowSettings] = useState(false);
-  const [columns, setColumns] = useState(grid?.columns ?? 2);
-  const [gap, setGap] = useState(grid?.gap ?? 10);
-  const [localHeaderTitle, setLocalHeaderTitle] = useState(headerTitle);
-  const [padding, setPadding] = useState(spacing.padding);
-  const [margin, setMargin] = useState(spacing.margin);
-  const [gridColumnSpan, setGridColumnSpan] = useState(1);
-  const [droppedContainers, setDroppedContainers] = useState([]);
-
-  const handleDelete = (e) => {
-    if (e.detail === 2) {
-      dispatch(deleteContainer({ catName, containerId: id }));
-    }
-  };
-
-  const handleToggleHeader = (enabled) => {
-    dispatch(updateContainerHeader({ catName, containerId: id, enabled, title: enabled ? localHeaderTitle : "" }));
-  };
-
-  const handleHeaderTitleChange = (e) => {
-    const newTitle = e.target.value;
-    setLocalHeaderTitle(newTitle);
-    dispatch(updateContainerHeader({ catName, containerId: id, enabled: headerEnabled, title: newTitle }));
-  };
-
-  const handlePaddingChange = (e) => {
-    const newPadding = parseInt(e.target.value) || 0;
-    setPadding(newPadding);
-    dispatch(updateContainerSpacing({ catName, containerId: id, padding: newPadding, margin }));
-  };
-
-  const handleMarginChange = (e) => {
-    const newMargin = parseInt(e.target.value) || 0;
-    setMargin(newMargin);
-    dispatch(updateContainerSpacing({ catName, containerId: id, padding, margin: newMargin }));
-  };
-
-  // ✅ Handle drops: both container overlays AND news containers
+  // ✅ Drop handler - SIMPLIFIED
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -398,32 +239,58 @@ export default function EditableContainer({ id, grid, catName }) {
     const type = e.dataTransfer.getData("text/plain");
     const newsId = e.dataTransfer.getData("newsId");
 
-    // ✅ If it's a container overlay, add as nested container
+    // If dropping container overlay, add nested container
     if (isContainerOverlay === "true") {
       dispatch(addNestedContainer(catName, id));
       return;
     }
 
-    // ✅ Otherwise, handle as news container drop
-    if (!type) return;
+    // If dropping news container type
+    if (type && !newsId) {
+      const slotId = `slot_${Date.now()}`;
+      
+      if (isNested && parentContainerId) {
+        dispatch(addEmptySlotToNested({
+          catName,
+          parentContainerId,
+          nestedContainerId: id,
+          containerType: type,
+          slotId,
+        }));
+      } else {
+        dispatch(addEmptySlot({ 
+          catName, 
+          containerId: id, 
+          containerType: type, 
+          slotId 
+        }));
+      }
+      return;
+    }
 
-    const slotId = `slot_${Date.now()}`;
-    const newContainer = {
-      id: slotId,
-      type,
-      data: {
-        image: jwt,
-        headline: `Sample Headline for ${type}`,
-        content: "This is sample content for the news container.",
-        time: "2 hours ago",
-      },
-    };
-
-    setDroppedContainers((prev) => [...prev, newContainer]);
-    dispatch(addEmptySlot({ catName, containerId: id, containerType: type, slotId }));
-
+    // If dropping news card with newsId
     if (newsId) {
-      dispatch(dropNewsIntoSlot({ catName, containerId: id, slotId, newsId: Number(newsId) }));
+      // Find the first empty slot or the slot being dropped on
+      const targetSlot = items.find(item => !item.newsId);
+      
+      if (targetSlot) {
+        if (isNested && parentContainerId) {
+          dispatch(dropNewsIntoNestedSlot({
+            catName,
+            parentContainerId,
+            nestedContainerId: id,
+            slotId: targetSlot.slotId,
+            newsId: Number(newsId),
+          }));
+        } else {
+          dispatch(dropNewsIntoSlot({ 
+            catName, 
+            containerId: id, 
+            slotId: targetSlot.slotId, 
+            newsId: Number(newsId) 
+          }));
+        }
+      }
     }
   };
 
@@ -432,27 +299,104 @@ export default function EditableContainer({ id, grid, catName }) {
     e.stopPropagation();
   };
 
-  const handleDeleteDroppedContainer = (containerId) => {
-    setDroppedContainers((prev) => prev.filter((c) => c.id !== containerId));
-  };
+  const borderColor = isNested ? "#f57c00" : "#666";
+  const bgColor = isNested ? "rgba(255, 152, 0, 0.05)" : "transparent";
 
   return (
-    <div style={{ border: "2px dashed #666", background: "transparent", borderRadius: "8px", gridColumn: `span ${gridColumnSpan}`, width: "100%", minHeight: droppedContainers.length === 0 && nestedContainers.length === 0 ? "250px" : "auto", position: "relative" }}>
-      <div style={{ width: "100%", height: "100%", position: "relative", pointerEvents: "auto", overflow: "visible", display: "flex", flexDirection: "column" }}>
+    <div 
+      style={{ 
+        border: `2px dashed ${borderColor}`, 
+        background: bgColor, 
+        borderRadius: "8px", 
+        gridColumn: `span ${gridColumnSpan}`, 
+        width: "100%", 
+        minHeight: nestedContainers.length === 0 && items.length === 0 ? "250px" : "auto", 
+        position: "relative",
+        margin: `${margin}px`,
+      }}
+    >
+      <div 
+        style={{ 
+          width: "100%", 
+          height: "100%", 
+          position: "relative", 
+          pointerEvents: "auto", 
+          overflow: "visible", 
+          display: "flex", 
+          flexDirection: "column" 
+        }}
+      >
         {/* Controls */}
-        <div style={{ position: "absolute", top: "8px", right: "8px", display: "flex", gap: "8px", zIndex: 1000, pointerEvents: "auto" }}>
-          <button onClick={() => setShowSettings(!showSettings)} style={{ background: "green", border: "none", borderRadius: "4px", padding: "6px", cursor: "pointer" }}>
-            <Edit2 size={18} color="white" />
+        <div 
+          style={{ 
+            position: "absolute", 
+            bottom: "-10px", 
+            right: "8px", 
+            display: "flex", 
+            gap: "8px", 
+            zIndex: 1000, 
+            pointerEvents: "auto" 
+          }}
+        >
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowSettings(!showSettings);
+            }} 
+            style={{ 
+              background: isNested ? "orange" : "green", 
+              border: "none", 
+              borderRadius: "100%", 
+              width: "20px",
+              height: "20px",
+              display: "flex", 
+              justifyContent: "center",
+              alignItems: "center", 
+              cursor: "pointer" 
+            }}
+          >
+            <Edit2 size={10} color="white" />
           </button>
-          <button onClick={handleDelete} title="Double click to delete" style={{ background: "red", border: "none", borderRadius: "4px", padding: "6px", cursor: "pointer" }}>
-            <X size={18} color="white" />
+          <button 
+            onClick={handleDelete} 
+            title="Double click to delete" 
+            style={{ 
+              background: "red", 
+              border: "none", 
+              borderRadius: "100%",
+              width: "20px",
+              height: "20px",
+              display: "flex", 
+              justifyContent: "center",
+              alignItems: "center", 
+              cursor: "pointer" 
+            }}
+          >
+            <X size={10} color="white" />
           </button>
         </div>
 
-        {/* Settings Panel - Same as before */}
+        {/* Settings Panel */}
         {showSettings && (
-          <div style={{ position: "absolute", top: "50px", right: "8px", background: "white", border: "2px solid #666", borderRadius: "8px", padding: "15px", zIndex: 20, minWidth: "220px", maxHeight: "500px", overflowY: "auto" }}>
-            <div style={{ marginBottom: "12px" }}>
+          <div 
+            style={{ 
+              position: "absolute",
+              display:"flex", 
+              justifyContent: "center",
+              alignItems: "center", 
+              bottom: "-120px", 
+              right: "-550px", 
+              background: "white", 
+              border: `2px solid ${borderColor}`, 
+              borderRadius: "8px", 
+              padding: "15px", 
+              zIndex: 20, 
+              minWidth: "660px", 
+              maxHeight: "500px", 
+              overflowY: "auto" 
+            }}
+          >
+            <div style={{ marginBottom: "12px" , display:"none"}}>
               <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
                 <Grid3x3 size={16} /> Grid Column Span
               </label>
@@ -462,7 +406,7 @@ export default function EditableContainer({ id, grid, catName }) {
             <div style={{ marginBottom: "12px" }}>
               <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                 <input type="checkbox" checked={headerEnabled} onChange={(e) => handleToggleHeader(e.target.checked)} style={{ cursor: "pointer" }} />
-                <span style={{ fontSize: "14px", fontWeight: "500" }}>Enable Header</span>
+                <span style={{ fontSize: "10px", fontWeight: "500" }}>Enable Header</span>
               </label>
             </div>
 
@@ -473,32 +417,36 @@ export default function EditableContainer({ id, grid, catName }) {
               </div>
             )}
 
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Grid3x3 size={16} /> Internal Columns
-              </label>
-              <input type="number" value={columns} min="1" max="6" onChange={(e) => { const v = parseInt(e.target.value) || 1; setColumns(v); dispatch(updateContainerGrid({ catName, containerId: id, columns: v, gap })); }} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
+            <div style={{display:"flex",alignItems: "center",justifyContent: "space-between"}}>
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Grid3x3 size={16} /> Internal Columns
+                </label>
+                <input type="number" value={columns} min="1" max="6" onChange={(e) => handleGridChange('columns', e.target.value)} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
+              </div>
+
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Space size={16} /> Gap (px)
+                </label>
+                <input type="number" value={gap} min="0" max="50" onChange={(e) => handleGridChange('gap', e.target.value)} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
+              </div>
             </div>
 
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Space size={16} /> Gap (px)
-              </label>
-              <input type="number" value={gap} min="0" max="50" onChange={(e) => { const v = parseInt(e.target.value) || 0; setGap(v); dispatch(updateContainerGrid({ catName, containerId: id, columns, gap: v })); }} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-            </div>
+            <div style={{display:"flex",alignItems: "center",justifyContent: "space-between"}}>
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Maximize2 size={16} /> Padding (px)
+                </label>
+                <input type="number" value={padding} min="0" max="100" onChange={handlePaddingChange} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
+              </div>
 
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Maximize2 size={16} /> Padding (px)
-              </label>
-              <input type="number" value={padding} min="0" max="100" onChange={handlePaddingChange} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-            </div>
-
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Move size={16} /> Margin (px)
-              </label>
-              <input type="number" value={margin} min="0" max="100" onChange={handleMarginChange} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Move size={16} /> Margin (px)
+                </label>
+                <input type="number" value={margin} min="0" max="100" onChange={handleMarginChange} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
+              </div>
             </div>
           </div>
         )}
@@ -506,41 +454,72 @@ export default function EditableContainer({ id, grid, catName }) {
         {/* Header */}
         {headerEnabled && (
           <div style={{ padding: `${padding}px`, fontSize: "18px", fontWeight: "bold", flexShrink: 0, pointerEvents: "none" }}>
-            <Newsheader name={headerTitle || "header"} />
+            <Newsheader name={headerTitle || (isNested ? "nested header" : "header")} />
           </div>
         )}
 
         {/* Drop Zone */}
-        <div style={{ flex: 1, position: "relative", overflow: "visible", padding: `${padding}px`, minHeight: droppedContainers.length === 0 && nestedContainers.length === 0 ? "150px" : "auto" }} onDrop={handleDrop} onDragOver={handleDragOver}>
-          {droppedContainers.length === 0 && nestedContainers.length === 0 && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#999", fontSize: "14px", textAlign: "center", padding: "20px" }}>
-              Drop containers here
+        <div 
+          style={{ 
+            flex: 1, 
+            position: "relative", 
+            overflow: "visible", 
+            padding: `${padding}px`, 
+            minHeight: nestedContainers.length === 0 && items.length === 0 ? "150px" : "auto" 
+          }} 
+          onDrop={handleDrop} 
+          onDragOver={handleDragOver}
+        >
+          {nestedContainers.length === 0 && items.length === 0 && (
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              height: "100%", 
+              color: isNested ? "#ff9800" : "#999", 
+              fontSize: "14px", 
+              textAlign: "center", 
+              padding: "20px" 
+            }}>
+              {isNested ? "Drop containers or news here (Nested)" : "Drop containers here"}
             </div>
           )}
 
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: `${gap}px`, pointerEvents: "none", width: "100%" }}>
-            {/* ✅ Render nested containers FIRST */}
+          <div 
+            style={{ 
+              display: "grid", 
+              gridTemplateColumns: `repeat(${columns}, 1fr)`, 
+              gap: `${gap}px`, 
+              width: "100%" 
+            }}
+          >
+            {/* ✅ Render nested containers FIRST - they appear before news items */}
             {nestedContainers.map((nested) => (
-              <NestedContainer
-                key={nested.id}
-                id={nested.id}
-                catName={catName}
-                parentContainerId={id}
-                grid={nested.grid}
-                header={nested.header}
-                spacing={nested.spacing}
-                items={nested.items}
-                nestedContainers={nested.nestedContainers}
-              />
+              <div key={nested.id} style={{ pointerEvents: "auto" }}>
+                <EditableContainer
+                  id={nested.id}
+                  catName={catName}
+                  isNested={true}
+                  parentContainerId={id}
+                />
+              </div>
             ))}
 
-            {/* Render dropped news containers */}
-            {droppedContainers.map((container) => {
-              const Component = COMPONENT_MAP[container.type];
+            {/* ✅ Render news items AFTER nested containers */}
+            {items.map((item) => {
+              const Component = COMPONENT_MAP[item.containerType];
               if (!Component) return null;
+              
               return (
-                <div key={container.id} style={{ pointerEvents: "auto" }}>
-                  <Component {...container.data} border slotId={container.id} catName={catName} containerId={id} onDelete={() => handleDeleteDroppedContainer(container.id)} />
+                <div key={item.slotId} style={{ pointerEvents: "auto" }}>
+                  <Component 
+                    border 
+                    slotId={item.slotId} 
+                    catName={catName} 
+                    containerId={id}
+                    isNested={isNested}
+                    parentContainerId={parentContainerId}
+                  />
                 </div>
               );
             })}
