@@ -1,12 +1,17 @@
 import React from 'react'
 import { useState } from 'react';
 import { FaCheck, FaEdit, FaTimes } from "react-icons/fa";
-
 import { Rnd } from "react-rnd";
 
-export default function ImageBox({ id, onDelete, onUpdate, initialContent, box }) {
+export default function ImageBox({ id, onDelete, onUpdate, initialContent, box, isInContainer = false }) {
   const [image, setImage] = useState(initialContent || null);
   const [editing, setEditing] = useState(!initialContent);
+  
+  // const handleDragStart = (e) => {
+  //   e.dataTransfer.effectAllowed = "move";
+  //   e.dataTransfer.setData("boxId", id.toString());
+  //   e.dataTransfer.setData("boxType", "image");
+  // };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -18,10 +23,72 @@ export default function ImageBox({ id, onDelete, onUpdate, initialContent, box }
     }
   };
 
+  if (isInContainer) {
+    return (
+      <div
+        style={{
+          border: "2px dashed #555",
+          background: "#fdfdfd",
+          borderRadius: "8px",
+          padding: "8px",
+          position: "relative",
+          width: "100%",
+          minHeight: "100px",
+          resize: "both",
+          overflow: "auto"
+        }}
+      >
+        <FaTimes
+          color="red"
+          style={{
+            position: "absolute",
+            top: 1,
+            right: 5,
+            background: "rgba(255, 235, 235, 1)",
+            padding: "4px",
+            borderRadius: "100%",
+            cursor: "pointer",
+            boxShadow: "0 0 8px rgba(0,0,0,0.2)",
+            fontSize: "23px",
+            zIndex: 99
+          }}
+          onDoubleClick={() => onDelete(id)}
+        />
+
+        {editing ? (
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+        ) : (
+          <div style={{ position: "relative" }}>
+            <img
+              src={image}
+              alt="uploaded"
+              style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "cover" }}
+            />
+            <FaEdit
+              style={{
+                position: "absolute",
+                cursor: "pointer",
+                top: -5,
+                right: 25,
+                background: "rgba(238, 255, 232, 1)",
+                padding: "4px",
+                borderRadius: "100%",
+                boxShadow: "0 0 8px rgba(0,0,0,0.2)",
+                fontSize: "23px",
+                color: "green",
+                zIndex: 10
+              }}
+              onClick={() => setEditing(true)}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <Rnd
       bounds="parent"
-      // CONTROLLED MODE
       position={{ x: box.x, y: box.y }}
       size={{ width: box.width, height: box.height }}
       minWidth={150}
@@ -29,7 +96,6 @@ export default function ImageBox({ id, onDelete, onUpdate, initialContent, box }
       onDrag={(e, data) => {
         onUpdate(id, { x: data.x, y: data.y, dragging: true });
       }}
-
       onDragStop={(e, data) => {
         onUpdate(id, { x: data.x, y: data.y, dragging: false });
       }}

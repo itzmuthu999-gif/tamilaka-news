@@ -31,8 +31,8 @@ export default function NewsContainerSettings({
         title="News Container Settings"
         style={{
           position: 'absolute',
-          top: '10px',
-          right: '10px',
+          top: '-50px',
+          right: '0px',
           background: '#ff0059',
           color: 'white',
           border: 'none',
@@ -65,13 +65,13 @@ export default function NewsContainerSettings({
           className="news-settings-panel"
           style={{
             position: 'absolute',
-            top: '60px',
-            right: '10px',
+            top: '0px',
+            right: '0px',
             background: 'white',
             borderRadius: '12px',
             boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
             padding: '20px',
-            width: '280px',
+            width: '300px',
             zIndex: 1000,
             border: '1px solid #e0e0e0'
           }}
@@ -124,109 +124,146 @@ export default function NewsContainerSettings({
 
           {/* Settings Content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {/* Height Setting */}
-            <div>
-              <label
-                htmlFor="container-height"
-                style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#555'
-                }}
-              >
-                Height (px)
-              </label>
-              <input
-                id="container-height"
-                type="number"
-                value={localSettings.height}
-                onChange={(e) => handleChange("height", e.target.value)}
-                min="200"
-                step="50"
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '2px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.currentTarget.style.borderColor = '#ff0059'}
-                onBlur={(e) => e.currentTarget.style.borderColor = '#e0e0e0'}
-              />
+            {/* Height and Padding Row */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ flex: 1 }}>
+                <label
+                  htmlFor="container-height"
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: '#555'
+                  }}
+                >
+                  Height (px)
+                </label>
+                <input
+                  id="container-height"
+                  type="number"
+                  value={localSettings.height}
+                  onChange={(e) => handleChange("height", e.target.value)}
+                  min="200"
+                  step="50"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#ff0059'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e0e0e0'}
+                />
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <label
+                  htmlFor="container-padding"
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: '#555'
+                  }}
+                >
+                  Padding (px)
+                </label>
+                <input
+                  id="container-padding"
+                  type="number"
+                  value={localSettings.padding}
+                  onChange={(e) => handleChange("padding", e.target.value)}
+                  min="0"
+                  step="5"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#ff0059'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e0e0e0'}
+                />
+              </div>
             </div>
 
-            {/* Padding Setting */}
-            <div>
-              <label
-                htmlFor="container-padding"
-                style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#555'
-                }}
-              >
-                Padding (px)
-              </label>
-              <input
-                id="container-padding"
-                type="number"
-                value={localSettings.padding}
-                onChange={(e) => handleChange("padding", e.target.value)}
-                min="0"
-                step="5"
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '2px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.currentTarget.style.borderColor = '#ff0059'}
-                onBlur={(e) => e.currentTarget.style.borderColor = '#e0e0e0'}
-              />
-            </div>
+            {/* Grid Columns and Gap Row */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ flex: 1 }}>
+                <label
+                  htmlFor="container-columns"
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: '#555'
+                  }}
+                >
+                  Columns
+                </label>
+                <input
+                  id="container-columns"
+                  type="number"
+                  value={localSettings.gridColumns}
+                  onChange={(e) => handleChange("gridColumns", e.target.value)}
+                  min="1"
+                  max="12"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#ff0059'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e0e0e0'}
+                />
+              </div>
 
-            {/* Gap Setting */}
-            <div>
-              <label
-                htmlFor="container-gap"
-                style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#555'
-                }}
-              >
-                Gap (px)
-              </label>
-              <input
-                id="container-gap"
-                type="number"
-                value={localSettings.gap}
-                onChange={(e) => handleChange("gap", e.target.value)}
-                min="0"
-                step="5"
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '2px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.currentTarget.style.borderColor = '#ff0059'}
-                onBlur={(e) => e.currentTarget.style.borderColor = '#e0e0e0'}
-              />
+              <div style={{ flex: 1 }}>
+                <label
+                  htmlFor="container-gap"
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: '#555'
+                  }}
+                >
+                  Gap (px)
+                </label>
+                <input
+                  id="container-gap"
+                  type="number"
+                  value={localSettings.gap}
+                  onChange={(e) => handleChange("gap", e.target.value)}
+                  min="0"
+                  step="5"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#ff0059'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e0e0e0'}
+                />
+              </div>
             </div>
           </div>
 
