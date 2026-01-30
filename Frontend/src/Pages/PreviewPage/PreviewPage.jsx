@@ -70,11 +70,11 @@ export default function PreviewPage() {
     },
   };
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth > 768);
+      setIsMobile(window.innerWidth <= 768);
     };
 
     window.addEventListener("resize", handleResize);
@@ -87,7 +87,7 @@ export default function PreviewPage() {
   if (!currentNews) 
     return <div style={{ padding: 40 }}>No news selected for preview.</div>;
 
-  const { data, fullContent } = currentNews;
+  const { data } = currentNews;
 
   const thumb = (() => {
     if (!data?.thumbnail) return { url: luffy, isVideo: false };
@@ -100,7 +100,8 @@ export default function PreviewPage() {
       isVideo =
         data.thumbnail.includes(".mp4") ||
         data.thumbnail.includes(".webm") ||
-        data.thumbnail.includes(".ogg");
+        data.thumbnail.includes(".ogg") ||
+        data.thumbnail.startsWith("data:video/");
     } else if (data.thumbnail instanceof File) {
       url = URL.createObjectURL(data.thumbnail);
       isVideo = data.thumbnail.type?.startsWith("video/");
@@ -195,27 +196,29 @@ export default function PreviewPage() {
               </div>
             </div>
 
+            {/* Render containers with responsive design */}
             <div
-              className="main-news-sbcon1"
+              className="main-news-content"
               style={{
-                position: "relative",
-                overflow: "visible",
-                display: "block",
-                border: "none",
-                fontSize: `${fontSize}%`, // Apply font size here too
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+                fontSize: `${fontSize}%`,
               }}
             >
-              {fullContent
-                .filter(box => box.type === "paragraph")
-                .map(box => (
-                  <ParagraphResponsive key={box.id} box={box} />
-                ))}
-
-              {fullContent
-                .filter(box => box.type === "image")
-                .map(box => (
-                  <ImageResponsive key={box.id} box={box} />
-                ))}
+              {currentNews.containerOverlays && currentNews.containerOverlays.length > 0 ? (
+                currentNews.containerOverlays.map((container) => (
+                  <ContainerView 
+                    key={container.id} 
+                    container={container} 
+                    isMobile={isMobile}
+                  />
+                ))
+              ) : (
+                <div style={{ padding: "20px", color: "#999", textAlign: "center" }}>
+                  No content available
+                </div>
+              )}
             </div>
             
             <div className="comment-sec">
@@ -226,7 +229,7 @@ export default function PreviewPage() {
             </div>  
           </div>
 
-          {MLayout === 1 && isMobile && <Line direction="V" length="1250px" thickness="1px" color="#e80d8c" />}
+          {MLayout === 1 && !isMobile && <Line direction="V" length="1250px" thickness="1px" color="#e80d8c" />}
           {MLayout === 1 && <Melumnews />}
         </div>
       </div>
@@ -241,8 +244,6 @@ export default function PreviewPage() {
             <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
             <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
             <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
-
-
           </AutoScrollContainer>
         </div>
         <Footer/>
@@ -251,40 +252,47 @@ export default function PreviewPage() {
   );
 }
 
-function ParagraphStatic({ box }) {
+// New component to render containers responsively
+function ContainerView({ container, isMobile }) {
+  // The container structure from Redux is: { id, settings: { columns, gap, padding, boxes } }
+  const settings = container.settings || container; // Handle both structures
+  
+  // Adjust columns for mobile - if more than 1 column, make it 1 on mobile
+  const responsiveColumns = isMobile && settings.columns > 1 ? 1 : settings.columns;
+  
   return (
     <div
       style={{
-        position: "absolute",
-        top: box.y,
-        left: box.x,
-        width: box.width,
-        padding: "8px",
-        whiteSpace: "pre-wrap",
-        fontSize: "17px",
-        lineHeight: "1.4",
+        display: "grid",
+        gridTemplateColumns: `repeat(${responsiveColumns}, 1fr)`,
+        gap: `${settings.gap}px`,
+        padding: `${settings.padding}px`,
+        background: "rgba(102, 126, 234, 0.02)",
+        borderRadius: "8px",
+        border: "1px solid rgba(102, 126, 234, 0.1)",
       }}
     >
-      {box.content}
+      {settings.boxes && settings.boxes.length > 0 ? (
+        settings.boxes.map((box) => (
+          <div key={box.id}>
+            {box.type === "paragraph" ? (
+              <ParagraphResponsive box={box} />
+            ) : box.type === "image" ? (
+              <ImageResponsive box={box} />
+            ) : null}
+          </div>
+        ))
+      ) : (
+        <div style={{ 
+          gridColumn: `span ${responsiveColumns}`, 
+          textAlign: "center", 
+          color: "#999", 
+          padding: "20px" 
+        }}>
+          No content in this container
+        </div>
+      )}
     </div>
-  );
-}
-
-function ImageStatic({ box }) {
-  return (
-    <img
-      src={box.content}
-      style={{
-        position: "absolute",
-        top: box.y,
-        left: box.x,
-        width: box.width,
-        height: box.height,
-        objectFit: "cover",
-        borderRadius: "6px",
-      }}
-      alt="news"
-    />
   );
 }
 
@@ -359,16 +367,49 @@ function Melumnews() {
 
 function ParagraphResponsive({ box }) {
   return (
-    <p className="news-paragraph">
-      {box.content}
-    </p>
+    <div
+      style={{
+        padding: "12px",
+        background: "#fff",
+        borderRadius: "6px",
+        border: "1px solid #e0e0e0",
+      }}
+    >
+      <p 
+        style={{ 
+          whiteSpace: "pre-wrap",
+          fontSize: "17px",
+          lineHeight: "1.6",
+          margin: 0,
+          color: "#333",
+        }}
+      >
+        {box.content}
+      </p>
+    </div>
   );
 }
 
 function ImageResponsive({ box }) {
   return (
-    <div className="news-image-wrapper">
-      <img src={box.content} alt="news" />
+    <div
+      style={{
+        width: "100%",
+        borderRadius: "6px",
+        overflow: "hidden",
+        border: "1px solid #e0e0e0",
+      }}
+    >
+      <img 
+        src={box.content} 
+        alt="news" 
+        style={{
+          width: "100%",
+          height: "auto",
+          display: "block",
+          objectFit: "cover",
+        }}
+      />
     </div>
   );
 }
