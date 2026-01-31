@@ -6,7 +6,7 @@ import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { IoSunnySharp } from "react-icons/io5";
-import { useState,useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { setLanguage, setTranslatedNews } from "../../Slice/newsformslice.js";
 import { translateToEnglish } from "../../Slice/translate.js";
@@ -18,6 +18,49 @@ const { allNews, language } = useSelector(
   (state) => state.newsform
 );
 const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
+  const [districtDropdownOpen, setDistrictDropdownOpen] = useState(false);
+  const districtDropdownRef = useRef(null);
+
+  const districts = [
+    "சென்னை",
+    "கோயம்புத்தூர்",
+    "மதுரை",
+    "திருச்சிராப்பள்ளி (திருச்சி)",
+    "சேலம்",
+    "திருப்பூர்",
+    "தஞ்சாவூர்",
+    "கன்னியாகுமரி",
+    "திருநெல்வேலி",
+    "ஈரோடு",
+    "வேலூர்",
+    "திருவள்ளூர்",
+    "காஞ்சிபுரம்",
+    "செங்கல்பட்டு",
+    "விழுப்புரம்",
+    "கடலூர்",
+    "நாமக்கல்",
+    "கரூர்",
+    "திண்டுக்கல்",
+    "தேனி",
+    "சிவகங்கை",
+    "விருதுநகர்",
+    "ராமநாதபுரம்",
+    "புதுக்கோட்டை",
+    "பெரம்பலூர்",
+    "அரியலூர்",
+    "தருமபுரி",
+    "கிருஷ்ணகிரி",
+    "திருவண்ணாமலை",
+    "திருவாரூர்",
+    "நாகப்பட்டினம்",
+    "மயிலாடுதுறை",
+    "நீலகிரி",
+    "கள்ளக்குறிச்சி",
+    "ராணிப்பேட்டை",
+    "திருப்பத்தூர்",
+    "தென்காசி",
+    "காஞ்சிபுரம்",
+  ];
 useEffect(() => {
   const handleResize = () => {
     setIsMobile(window.innerWidth > 768);
@@ -27,6 +70,18 @@ useEffect(() => {
 
   return () => window.removeEventListener("resize", handleResize);
 }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (districtDropdownRef.current && !districtDropdownRef.current.contains(e.target)) {
+        setDistrictDropdownOpen(false);
+      }
+    };
+    if (districtDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [districtDropdownOpen]);
 const handleLanguageToggle = async () => {
   if (language === "ta") {
     // Translate ALL news to English
@@ -89,10 +144,32 @@ const handleLanguageToggle = async () => {
               <div>அரசியல்</div>
               <div>உலகம்</div>
               <div>இந்தியா</div>
-              {isMobile &&  <div>தமிழக நியூஸ்</div>}
-              {isMobile &&  <div>மாவட்டம்</div>}
-             {isMobile &&   <div>விளையாட்டு</div>}
-            {isMobile &&    <div>ட்ரெண்டிங்</div>}
+              <div>தமிழக நியூஸ்</div>
+              {(
+                <div ref={districtDropdownRef} className="nav-district-dropdown">
+                  <div
+                    className="nav-district-trigger"
+                    onClick={() => setDistrictDropdownOpen((prev) => !prev)}
+                  >
+                    மாவட்டம் ▾
+                  </div>
+                  {districtDropdownOpen && (
+                    <div className="nav-district-menu">
+                      {districts.map((district) => (
+                        <div
+                          key={district}
+                          className="nav-district-item"
+                          onClick={() => setDistrictDropdownOpen(false)}
+                        >
+                          {district}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              <div>விளையாட்டு</div>
+              <div>ட்ரெண்டிங்</div>
             </div>
           { isMobile &&             <div className="nav-c3-dm-v2">
           {isOn ?   <IoSunnySharp onClick={() => setIsOn(!isOn)} />:<HiMiniMoon onClick={() => setIsOn(!isOn)} />}

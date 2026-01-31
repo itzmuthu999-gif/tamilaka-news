@@ -23,6 +23,10 @@ import WeatherBox from "../Components/WeatherBox";
 import { useState,useEffect } from "react";
 export default function Main() {
   const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
+  const newslist={
+     n1: 1769719221991,
+     n2: 1769719221991,
+  }
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth > 768);
@@ -33,13 +37,14 @@ export default function Main() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   
+
   return (
     <div className="np-main-cont">
       <div
         className="npmc-c1"
 
       >
-        <BigNewsContainer1 newsId={1766221597943} />
+        <BigNewsContainer1 newsId={newslist.n1} />
         {isMobile && <Line direction="V" length="630px" thickness="1px" color="#e80d8c" />}
         {/* {!isMobile && <Line direction="H" length="100%" thickness="1px" color="#e80d8c" />} */}
          {!isMobile && 
@@ -56,29 +61,21 @@ export default function Main() {
           }}
         >
           <Newsheader name={"Top news"} />
-          <NorContainer5 newsId={1766223853802} />
+          <NorContainer5 newsId={newslist.n1} />
           <Line
             direction="H"
             length="100%"
             thickness="0.5px"
             color="#b6b6b6ff"
           />
-          <NorContainer5 newsId={1766224089643} />
+          <NorContainer5 newsId={newslist.n1} />
           <Line
             direction="H"
             length="100%"
             thickness="0.5px"
             color="#b6b6b6ff"
           />
-          <NorContainer5 newsId={1766221597943} />
-          <Line
-            direction="H"
-            length="100%"
-            thickness="0.5px"
-            color="#b6b6b6ff"
-          />
-
-          <NorContainer5 newsId={1766225666747} />
+          <NorContainer5 newsId={newslist.n1} />
           <Line
             direction="H"
             length="100%"
@@ -86,7 +83,15 @@ export default function Main() {
             color="#b6b6b6ff"
           />
 
-          <NorContainer5 newsId={1766224333255} />
+          <NorContainer5 newsId={newslist.n1} />
+          <Line
+            direction="H"
+            length="100%"
+            thickness="0.5px"
+            color="#b6b6b6ff"
+          />
+
+          <NorContainer5 newsId={newslist.n1} />
           <Line
             direction="H"
             length="100%"
@@ -106,28 +111,28 @@ export default function Main() {
         }}
       >
         <div className="npmcc2-s1">
-          <NorContainer1 newsId={1766224333255} />
+          <NorContainer1 newsId={newslist.n1} />
           <Line
             direction="H"
             length="100%"
             thickness="0.5px"
             color="#b6b6b6ff"
           />
-          <NorContainer1 newsId={1766224089643} />
+          <NorContainer1 newsId={newslist.n1} />
           <Line
             direction="H"
             length="100%"
             thickness="0.5px"
             color="#b6b6b6ff"
           />
-          <NorContainer1 newsId={1766221597943} />
+          <NorContainer1 newsId={newslist.n1} />
           <Line
             direction="H"
             length="100%"
             thickness="0.5px"
             color="#b6b6b6ff"
           />
-          <NorContainer1 newsId={1766223853802} />
+          <NorContainer1 newsId={newslist.n1} />
         </div>
         <Line direction="V" length="850px" thickness="1px" color="#e80d8c" />
         <div className="npmcc2-s2">
@@ -144,11 +149,11 @@ export default function Main() {
         }}
       >
         <AutoScrollContainer>
-          <BigNewsContainer4A newsId={1766221597943} />
-          <BigNewsContainer4A newsId={1766225666747} />
-          <BigNewsContainer4A newsId={1766224333255} />
-          <BigNewsContainer4A newsId={1766224089643} />
-          <BigNewsContainer4A newsId={1766221597943} />
+          <BigNewsContainer4A newsId={newslist.n1} />
+          <BigNewsContainer4A newsId={newslist.n1} />
+          <BigNewsContainer4A newsId={newslist.n1} />
+          <BigNewsContainer4A newsId={newslist.n1} />
+          <BigNewsContainer4A newsId={newslist.n1} />
         </AutoScrollContainer>
       </div>
       <br /> <AdBox width="100%" height="150px" /> <br />
@@ -160,21 +165,21 @@ export default function Main() {
           gap: "15px",
         }}
       >
-        <BigNewsContainer3 newsId={1766221597943} />
+        <BigNewsContainer3 newsId={newslist.n1} />
         <div className="npmcc4-s1">
-          <NorContainer3 newsId={1766225666747} />
+          <NorContainer3 newsId={newslist.n1} />
 
-          <NorContainer3 newsId={1766221597943} />
-          <NorContainer3 newsId={1766224089643} />
-          <NorContainer3 newsId={1766221597943} />
-          <NorContainer3 newsId={1766221597943} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
         </div>
         <div className="npmcc4-s1">
-          <NorContainer3 newsId={1766224333255} />
-          <NorContainer3 newsId={1766221597943} />
-          <NorContainer3 newsId={1766224089643} />
-          <NorContainer3 newsId={1766221597943} />
-          <NorContainer3 newsId={1766221597943} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
         </div>
       </div>
       <br /> <AdBox width="100%" height="150px" /> <br />
@@ -187,22 +192,22 @@ export default function Main() {
         }}
       >
         <div className="npmcc4-s1">
-          <NorContainer3 newsId={1766225666747} />
-          <NorContainer3 newsId={1766224089643} />
-          <NorContainer3 newsId={1766224333255} />
-          <NorContainer3 newsId={1766221597943} />
-          <NorContainer3 newsId={1766221597943} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
         </div>
         <div className="npmcc4-s2">
-          <BigNewsContainer3 newsId={1766221597943} />
-          <NorContainer3 newsId={1766221597943} />
+          <BigNewsContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
         </div>
         <div className="npmcc4-s1">
-          <NorContainer3 newsId={1766221597943} />
-          <NorContainer3 newsId={1766224333255} />
-          <NorContainer3 newsId={1766223853802} />
-          <NorContainer3 newsId={1766224089643} />
-          <NorContainer3 newsId={1766221597943} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
+          <NorContainer3 newsId={newslist.n1} />
         </div>
       </div>
       <br />
@@ -220,30 +225,30 @@ export default function Main() {
         <div className="npmcc5-s1">
           <Newsheader name={"weather"} />
           <div style={{ display: "flex", gap: "5px" }}>
-            <BigNewsContainer4A size={500} newsId={1766221597943} />
+            <BigNewsContainer4A size={500} newsId={newslist.n1} />
             <div>
-              <NorContainer4A newsId={1766224089643} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766221597943} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766223853802} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766221597943} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
@@ -257,30 +262,30 @@ export default function Main() {
         <div className="npmcc5-s2">
           <Newsheader name={"weather"} />
           <div style={{ display: "flex", gap: "5px" }}>
-            <BigNewsContainer4A newsId={1766225666747} />
+            <BigNewsContainer4A newsId={newslist.n1} />
             <div>
-              <NorContainer4A newsId={1766224089643} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766224333255} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766221597943} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766223853802} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
@@ -305,14 +310,14 @@ export default function Main() {
           }}
         >
           <div>
-            <NorContainer4 newsId={1766221597943} />
+            <NorContainer4 newsId={newslist.n1} />
             <Line
               direction="H"
               length="100%"
               thickness="0.5px"
               color="#b6b6b6ff"
             />
-            <NorContainer4 newsId={1766221597943} />
+            <NorContainer4 newsId={newslist.n1} />
           </div>
           <Line
             direction="V"
@@ -321,14 +326,14 @@ export default function Main() {
             color="#b6b6b6ff"
           />
           <div>
-            <NorContainer4 newsId={1766225666747} />
+            <NorContainer4 newsId={newslist.n1} />
             <Line
               direction="H"
               length="100%"
               thickness="0.5px"
               color="#b6b6b6ff"
             />
-            <NorContainer4 newsId={1766221597943} />
+            <NorContainer4 newsId={newslist.n1} />
           </div>
           <Line
             direction="V"
@@ -337,14 +342,14 @@ export default function Main() {
             color="#b6b6b6ff"
           />
           <div>
-            <NorContainer4 newsId={1766221597943} />
+            <NorContainer4 newsId={newslist.n1} />
             <Line
               direction="H"
               length="100%"
               thickness="0.5px"
               color="#b6b6b6ff"
             />
-            <NorContainer4 newsId={1766221597943} />
+            <NorContainer4 newsId={newslist.n1} />
           </div>
           <Line
             direction="V"
@@ -353,14 +358,14 @@ export default function Main() {
             color="#b6b6b6ff"
           />
           <div style={{ display: "inline-block" }}>
-            <NorContainer4 newsId={1766224333255} />
+            <NorContainer4 newsId={newslist.n1} />
             <Line
               direction="H"
               length="100%"
               thickness="0.5px"
               color="#b6b6b6ff"
             />
-            <NorContainer4 newsId={1766223853802} />
+            <NorContainer4 newsId={newslist.n1} />
           </div>
           <Line
             direction="V"
@@ -384,30 +389,30 @@ export default function Main() {
         <div className="npmcc5-s1">
           <Newsheader name={"weather"} />
           <div style={{ display: "flex", gap: "5px" }}>
-            <BigNewsContainer4A size={500} newsId={1766221597943} />
+            <BigNewsContainer4A size={500} newsId={newslist.n1} />
             <div>
-              <NorContainer4A newsId={1766221597943} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766223853802} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766224333255} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766224089643} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
@@ -421,30 +426,30 @@ export default function Main() {
         <div className="npmcc5-s2">
           <Newsheader name={"weather"} />
           <div style={{ display: "flex", gap: "5px" }}>
-            <BigNewsContainer4A newsId={1766225666747} />
+            <BigNewsContainer4A newsId={newslist.n1} />
             <div>
-              <NorContainer4A newsId={1766224089643} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766221597943} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766224333255} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
                 thickness="0.5px"
                 color="#b6b6b6ff"
               />
-              <NorContainer4A newsId={1766223853802} />
+              <NorContainer4A newsId={newslist.n1} />
               <Line
                 direction="H"
                 length="100%"
