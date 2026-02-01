@@ -43,7 +43,6 @@ export default function Editpaper() {
     setNextId(nextId + 1);
   };
 
-  // ✅ Handle drop for container overlay on ep-ed-cont
   const handleCanvasDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -58,7 +57,6 @@ export default function Editpaper() {
     }
   };
 
-  // ✅ Allow drop event
   const handleCanvasDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -94,7 +92,6 @@ export default function Editpaper() {
       </div>
 
       <div className="ep-main-ed-cont">
-        {/* ✅ CRITICAL: Main canvas with drop handlers */}
         <div 
           className="ep-ed-cont" 
           style={{ 
@@ -106,20 +103,19 @@ export default function Editpaper() {
           onDrop={handleCanvasDrop}
           onDragOver={handleCanvasDragOver}
         >
-          {/* ✅ EDITOR SETTINGS BUTTON */}
           <EditorSettings />
 
-          {/* ✅ GRID CONTAINER FOR CONTAINERS - This is the key fix */}
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: `repeat(${pageSettings.gridColumns}, 1fr)`,
               gap: `${pageSettings.gap}px`,
               width: '100%',
-              marginBottom: `${pageSettings.gap}px`
+              marginBottom: `${pageSettings.gap}px`,
+              position: 'relative',
+              zIndex: 1
             }}
           >
-            {/* RENDER CONTAINERS IN GRID */}
             {containers.map((container) => (
               <EditableContainer
                 key={container.id}
@@ -131,7 +127,6 @@ export default function Editpaper() {
             ))}
           </div>
 
-          {/* RENDER SLIDERS - Outside grid, positioned absolutely */}
           {sliders.map((slider) => {
             if (slider.type === "type1") {
               return (
@@ -162,7 +157,6 @@ export default function Editpaper() {
             return null;
           })}
 
-          {/* RENDER LINES - Outside grid, positioned absolutely */}
           {lines.map((line) => (
             <EditableLine
               key={line.id}
@@ -177,7 +171,6 @@ export default function Editpaper() {
             />
           ))}
 
-          {/* Empty state message */}
           {containers.length === 0 && sliders.length === 0 && lines.length === 0 && (
             <div style={{ 
               padding: "40px", 

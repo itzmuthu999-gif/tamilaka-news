@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTimes, FaEdit } from 'react-icons/fa';
 import ImageBox from './ImageBox.jsx';
 import ParagraphBox from './ParagraphBox.jsx';
 
-export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettings = {} }) {
+const defaultSettings = {
+  columns: 2,
+  gap: 10,
+  padding: 20,
+  boxes: []
+};
+
+export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettings = {}, activeLang = "ta" }) {
   const [settings, setSettings] = useState({
-    columns: initialSettings.columns || 2,
-    gap: initialSettings.gap || 10,
-    padding: initialSettings.padding || 20,
-    boxes: initialSettings.boxes || [],
-    ...initialSettings
+    ...defaultSettings,
+    ...initialSettings,
+    boxes: initialSettings.boxes || []
   });
+
+  useEffect(() => {
+    const loaded = {
+      ...defaultSettings,
+      ...initialSettings,
+      boxes: initialSettings.boxes || []
+    };
+    setSettings(loaded);
+  }, [id]);
   
   const [showSettings, setShowSettings] = useState(false);
   const [tempSettings, setTempSettings] = useState({ ...settings });
@@ -268,7 +282,8 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
                     id={box.id}
                     onDelete={removeBoxFromContainer}
                     onUpdate={updateBoxInContainer}
-                    initialContent={box.content}
+                    initialContent={activeLang === "en" && box.contentEn != null ? box.contentEn : box.content}
+                    contentKey={activeLang === "en" ? "contentEn" : "content"}
                     box={{ x: 0, y: 0, width: 200, height: 150, ...box }}
                     isInContainer={true}
                   />

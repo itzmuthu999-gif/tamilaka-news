@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import logo from "../../assets/logo.png";
 
 import { IoSearchSharp } from "react-icons/io5";
@@ -43,6 +43,8 @@ export default function Templatepage() {
   });
   
   const [formState, setFormState] = useState(null);
+  const [formStateEn, setFormStateEn] = useState(null);
+  const [activeLang, setActiveLang] = useState("ta");
 
   const [hiddenElements, setHiddenElements] = useState({
     thumbnail: false,
@@ -53,6 +55,7 @@ export default function Templatepage() {
   useEffect(() => {
     if (currentNews) {
       setFormState(currentNews.data || null);
+      setFormStateEn(currentNews.dataEn || null);
       setBoxes(currentNews.fullContent ? JSON.parse(JSON.stringify(currentNews.fullContent)) : []);
       setContainerOverlays(currentNews.containerOverlays ? JSON.parse(JSON.stringify(currentNews.containerOverlays)) : []);
       
@@ -112,7 +115,9 @@ export default function Templatepage() {
       id: Date.now(),
       settings: {
         columns: 2,
-        gap: 10
+        gap: 10,
+        padding: 20,
+        boxes: []
       }
     };
     setContainerOverlays(prev => [...prev, newContainer]);
@@ -123,14 +128,13 @@ export default function Templatepage() {
   };
 
   const updateContainerOverlay = (id, newSettings) => {
-    setContainerOverlays(prev => {
-      const newArr = [...prev];
-      const container = newArr.find(c => c.id === id);
-      if (container) {
-        container.settings = { ...container.settings, ...newSettings };
-      }
-      return newArr;
-    });
+    setContainerOverlays(prev =>
+      prev.map((c) =>
+        c.id === id
+          ? { ...c, settings: { ...c.settings, ...newSettings } }
+          : c
+      )
+    );
   };
 
   const handleDragOver = (e) => {
@@ -162,6 +166,7 @@ export default function Templatepage() {
         id: currentNews.id,
         updatedNews: {
           data: formState,
+          dataEn: formStateEn || null,
           fullContent: boxes,
           containerOverlays: containerOverlays,
           containerSettings: containerSettings,
@@ -173,6 +178,7 @@ export default function Templatepage() {
     } else {
       dispatch(saveNews({
         data: formState || {},
+        dataEn: formStateEn || null,
         fullContent: boxes,
         containerOverlays: containerOverlays,
         containerSettings: containerSettings,
@@ -184,17 +190,81 @@ export default function Templatepage() {
       dispatch(setCurrentNews({
         id: Date.now(),
         data: formState || {},
+        dataEn: formStateEn || null,
         fullContent: boxes,
         containerOverlays: containerOverlays
       }));
     }
   };
 
-  function handleFormChange(data) {
-    setFormState(data);
-  }
+  const handleFormChange = useCallback((data) => {
+    if (data && typeof data.tamil !== "undefined") {
+      setFormState(data.tamil || null);
+      setFormStateEn(data.english || null);
+    } else {
+      setFormState(data);
+    }
+  }, []);
 
-  const formNewsData = formState;
+  const formNewsData = activeLang === "en" && formStateEn ? formStateEn : formState;
+
+  const getAllParagraphBoxes = useCallback(() => {
+    const outsideParagraphs = boxes.filter((b) => b.type === "paragraph");
+    const containerParagraphs = [];
+    
+    containerOverlays.forEach(container => {
+      if (container.settings && container.settings.boxes) {
+        container.settings.boxes.forEach(box => {
+          if (box.type === 'paragraph') {
+            containerParagraphs.push({
+              id: box.id,
+              content: box.content,
+              contentEn: box.contentEn
+            });
+          }
+        });
+      }
+    });
+    
+    return [...outsideParagraphs, ...containerParagraphs];
+  }, [boxes, containerOverlays]);
+
+  const paragraphBoxesForTranslation = getAllParagraphBoxes();
+
+  const handleTranslatedParagraphs = useCallback((translated) => {
+    if (!translated || !translated.length) return;
+    
+    // Update outside container paragraphs
+    setBoxes((prev) => {
+      const next = prev.map((b) => {
+        const t = translated.find((x) => x.id === b.id);
+        if (t) return { ...b, contentEn: t.contentEn };
+        return b;
+      });
+      return next;
+    });
+    
+    // Update inside container paragraphs
+    setContainerOverlays((prev) => {
+      return prev.map((container) => {
+        if (container.settings && container.settings.boxes) {
+          const updatedBoxes = container.settings.boxes.map((box) => {
+            const t = translated.find((x) => x.id === box.id);
+            if (t) return { ...box, contentEn: t.contentEn };
+            return box;
+          });
+          return {
+            ...container,
+            settings: {
+              ...container.settings,
+              boxes: updatedBoxes
+            }
+          };
+        }
+        return container;
+      });
+    });
+  }, []);
 
   return (
     <div>
@@ -209,6 +279,10 @@ export default function Templatepage() {
         initialData={currentNews} 
         onChange={handleFormChange} 
         onSave={() => saveThisNews()} 
+        activeLang={activeLang}
+        onActiveLangChange={setActiveLang}
+        paragraphBoxes={paragraphBoxesForTranslation}
+        onTranslatedParagraphs={handleTranslatedParagraphs}
       />
       <div className='navcon1'>
         <div className='navcon2'>
@@ -399,6 +473,7 @@ export default function Templatepage() {
       onDelete={removeContainerOverlay}
       onUpdate={updateContainerOverlay}
       initialSettings={container.settings}
+      activeLang={activeLang}
     />
   </div>
 ))}
@@ -409,7 +484,8 @@ export default function Templatepage() {
       id={box.id} 
       onDelete={removeBox} 
       onUpdate={updateBoxContent} 
-      initialContent={box.content}
+      initialContent={activeLang === "en" && box.contentEn != null ? box.contentEn : box.content}
+      contentKey={activeLang === "en" ? "contentEn" : "content"}
       box={box}
     />
   ) : (

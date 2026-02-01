@@ -16,6 +16,8 @@ import {
   updateNestedContainerSpacing,
   addEmptySlotToNested,
   dropNewsIntoNestedSlot,
+  removeNewsFromNestedSlot,
+  removeNewsFromSlot
 } from "../../Slice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
@@ -32,7 +34,6 @@ import NorContainer4 from "../Containers_/NorContainer4";
 import NorContainer4A from "../Containers_/NorContainer4A";
 import NorContainer5 from "../Containers_/NorContainer5";
 
-// import jwt from "../../../assets/jwt.jpg";
 import Newsheader from "../../Newspaper/Components/Newsheader";
 
 const COMPONENT_MAP = {
@@ -50,7 +51,6 @@ const COMPONENT_MAP = {
   "Normal Container Type 5": NorContainer5,
 };
 
-// ✅ SIMPLE RECURSIVE COMPONENT - Same behavior everywhere
 export default function EditableContainer({ 
   id, 
   catName,
@@ -59,7 +59,6 @@ export default function EditableContainer({
 }) {
   const dispatch = useDispatch();
   
-  // ✅ Get container data from Redux
   const containerData = useSelector(state => {
     const page = state.editpaper.pages.find(p => p.catName === catName);
     
@@ -97,7 +96,6 @@ export default function EditableContainer({
   const [margin, setMargin] = useState(spacing.margin);
   const [gridColumnSpan, setGridColumnSpan] = useState(1);
 
-  // ✅ Delete handler
   const handleDelete = (e) => {
     if (e.detail === 2) {
       e.stopPropagation();
@@ -113,7 +111,6 @@ export default function EditableContainer({
     }
   };
 
-  // ✅ Header toggle
   const handleToggleHeader = (enabled) => {
     if (isNested && parentContainerId) {
       dispatch(updateNestedContainerHeader({
@@ -133,7 +130,6 @@ export default function EditableContainer({
     }
   };
 
-  // ✅ Header title change
   const handleHeaderTitleChange = (e) => {
     const newTitle = e.target.value;
     setLocalHeaderTitle(newTitle);
@@ -156,7 +152,6 @@ export default function EditableContainer({
     }
   };
 
-  // ✅ Padding change
   const handlePaddingChange = (e) => {
     const newPadding = parseInt(e.target.value) || 0;
     setPadding(newPadding);
@@ -179,7 +174,6 @@ export default function EditableContainer({
     }
   };
 
-  // ✅ Margin change
   const handleMarginChange = (e) => {
     const newMargin = parseInt(e.target.value) || 0;
     setMargin(newMargin);
@@ -202,7 +196,6 @@ export default function EditableContainer({
     }
   };
 
-  // ✅ Grid changes
   const handleGridChange = (type, value) => {
     const v = parseInt(value) || (type === 'columns' ? 1 : 0);
     
@@ -230,7 +223,6 @@ export default function EditableContainer({
     }
   };
 
-  // ✅ Drop handler - SIMPLIFIED
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -239,13 +231,11 @@ export default function EditableContainer({
     const type = e.dataTransfer.getData("text/plain");
     const newsId = e.dataTransfer.getData("newsId");
 
-    // If dropping container overlay, add nested container
     if (isContainerOverlay === "true") {
       dispatch(addNestedContainer(catName, id));
       return;
     }
 
-    // If dropping news container type
     if (type && !newsId) {
       const slotId = `slot_${Date.now()}`;
       
@@ -268,9 +258,7 @@ export default function EditableContainer({
       return;
     }
 
-    // If dropping news card with newsId
     if (newsId) {
-      // Find the first empty slot or the slot being dropped on
       const targetSlot = items.find(item => !item.newsId);
       
       if (targetSlot) {
@@ -326,7 +314,6 @@ export default function EditableContainer({
           flexDirection: "column" 
         }}
       >
-        {/* Controls */}
         <div 
           style={{ 
             position: "absolute", 
@@ -376,7 +363,6 @@ export default function EditableContainer({
           </button>
         </div>
 
-        {/* Settings Panel */}
         {showSettings && (
           <div 
             style={{ 
@@ -451,14 +437,12 @@ export default function EditableContainer({
           </div>
         )}
 
-        {/* Header */}
         {headerEnabled && (
           <div style={{ padding: `${padding}px`, fontSize: "18px", fontWeight: "bold", flexShrink: 0, pointerEvents: "none" }}>
             <Newsheader name={headerTitle || (isNested ? "nested header" : "header")} />
           </div>
         )}
 
-        {/* Drop Zone */}
         <div 
           style={{ 
             flex: 1, 
@@ -490,12 +474,61 @@ export default function EditableContainer({
               display: "grid", 
               gridTemplateColumns: `repeat(${columns}, 1fr)`, 
               gap: `${gap}px`, 
-              width: "100%" 
+              width: "100%",
+              position: "relative"
             }}
           >
-            {/* ✅ Render nested containers FIRST - they appear before news items */}
-            {nestedContainers.map((nested) => (
-              <div key={nested.id} style={{ pointerEvents: "auto" }}>
+            {items.map((item, index) => {
+              const Component = COMPONENT_MAP[item.containerType];
+              if (!Component) return null;
+              
+              return (
+                <div 
+                  key={item.slotId} 
+                  style={{ 
+                    pointerEvents: "auto",
+                    position: "relative",
+                    zIndex: 10 + index
+                  }}
+                >
+                  <Component 
+                    border 
+                    slotId={item.slotId} 
+                    catName={catName} 
+                    containerId={id}
+                    isNested={isNested}
+                    parentContainerId={parentContainerId}
+                    onDelete={() => {
+                      // Remove the news from the slot
+                      if (isNested && parentContainerId) {
+                        dispatch(removeNewsFromNestedSlot({
+                          catName,
+                          parentContainerId,
+                          nestedContainerId: id,
+                          slotId: item.slotId
+                        }));
+                      } else {
+                        dispatch(removeNewsFromSlot({ 
+                          catName, 
+                          containerId: id, 
+                          slotId: item.slotId 
+                        }));
+                      }
+                    }}
+                  />
+                </div>
+              );
+            })}
+
+            {nestedContainers.map((nested, index) => (
+              <div 
+                key={nested.id} 
+                style={{ 
+                  pointerEvents: "auto",
+                  position: "relative",
+                  zIndex: 10 + items.length + index
+                }}
+              >
                 <EditableContainer
                   id={nested.id}
                   catName={catName}
@@ -504,25 +537,6 @@ export default function EditableContainer({
                 />
               </div>
             ))}
-
-            {/* ✅ Render news items AFTER nested containers */}
-            {items.map((item) => {
-              const Component = COMPONENT_MAP[item.containerType];
-              if (!Component) return null;
-              
-              return (
-                <div key={item.slotId} style={{ pointerEvents: "auto" }}>
-                  <Component 
-                    border 
-                    slotId={item.slotId} 
-                    catName={catName} 
-                    containerId={id}
-                    isNested={isNested}
-                    parentContainerId={parentContainerId}
-                  />
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>

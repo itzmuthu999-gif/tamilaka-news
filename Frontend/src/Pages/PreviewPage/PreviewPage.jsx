@@ -15,6 +15,8 @@ import BigNewsContainer4A from "../Newspaper/Containers_/BigContainer4A";
 import BigNewsContainer4 from "../Newspaper/Containers_/BigContainer4";
 import CommentSection from "./CommentSection";
 import Navbarr from "../Newspaper/Components/Navbarr";
+import Sidebar from "../Newspaper/Components/Sidebar";
+import "../Newspaper/newspaper.scss";
 import "./Previewpge.scss";
 
 import timeFun from "../Newspaper/Containers_/timeFun";
@@ -41,7 +43,16 @@ export default function PreviewPage() {
   
   // Font size state - starts at 100% (base size)
   const [fontSize, setFontSize] = useState(100);
-  
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isOn, setIsOn] = useState(false);
+
+  const themeStyle = {
+    backgroundColor: isOn ? "#141414" : "#ffffff",
+    color: isOn ? "#ffffff" : "#141414",
+    transition: "all 0.3s ease",
+    fontFamily: "Noto Sans Tamil",
+  };
+
   const icons = [
     { icon: <FaWhatsapp />, href: "#" },
     { icon: <FaFacebookF />, href: "#" },
@@ -123,10 +134,19 @@ export default function PreviewPage() {
   };
 
   return (
-    <div className="prepge-main">
+    <div className="prepge-main" style={{ ...themeStyle, minHeight: "100vh" }}>
       <div className="pp-nav-ov">
-        <Navbarr/>
+        <Navbarr
+          setIsOn={setIsOn}
+          isOn={isOn}
+          openSidebar={() => setSidebarOpen(true)}
+        />
       </div>
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        openSidebar={() => setSidebarOpen(true)}
+      />
       <div>
         <br />
       </div>
@@ -196,6 +216,28 @@ export default function PreviewPage() {
               </div>
             </div>
 
+            {/* Render outside container boxes first */}
+            {currentNews.fullContent && currentNews.fullContent.length > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "20px",
+                  fontSize: `${fontSize}%`,
+                }}
+              >
+                {currentNews.fullContent.map((box) => (
+                  <div key={box.id}>
+                    {box.type === "paragraph" ? (
+                      <ParagraphResponsive box={box} />
+                    ) : box.type === "image" ? (
+                      <ImageResponsive box={box} />
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Render containers with responsive design */}
             <div
               className="main-news-content"
@@ -212,6 +254,7 @@ export default function PreviewPage() {
                     key={container.id} 
                     container={container} 
                     isMobile={isMobile}
+                    fontSizePercent={fontSize}
                   />
                 ))
               ) : (
@@ -253,7 +296,7 @@ export default function PreviewPage() {
 }
 
 // New component to render containers responsively
-function ContainerView({ container, isMobile }) {
+function ContainerView({ container, isMobile, fontSizePercent = 100 }) {
   // The container structure from Redux is: { id, settings: { columns, gap, padding, boxes } }
   const settings = container.settings || container; // Handle both structures
   
@@ -267,9 +310,7 @@ function ContainerView({ container, isMobile }) {
         gridTemplateColumns: `repeat(${responsiveColumns}, 1fr)`,
         gap: `${settings.gap}px`,
         padding: `${settings.padding}px`,
-        background: "rgba(102, 126, 234, 0.02)",
-        borderRadius: "8px",
-        border: "1px solid rgba(102, 126, 234, 0.1)",
+        fontSize: `${fontSizePercent}%`,
       }}
     >
       {settings.boxes && settings.boxes.length > 0 ? (
@@ -368,20 +409,20 @@ function Melumnews() {
 function ParagraphResponsive({ box }) {
   return (
     <div
+      className="preview-paragraph-responsive"
       style={{
         padding: "12px",
-        background: "#fff",
+        background: "transparent",
         borderRadius: "6px",
-        border: "1px solid #e0e0e0",
       }}
     >
       <p 
         style={{ 
           whiteSpace: "pre-wrap",
-          fontSize: "17px",
+          fontSize: "1em",
           lineHeight: "1.6",
           margin: 0,
-          color: "#333",
+          color: "inherit",
         }}
       >
         {box.content}
@@ -393,11 +434,11 @@ function ParagraphResponsive({ box }) {
 function ImageResponsive({ box }) {
   return (
     <div
+      className="preview-image-responsive"
       style={{
         width: "100%",
         borderRadius: "6px",
         overflow: "hidden",
-        border: "1px solid #e0e0e0",
       }}
     >
       <img 

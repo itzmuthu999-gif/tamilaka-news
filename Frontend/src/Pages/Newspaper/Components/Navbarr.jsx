@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import ReactDOM from 'react-dom';
 import logo from "../../../assets/logo1.png";
 import { IoSearchSharp } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
@@ -6,7 +7,7 @@ import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiMiniMoon } from "react-icons/hi2";
 import { IoSunnySharp } from "react-icons/io5";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { setLanguage, setTranslatedNews } from "../../Slice/newsformslice.js";
 import { translateToEnglish } from "../../Slice/translate.js";
@@ -19,6 +20,7 @@ const { allNews, language } = useSelector(
 );
 const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
   const [districtDropdownOpen, setDistrictDropdownOpen] = useState(false);
+  const [menuPortalPosition, setMenuPortalPosition] = useState(null);
   const districtDropdownRef = useRef(null);
 
   const districts = [
@@ -71,9 +73,31 @@ useEffect(() => {
   return () => window.removeEventListener("resize", handleResize);
 }, []);
 
+  useLayoutEffect(() => {
+    if (!districtDropdownOpen || !districtDropdownRef.current) {
+      setMenuPortalPosition(null);
+      return;
+    }
+    const rect = districtDropdownRef.current.getBoundingClientRect();
+    setMenuPortalPosition({ top: rect.bottom + 6, left: rect.left });
+  }, [districtDropdownOpen]);
+
+  useEffect(() => {
+    if (!districtDropdownOpen) return;
+    const handleScrollOrResize = () => setDistrictDropdownOpen(false);
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+    return () => {
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
+  }, [districtDropdownOpen]);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (districtDropdownRef.current && !districtDropdownRef.current.contains(e.target)) {
+        const menuEl = document.querySelector(".nav-district-menu-portal");
+        if (menuEl && menuEl.contains(e.target)) return;
         setDistrictDropdownOpen(false);
       }
     };
@@ -153,8 +177,15 @@ const handleLanguageToggle = async () => {
                   >
                     மாவட்டம் ▾
                   </div>
-                  {districtDropdownOpen && (
-                    <div className="nav-district-menu">
+                  {districtDropdownOpen && menuPortalPosition && ReactDOM.createPortal(
+                    <div
+                      className={`nav-district-menu nav-district-menu-portal${isOn ? " nav-district-menu-dark" : ""}`}
+                      style={{
+                        position: "fixed",
+                        top: menuPortalPosition.top,
+                        left: menuPortalPosition.left,
+                      }}
+                    >
                       {districts.map((district) => (
                         <div
                           key={district}
@@ -164,7 +195,8 @@ const handleLanguageToggle = async () => {
                           {district}
                         </div>
                       ))}
-                    </div>
+                    </div>,
+                    document.body
                   )}
                 </div>
               )}

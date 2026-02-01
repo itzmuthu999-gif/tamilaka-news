@@ -3,10 +3,14 @@ import { useState, useEffect } from 'react';
 import { FaCheck, FaEdit, FaTimes } from "react-icons/fa";
 import { Rnd } from "react-rnd";
 
-export default function ParagraphBox({ id, onDelete, onUpdate, initialContent, box, isInContainer = false }) {
+export default function ParagraphBox({ id, onDelete, onUpdate, initialContent, box, isInContainer = false, contentKey = "content" }) {
   const [text, setText] = useState(initialContent || "");
   const [editing, setEditing] = useState(true);
   
+  useEffect(() => {
+    setText(initialContent || "");
+  }, [initialContent, contentKey]);
+
   const handleDragStart = (e) => {
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("boxId", id.toString());
@@ -14,7 +18,7 @@ export default function ParagraphBox({ id, onDelete, onUpdate, initialContent, b
   };
 
   useEffect(() => {
-    onUpdate(id, { content: text });
+    onUpdate(id, { [contentKey]: text });
   }, [text]);
    
   if (isInContainer) {

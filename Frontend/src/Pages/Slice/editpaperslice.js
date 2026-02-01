@@ -573,6 +573,18 @@ const pageLayoutSlice = createSlice({
       logState(state, "dropNewsIntoNestedSlot");
     },
 
+    removeNewsFromNestedSlot(state, action) {
+      const { catName, parentContainerId, nestedContainerId, slotId } = action.payload;
+      const slot = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId)
+        ?.items.find(i => i.slotId === slotId);
+
+      if (slot) slot.newsId = null;
+      logState(state, "removeNewsFromNestedSlot");
+    },
+
     toggleNestedSeparator(state, action) {
       const { catName, parentContainerId, nestedContainerId, slotId } = action.payload;
       const slot = state.pages
@@ -627,6 +639,7 @@ export const {
   updateNestedContainerSpacing,
   addEmptySlotToNested,
   dropNewsIntoNestedSlot,
+  removeNewsFromNestedSlot,
   toggleNestedSeparator,
 
   addLine,

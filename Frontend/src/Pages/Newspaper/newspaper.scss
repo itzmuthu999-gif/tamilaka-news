@@ -255,10 +255,10 @@
   flex-wrap: nowrap;
 }
 
-/* Mobile: horizontal scrollable sections */
+/* Mobile: horizontal scrollable sections - overflow visible so மாவட்டம் dropdown can show */
 @media (max-width: 768px) {
   .nav-c3-v2 {
-    overflow: hidden;
+    overflow: visible;
   }
 
   .nav-c3-sections-v2 {
@@ -307,7 +307,7 @@
   min-width: 220px;
   max-height: 320px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
 }
 
 .nav-district-item {
@@ -325,6 +325,22 @@
     background: #f8f8f8;
   }
 }
+
+.nav-district-menu-dark {
+  background: #1f1f1f !important;
+  border-color: #333 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  .nav-district-item {
+    border-bottom-color: #333;
+    color: #fff;
+
+    &:hover {
+      background: #333;
+    }
+  }
+}
+
 .nav-c2-line-v2 {
   width: 100%;
   height: 2px;

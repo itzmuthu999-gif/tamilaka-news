@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import luffy from '../assets/luffy.webp'
 import { deleteNews, setCurrentNews } from "./Slice/newsformslice.js";
+import './Newsbund.scss';
 
 export default function Newsbund() {
   const dispatch = useDispatch();
@@ -29,92 +30,100 @@ export default function Newsbund() {
   };
 
   return (
-    <div>
+    <div className="newsbund-container">
       <nav className='navbar'>
-        <div className='logo'><img src={logo} alt="alt" /></div>
-<Link 
-  className='link' 
-  to="/Newsupload"
-  onClick={() => dispatch(setCurrentNews(null))}
->
-  Upload News
-</Link>
-
+        <div className='logo'><img src={logo} alt="Tamilaka News" /></div>
+        <Link 
+          className='upload-news-btn' 
+          to="/Newsupload"
+          onClick={() => dispatch(setCurrentNews(null))}
+        >
+          Upload News
+        </Link>
       </nav>
 
       <div className="news-grid-container">
         <div className="news-grid">
+          {allNews.length === 0 ? (
+            <div className="no-news-message">
+              <h3>No News Yet</h3>
+              <p>Start creating amazing news content by clicking the "Upload News" button above!</p>
+            </div>
+          ) : (
+            allNews.map((news) => {
+              const thumb = getThumbnail(news.data?.thumbnail);
 
-          {allNews.length === 0 && <div>No news yet</div>}
-
-          {allNews.map((news) => {
-            const thumb = getThumbnail(news.data?.thumbnail);
-
-            return (
-              <div
-                key={news.id}
-                className="news-card-container"
-                style={{
-                  border: '1px solid #ddd',
-                  padding: 8,
-                  margin: 8,
-                  width: 300,
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  dispatch(setCurrentNews(news));
-                  navigate('/Newsupload');
-                }}
-              >
-
-                {/* NEWS CARD HEADER */}
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  
-                  <div>
-                    <h4 style={{ margin: 0 }}>{news.data?.headline || 'Untitled'}</h4>
-                    <div style={{ fontSize: 12, color: 'gray' }}>{news.time}</div>
+              return (
+                <div
+                  key={news.id}
+                  className="news-card-container"
+                  onClick={() => {
+                    dispatch(setCurrentNews(news));
+                    navigate('/Newsupload');
+                  }}
+                >
+                  {/* NEWS CARD HEADER */}
+                  <div className="news-card-header">
+                    <div className="news-card-content">
+                      <h3 className="news-card-title">
+                        {news.data?.headline || 'Untitled News'}
+                      </h3>
+                      <div className="news-card-time">
+                        {news.time || 'No time available'}
+                      </div>
+                    </div>
+                    <div className="news-card-thumbnail">
+                      <img
+                        src={thumb || luffy}
+                        alt="News thumbnail"
+                      />
+                    </div>
                   </div>
 
-                  <div style={{ width: 80, height: 60 }}>
-                    <img
-                      src={thumb || luffy}
-                      alt="thumbnail"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
+                  {/* NEWS CARD BODY */}
+                  <div className="news-card-body">
+                    <div className="news-card-description">
+                      {news.data?.oneLiner || 'No description available for this news article.'}
+                    </div>
+                  </div>
+
+                  {/* NEWS CARD ACTIONS */}
+                  <div className="news-card-actions">
+                    <button
+                      className="news-card-btn edit-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(setCurrentNews(news));
+                        navigate('/Newsupload');
                       }}
-                    />
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="news-card-btn preview-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/preview/${news.id}`);
+                      }}
+                    >
+                      Preview
+                    </button>
+                    <button
+                      className="news-card-btn delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm('Are you sure you want to delete this news?')) {
+                          dispatch(deleteNews(news.id));
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
                   </div>
-
                 </div>
-
-                {/* DELETE BUTTON */}
-                <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      dispatch(deleteNews(news.id));
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-<button
-  onClick={(e) => {
-    e.stopPropagation();
-    navigate(`/preview/${news.id}`);
-  }}
->
-  Preview
-</button>
-
-
-
-              </div>
-            );
-          })}
-
+              );
+            })
+          )}
         </div>
       </div>
     </div>

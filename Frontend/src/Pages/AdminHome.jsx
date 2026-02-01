@@ -1,27 +1,184 @@
 import React from "react";
 import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
+import { 
+  FiHome, 
+  FiFileText, 
+  FiEdit3, 
+  FiLayers, 
+  FiSettings,
+  FiUser,
+  FiLogOut,
+  FiChevronDown,
+  FiGrid,
+  FiTrendingUp,
+  FiUsers,
+  FiCalendar,
+  FiBell
+} from "react-icons/fi";
+import "./Adminhome.scss";
+
 export default function AdminHome() {
   return (
-    <div>
-      <nav>
-        <div className="logo">
-          <img src={logo} alt="alt" />
+    <div className="admin-home">
+      {/* Sidebar */}
+      <div className="admin-sidebar">
+        {/* Logo Section */}
+        <div className="sidebar-logo">
+          <img src={logo} alt="Tamilaka News Admin" />
+          <span>Tamilaka Admin</span>
         </div>
-      </nav>
-      <div className="main-container">
-        <Link to="/Newsbund" className="mc-c1-b1">
-          raw news
-        </Link>
-        <Link to="/editpaper" className="mc-c1-b2">
-          Edit Paper
-        </Link>
-        <Link to="/Newspaper" className="mc-c1-b2">
-          Newspaper
-        </Link>
-        <Link to="/ResizableDragPage" className="mc-c1-b2">
-          Try
-        </Link>
+
+        {/* Navigation Menu */}
+        <nav className="sidebar-nav">
+          <ul className="nav-list">
+            <li className="nav-item active">
+              <Link to="/admin-overview" className="nav-link">
+                <FiHome className="nav-icon" />
+                <span>Dashboard</span>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/Newsbund" className="nav-link">
+                <FiFileText className="nav-icon" />
+                <span>Raw News</span>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/editpaper" className="nav-link">
+                <FiEdit3 className="nav-icon" />
+                <span>Edit Paper</span>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/Newspaper" className="nav-link">
+                <FiLayers className="nav-icon" />
+                <span>Newspaper</span>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/analytics" className="nav-link">
+                <FiTrendingUp className="nav-icon" />
+                <span>Analytics</span>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/users" className="nav-link">
+                <FiUsers className="nav-icon" />
+                <span>Users</span>
+              </Link>
+            </li>
+
+            <li className="nav-item">
+              <Link to="/settings" className="nav-link">
+                <FiSettings className="nav-icon" />
+                <span>Settings</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* User Profile Section */}
+        <div className="sidebar-profile">
+          <div className="profile-info">
+            <div className="profile-avatar">
+              <FiUser />
+            </div>
+            <div className="profile-details">
+              <div className="profile-name">Admin User</div>
+              <div className="profile-role">Administrator</div>
+            </div>
+            <FiChevronDown className="profile-dropdown" />
+          </div>
+          <div className="profile-actions">
+            <Link to="/notifications" className="profile-action">
+              <FiBell />
+            </Link>
+            <Link to="/logout" className="profile-action logout">
+              <FiLogOut />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="admin-main">
+
+
+        {/* Dashboard Content */}
+        <div className="dashboard-content">
+          {/* Quick Actions Grid */}
+          <div className="quick-actions">
+            <h2>Quick Actions</h2>
+            <div className="actions-grid">
+              <Link to="/Newsbund" className="action-card">
+                <div className="action-icon">
+                  <FiFileText />
+                </div>
+                <h3>Manage News</h3>
+                <p>Add, edit, and organize news articles</p>
+              </Link>
+              
+              <Link to="/editpaper" className="action-card">
+                <div className="action-icon">
+                  <FiEdit3 />
+                </div>
+                <h3>Edit Paper</h3>
+                <p>Design and layout newspaper pages</p>
+              </Link>
+              
+              <Link to="/Newspaper" className="action-card">
+                <div className="action-icon">
+                  <FiLayers />
+                </div>
+                <h3>View Newspaper</h3>
+                <p>Preview and publish newspaper</p>
+              </Link>
+              
+              <Link to="/analytics" className="action-card">
+                <div className="action-icon">
+                  <FiTrendingUp />
+                </div>
+                <h3>Analytics</h3>
+                <p>View performance metrics and insights</p>
+              </Link>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="recent-activity">
+            <h2>Recent Activity</h2>
+            <div className="activity-list">
+              <div className="activity-item">
+                <div className="activity-icon">
+                  <FiEdit3 />
+                </div>
+                <div className="activity-content">
+                  <div className="activity-title">New article published</div>
+                  <div className="activity-time">2 hours ago</div>
+                </div>
+              </div>
+              <div className="activity-item">
+                <div className="activity-icon">
+                  <FiUser />
+                </div>
+                <div className="activity-content">
+                  <div className="activity-title">New user registered</div>
+                  <div className="activity-time">5 hours ago</div>
+                </div>
+              </div>
+              <div className="activity-item">
+                <div className="activity-icon">
+                  <FiCalendar />
+                </div>
+                <div className="activity-content">
+                  <div className="activity-title">Publication scheduled</div>
+                  <div className="activity-time">1 day ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

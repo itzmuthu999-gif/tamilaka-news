@@ -288,12 +288,19 @@
   font-size: 13px;
   color: gray;
 }
-.prepge-main
-{
-    width: 118.8%;
-    overflow-x: hidden;
-    margin: 0px;padding: 0px;
 
+.prepge-main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  overflow-x: hidden;
+}
+
+.pp-nav-ov {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .premain-con1-sub
@@ -436,3 +443,10 @@
     width: 100%;max-width: 1275px;
 
    }
+
+/* Remove borders from preview content boxes */
+.preview-paragraph-responsive,
+.preview-image-responsive {
+  border: none !important;
+  box-shadow: none !important;
+}

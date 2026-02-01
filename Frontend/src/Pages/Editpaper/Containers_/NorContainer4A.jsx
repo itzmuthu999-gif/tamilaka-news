@@ -8,8 +8,11 @@ import {
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  dropNewsIntoNestedSlot,
+  removeNewsFromNestedSlot,
   toggleContainerSeparator,
   toggleSliderSeparator,
+  toggleNestedSeparator,
 } from "../../Slice/editpaperslice";
 
 
@@ -21,6 +24,8 @@ const NorContainer4A = ({
   containerId,
   isSlider = false,
   isSlider2 = false,
+  isNested = false,
+  parentContainerId = null,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -37,6 +42,11 @@ const NorContainer4A = ({
       const slider = page?.sliders.find((s) => s.id === containerId);
       const item = slider?.items.find((i) => i.slotId === slotId);
       return item?.showSeparator || false;
+    } else if (isNested && parentContainerId) {
+      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+        ?.nestedContainers?.find((nc) => nc.id === containerId);
+      const item = nestedCont?.items?.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
     } else {
       const container = page?.containers.find((c) => c.id === containerId);
       const item = container?.items.find((i) => i.slotId === slotId);
@@ -47,10 +57,13 @@ const NorContainer4A = ({
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
-    // ✅ Both slider types now use the same sliders array
     if (isSlider || isSlider2) {
       const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
+    } else if (isNested && parentContainerId) {
+      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+        ?.nestedContainers?.find((nc) => nc.id === containerId);
+      return nestedCont?.items?.find((i) => i.slotId === slotId);
     } else {
       const container = page?.containers.find((c) => c.id === containerId);
       return container?.items.find((i) => i.slotId === slotId);
@@ -89,6 +102,16 @@ const NorContainer4A = ({
             newsId: Number(droppedId),
           })
         );
+      } else if (isNested && parentContainerId) {
+        dispatch(
+          dropNewsIntoNestedSlot({
+            catName,
+            parentContainerId,
+            nestedContainerId: containerId,
+            slotId,
+            newsId: Number(droppedId),
+          })
+        );
       } else {
         dispatch(
           dropNewsIntoSlot({
@@ -111,6 +134,15 @@ const NorContainer4A = ({
         removeNewsFromSliderSlot({
           catName,
           sliderId: containerId,
+          slotId,
+        })
+      );
+    } else if (isNested && parentContainerId) {
+      dispatch(
+        removeNewsFromNestedSlot({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
           slotId,
         })
       );
@@ -142,6 +174,15 @@ const NorContainer4A = ({
         toggleSliderSeparator({
           catName,
           sliderId: containerId,
+          slotId,
+        })
+      );
+    } else if (isNested && parentContainerId) {
+      dispatch(
+        toggleNestedSeparator({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
           slotId,
         })
       );

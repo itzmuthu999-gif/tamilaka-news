@@ -9,8 +9,11 @@ import {
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  dropNewsIntoNestedSlot,
+  removeNewsFromNestedSlot,
   toggleContainerSeparator,
   toggleSliderSeparator,
+  toggleNestedSeparator,
 } from "../../Slice/editpaperslice";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -24,6 +27,8 @@ const BigNewsContainer2 = ({
   containerId,
   isSlider = false,
   isSlider2 = false,
+  isNested = false,
+  parentContainerId = null,
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
@@ -37,6 +42,11 @@ const BigNewsContainer2 = ({
       const slider = page?.sliders.find((s) => s.id === containerId);
       const item = slider?.items.find((i) => i.slotId === slotId);
       return item?.showSeparator || false;
+    } else if (isNested && parentContainerId) {
+      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+        ?.nestedContainers?.find((nc) => nc.id === containerId);
+      const item = nestedCont?.items?.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
     } else {
       const container = page?.containers.find((c) => c.id === containerId);
       const item = container?.items.find((i) => i.slotId === slotId);
@@ -49,6 +59,10 @@ const BigNewsContainer2 = ({
     if (isSlider || isSlider2) {
       const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
+    } else if (isNested && parentContainerId) {
+      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+        ?.nestedContainers?.find((nc) => nc.id === containerId);
+      return nestedCont?.items?.find((i) => i.slotId === slotId);
     } else {
       const container = page?.containers.find((c) => c.id === containerId);
       return container?.items.find((i) => i.slotId === slotId);
@@ -96,6 +110,16 @@ const BigNewsContainer2 = ({
           newsId: Number(droppedId),
         })
       );
+    } else if (isNested && parentContainerId) {
+      dispatch(
+        dropNewsIntoNestedSlot({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
+          slotId,
+          newsId: Number(droppedId),
+        })
+      );
     } else {
       dispatch(
         dropNewsIntoSlot({
@@ -110,23 +134,8 @@ const BigNewsContainer2 = ({
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    if (isSlider || isSlider2) {
-      dispatch(
-        removeNewsFromSliderSlot({
-          catName,
-          sliderId: containerId,
-          slotId,
-        })
-      );
-    } else {
-      dispatch(
-        removeNewsFromSlot({
-          catName,
-          containerId,
-          slotId,
-        })
-      );
-    }
+    // Just call the onDelete prop passed from parent
+    // The parent will handle the Redux dispatch
     onDelete?.();
   };
 
@@ -149,6 +158,15 @@ const BigNewsContainer2 = ({
         toggleSliderSeparator({
           catName,
           sliderId: containerId,
+          slotId,
+        })
+      );
+    } else if (isNested && parentContainerId) {
+      dispatch(
+        toggleNestedSeparator({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
           slotId,
         })
       );

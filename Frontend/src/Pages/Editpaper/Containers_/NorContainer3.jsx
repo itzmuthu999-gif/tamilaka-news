@@ -8,8 +8,11 @@ import {
   removeNewsFromSlot,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
+  dropNewsIntoNestedSlot,
+  removeNewsFromNestedSlot,
   toggleContainerSeparator,
   toggleSliderSeparator,
+  toggleNestedSeparator,
 } from "../../Slice/editpaperslice";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -23,6 +26,8 @@ const NorContainer3 = ({
   containerId,
   isSlider = false,
   isSlider2 = false,
+  isNested = false,
+  parentContainerId = null,
 }) => {
   const [version, setVersion] = useState(1);
   const navigate = useNavigate();
@@ -35,6 +40,10 @@ const NorContainer3 = ({
     if (isSlider || isSlider2) {
       const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
+    } else if (isNested && parentContainerId) {
+      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+        ?.nestedContainers?.find((nc) => nc.id === containerId);
+      return nestedCont?.items?.find((i) => i.slotId === slotId);
     } else {
       const container = page?.containers.find((c) => c.id === containerId);
       return container?.items.find((i) => i.slotId === slotId);
@@ -83,6 +92,16 @@ const NorContainer3 = ({
             newsId: Number(droppedId),
           })
         );
+      } else if (isNested && parentContainerId) {
+        dispatch(
+          dropNewsIntoNestedSlot({
+            catName,
+            parentContainerId,
+            nestedContainerId: containerId,
+            slotId,
+            newsId: Number(droppedId),
+          })
+        );
       } else {
         dispatch(
           dropNewsIntoSlot({
@@ -107,6 +126,15 @@ const NorContainer3 = ({
           slotId,
         })
       );
+    } else if (isNested && parentContainerId) {
+      dispatch(
+        removeNewsFromNestedSlot({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
+          slotId,
+        })
+      );
     } else {
       dispatch(
         removeNewsFromSlot({
@@ -116,7 +144,7 @@ const NorContainer3 = ({
         })
       );
     }
-    
+
     onDelete?.();
   };
 
@@ -135,6 +163,15 @@ const NorContainer3 = ({
         toggleSliderSeparator({
           catName,
           sliderId: containerId,
+          slotId,
+        })
+      );
+    } else if (isNested && parentContainerId) {
+      dispatch(
+        toggleNestedSeparator({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
           slotId,
         })
       );
