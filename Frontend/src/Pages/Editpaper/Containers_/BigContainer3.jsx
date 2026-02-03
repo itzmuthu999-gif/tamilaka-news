@@ -107,6 +107,9 @@ const BigNewsContainer3 = ({
             sliderId: containerId,
             slotId,
             newsId: Number(droppedId),
+            containerId,
+            isNested,
+            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -157,6 +160,9 @@ const BigNewsContainer3 = ({
           catName,
           sliderId: containerId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -196,7 +202,6 @@ const BigNewsContainer3 = ({
         .ep-bg-news-3 {
           width: 400px;
           height: fit-content;
-          margin: 5px;
           transition: 0.5s ease-in-out;
           cursor: pointer;
         }
@@ -284,7 +289,6 @@ const BigNewsContainer3 = ({
         /* Mobile */
         @media (max-width: 640px) {
           .ep-bg-news-3 {
-            margin: 3px;
           }
 
           .epbn3-img {

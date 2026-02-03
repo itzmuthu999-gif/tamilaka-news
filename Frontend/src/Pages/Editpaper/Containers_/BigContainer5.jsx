@@ -23,6 +23,7 @@ const BigNewsContainer5 = ({
   slotId,
   catName,
   containerId,
+  sliderId,
   isSlider = false,
   isSlider2 = false,
   isNested = false,
@@ -37,7 +38,8 @@ const BigNewsContainer5 = ({
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
       const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
@@ -89,9 +91,12 @@ const BigNewsContainer5 = ({
         dispatch(
           dropNewsIntoSliderSlot({
             catName,
-            sliderId: containerId,
+            sliderId: sliderId,
             slotId,
             newsId: Number(droppedId),
+            containerId,
+            isNested,
+            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -137,8 +142,11 @@ const BigNewsContainer5 = ({
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -204,9 +212,7 @@ const BigNewsContainer5 = ({
           .ep-bg-news5-1 {
             width: 910px;
             height: fit-content;
-            margin: 5px;
             display: flex;
-            gap: 10px;
             transition: 0.5s ease-in-out;
           }
           

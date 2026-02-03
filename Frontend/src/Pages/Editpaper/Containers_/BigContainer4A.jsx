@@ -41,7 +41,8 @@ const BigNewsContainer4A = ({
   const showSeparator = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       const item = slider?.items.find((i) => i.slotId === slotId);
       return item?.showSeparator || false;
     } else if (isNested && parentContainerId) {
@@ -59,7 +60,8 @@ const BigNewsContainer4A = ({
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
       const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
@@ -108,9 +110,12 @@ const BigNewsContainer4A = ({
         dispatch(
           dropNewsIntoSliderSlot({
             catName,
-            sliderId: containerId,
+            sliderId: sliderId,
             slotId,
             newsId: Number(droppedId),
+            containerId,
+            isNested,
+            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -159,8 +164,11 @@ const BigNewsContainer4A = ({
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -200,10 +208,8 @@ const BigNewsContainer4A = ({
         .ep-bg-news-4a {
           width: ${size}px;
           height: fit-content;
-          margin: 5px;
           transition: 0.5s ease-in-out;
           cursor: pointer;
-          gap: 5px;
         }
 
         .ep-bg-news-4a:hover {
@@ -284,7 +290,7 @@ const BigNewsContainer4A = ({
         /* Mobile */
         @media (max-width: 640px) {
           .ep-bg-news-4a {
-            margin: 3px;
+
           }
 
           .epbn4a-img {

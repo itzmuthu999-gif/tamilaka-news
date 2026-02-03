@@ -165,17 +165,16 @@ const handleLanguageToggle = async () => {
 </div> }
 
             <div className="nav-c3-sections-v2">
-              <div>அரசியல்</div>
+               <div>வர்த்தகம்</div>
               <div>உலகம்</div>
               <div>இந்தியா</div>
-              <div>தமிழக நியூஸ்</div>
               {(
                 <div ref={districtDropdownRef} className="nav-district-dropdown">
                   <div
                     className="nav-district-trigger"
                     onClick={() => setDistrictDropdownOpen((prev) => !prev)}
                   >
-                    மாவட்டம் ▾
+                    தமிழக நியூஸ் ▾
                   </div>
                   {districtDropdownOpen && menuPortalPosition && ReactDOM.createPortal(
                     <div
@@ -200,6 +199,7 @@ const handleLanguageToggle = async () => {
                   )}
                 </div>
               )}
+              <div>அரசியல்</div>
               <div>விளையாட்டு</div>
               <div>ட்ரெண்டிங்</div>
             </div>

@@ -288,9 +288,9 @@ export default function PageEditor({
 
   const sliderTypes = [
 
-    { id: 1, label: "Slider Type 1 (Carousel)", action: onAddSlider },
+    { id: 1, label: "Slider Type 1 (Carousel)", type: "type1" },
 
-    { id: 2, label: "Slider Type 2 (Horizontal)", action: onAddSlider2 },
+    { id: 2, label: "Slider Type 2 (Horizontal)", type: "type2" },
 
   ];
 
@@ -674,11 +674,25 @@ export default function PageEditor({
 
                 {sliderTypes.map((slider) => (
 
-                  <button
+                  <div
 
                     key={slider.id}
 
-                    onClick={slider.action}
+                    draggable
+
+                    onDragStart={(e) => {
+
+                      e.dataTransfer.setData("sliderType", slider.type);
+
+                      e.dataTransfer.effectAllowed = "copy";
+
+                    }}
+
+                    onDragEnd={(e) => {
+
+                      e.preventDefault();
+
+                    }}
 
                     className="dds-add-cont-btn"
 
@@ -690,7 +704,17 @@ export default function PageEditor({
 
                       fontSize: "14px",
 
-                      fontWeight: "500"
+                      fontWeight: "500",
+
+                      cursor: "grab",
+
+                      display: "flex",
+
+                      alignItems: "center",
+
+                      justifyContent: "center",
+
+                      gap: "10px"
 
                     }}
 
@@ -700,7 +724,7 @@ export default function PageEditor({
 
                     {slider.label}
 
-                  </button>
+                  </div>
 
                 ))}
 

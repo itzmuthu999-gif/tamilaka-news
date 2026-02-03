@@ -17,7 +17,16 @@ import {
   addEmptySlotToNested,
   dropNewsIntoNestedSlot,
   removeNewsFromNestedSlot,
-  removeNewsFromSlot
+  removeNewsFromSlot,
+  removeSlotFromContainer,
+  removeSlotFromNestedContainer,
+  addSliderToContainer,
+  updateSliderWidth,
+  updateContainerSliderGap,
+  deleteContainerSlider,
+  addSlotToContainerSlider,
+  dropNewsIntoContainerSliderSlot,
+  removeSlotFromContainerSlider
 } from "../../Slice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
@@ -35,6 +44,8 @@ import NorContainer4A from "../Containers_/NorContainer4A";
 import NorContainer5 from "../Containers_/NorContainer5";
 
 import Newsheader from "../../Newspaper/Components/Newsheader";
+import { EditableSlider } from "./EditableSlider";
+import { EditableSlider2 } from "./EditableSlider2";
 
 const COMPONENT_MAP = {
   "Big Container Type 1": BigNewsContainer1,
@@ -87,6 +98,7 @@ export default function EditableContainer({
   const spacing = containerData?.spacing || { padding: 10, margin: 0 };
   const nestedContainers = containerData?.nestedContainers || [];
   const items = containerData?.items || [];
+  const sliders = containerData?.sliders || [];
 
   const [showSettings, setShowSettings] = useState(false);
   const [columns, setColumns] = useState(grid.columns);
@@ -230,6 +242,12 @@ export default function EditableContainer({
     const isContainerOverlay = e.dataTransfer.getData("containerOverlay");
     const type = e.dataTransfer.getData("text/plain");
     const newsId = e.dataTransfer.getData("newsId");
+    const sliderType = e.dataTransfer.getData("sliderType");
+
+    if (sliderType) {
+      dispatch(addSliderToContainer(catName, id, sliderType, isNested, parentContainerId));
+      return;
+    }
 
     if (isContainerOverlay === "true") {
       dispatch(addNestedContainer(catName, id));
@@ -449,12 +467,12 @@ export default function EditableContainer({
             position: "relative", 
             overflow: "visible", 
             padding: `${padding}px`, 
-            minHeight: nestedContainers.length === 0 && items.length === 0 ? "150px" : "auto" 
+            minHeight: nestedContainers.length === 0 && items.length === 0 && sliders.length === 0 ? "150px" : "auto" 
           }} 
           onDrop={handleDrop} 
           onDragOver={handleDragOver}
         >
-          {nestedContainers.length === 0 && items.length === 0 && (
+          {nestedContainers.length === 0 && items.length === 0 && sliders.length === 0 && (
             <div style={{ 
               display: "flex", 
               alignItems: "center", 
@@ -499,16 +517,15 @@ export default function EditableContainer({
                     isNested={isNested}
                     parentContainerId={parentContainerId}
                     onDelete={() => {
-                      // Remove the news from the slot
                       if (isNested && parentContainerId) {
-                        dispatch(removeNewsFromNestedSlot({
+                        dispatch(removeSlotFromNestedContainer({
                           catName,
                           parentContainerId,
                           nestedContainerId: id,
                           slotId: item.slotId
                         }));
                       } else {
-                        dispatch(removeNewsFromSlot({ 
+                        dispatch(removeSlotFromContainer({ 
                           catName, 
                           containerId: id, 
                           slotId: item.slotId 
@@ -535,6 +552,35 @@ export default function EditableContainer({
                   isNested={true}
                   parentContainerId={id}
                 />
+              </div>
+            ))}
+
+            {sliders.map((slider, index) => (
+              <div
+                key={slider.id}
+                style={{
+                  pointerEvents: "auto",
+                  position: "relative",
+                  zIndex: 10 + items.length + nestedContainers.length + index
+                }}
+              >
+                {slider.type === "type1" ? (
+                  <EditableSlider
+                    id={slider.id}
+                    catName={catName}
+                    containerId={id}
+                    isNested={isNested}
+                    parentContainerId={parentContainerId}
+                  />
+                ) : (
+                  <EditableSlider2
+                    id={slider.id}
+                    catName={catName}
+                    containerId={id}
+                    isNested={isNested}
+                    parentContainerId={parentContainerId}
+                  />
+                )}
               </div>
             ))}
           </div>

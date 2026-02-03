@@ -15,6 +15,9 @@ import {
   toggleContainerSeparator,
   toggleSliderSeparator,
   toggleNestedSeparator,
+  removeSlotFromContainer,
+  removeSlotFromSlider,
+  removeSlotFromNestedContainer,
 } from "../../Slice/editpaperslice";
 
 const BigNewsContainer1 = ({
@@ -111,6 +114,9 @@ const BigNewsContainer1 = ({
             sliderId: containerId,
             slotId,
             newsId: Number(droppedId),
+            containerId,
+            isNested,
+            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -139,8 +145,7 @@ const BigNewsContainer1 = ({
   const handleDelete = (e) => {
     e.stopPropagation();
     
-    // Just call the onDelete prop passed from parent
-    // The parent will handle the Redux dispatch
+    // Call the onDelete prop to remove the entire slot
     onDelete?.();
   };
 
@@ -165,6 +170,9 @@ const BigNewsContainer1 = ({
           catName,
           sliderId: containerId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -203,7 +211,6 @@ const BigNewsContainer1 = ({
           .ep-bg-news-1 {
             width: 800px; 
             height: fit-content;
-            margin: 5px;
             transition: 0.5s ease-in-out;
             cursor: pointer;
           }

@@ -1,16 +1,13 @@
-import React, { useState } from "react";
-import { Rnd } from "react-rnd";
+import React, { useState, useRef, useEffect } from "react";
 import { X, Edit2, Space } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
-  updateSliderPosition,
-  updateSliderSize,
-  updateSliderGap,
-  addSlotToSlider,
-  dropNewsIntoSliderSlot,
-  deleteSlider,
-  removeSlotFromSlider,
+  updateSliderWidth,
+  updateContainerSliderGap,
+  addSlotToContainerSlider,
+  dropNewsIntoContainerSliderSlot,
+  deleteContainerSlider,
+  removeSlotFromContainerSlider,
 } from "../../Slice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
@@ -19,7 +16,6 @@ import BigNewsContainer3 from "../Containers_/BigContainer3";
 import BigNewsContainer4 from "../Containers_/BigContainer4";
 import BigNewsContainer4A from "../Containers_/BigContainer4A";
 import BigNewsContainer5 from "../Containers_/BigContainer5";
-
 import NorContainer1 from "../Containers_/NorContainer1";
 import NorContainer2 from "../Containers_/NorContainer2";
 import NorContainer3 from "../Containers_/NorContainer3";
@@ -31,82 +27,233 @@ const COMPONENT_MAP = {
   "Big Container Type 1": BigNewsContainer1,
   "Big Container Type 2": BigNewsContainer2,
   "Big Container Type 3": BigNewsContainer3,
+
   "Big Container Type 4": BigNewsContainer4,
+
   "Big Container Type 4A": BigNewsContainer4A,
+
   "Big Container Type 5": BigNewsContainer5,
+
   "Normal Container Type 1": NorContainer1,
+
   "Normal Container Type 2": NorContainer2,
+
   "Normal Container Type 3": NorContainer3,
+
   "Normal Container Type 4": NorContainer4,
+
   "Normal Container Type 4A": NorContainer4A,
+
   "Normal Container Type 5": NorContainer5,
 };
 
 export function EditableSlider2({
   id,
-  position,
-  size,
-  gap: initialGap,
+
   catName,
+
+  containerId,
+
+  isNested = false,
+
+  parentContainerId = null,
 }) {
   const dispatch = useDispatch();
-  
-  // ✅ FIXED: Get slider data from unified sliders array
+
+  const containerRef = useRef(null);
+
+  const resizerRef = useRef(null);
+
   const slider = useSelector((state) => {
-    const page = state.editpaper.pages.find((p) => p.catName === catName);
-    return page?.sliders.find((s) => s.id === id); // Changed from sliders2 to sliders
+    if (isNested && parentContainerId) {
+      const parentCont = state.editpaper.pages
+
+        .find((p) => p.catName === catName)
+
+        ?.containers.find((c) => c.id === parentContainerId);
+
+      return parentCont?.nestedContainers
+
+        ?.find((nc) => nc.id === containerId)
+
+        ?.sliders?.find((s) => s.id === id);
+    } else {
+      return state.editpaper.pages
+
+        .find((p) => p.catName === catName)
+
+        ?.containers.find((c) => c.id === containerId)
+
+        ?.sliders?.find((s) => s.id === id);
+    }
   });
 
   const [showSettings, setShowSettings] = useState(false);
-  const [gap, setGap] = useState(initialGap ?? 10);
+
+  const [gap, setGap] = useState(slider?.gap ?? 10);
+
+  const [width, setWidth] = useState(slider?.size?.width || 0);
+
+  const [isResizing, setIsResizing] = useState(false);
 
   const droppedContainers = slider?.items || [];
+
   const lockedType = slider?.lockedType;
 
-  /* ---------- DELETE SLIDER ---------- */
+  useEffect(() => {
+    if (containerRef.current && width === 0) {
+      const containerWidth = containerRef.current.offsetWidth;
+
+      setWidth(containerWidth);
+
+      dispatch(
+        updateSliderWidth({
+          catName,
+
+          containerId,
+
+          sliderId: id,
+
+          width: containerWidth,
+
+          isNested,
+
+          parentContainerId,
+        }),
+      );
+    }
+  }, [
+    containerRef,
+    width,
+    dispatch,
+    catName,
+    containerId,
+    id,
+    isNested,
+    parentContainerId,
+  ]);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e) => {
+      if (containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+
+        const newWidth = Math.max(200, e.clientX - containerRect.left);
+
+        setWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+
+      dispatch(
+        updateSliderWidth({
+          catName,
+
+          containerId,
+
+          sliderId: id,
+
+          width,
+
+          isNested,
+
+          parentContainerId,
+        }),
+      );
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [
+    isResizing,
+    width,
+    dispatch,
+    catName,
+    containerId,
+    id,
+    isNested,
+    parentContainerId,
+  ]);
+
   const handleDelete = (e) => {
     if (e.detail === 2) {
-      dispatch(deleteSlider({ catName, sliderId: id })); // Changed from slider2Id to sliderId
+      dispatch(
+        deleteContainerSlider({
+          catName,
+          containerId,
+          sliderId: id,
+          isNested,
+          parentContainerId,
+        }),
+      );
     }
   };
 
-  /* ---------- DROP CONTAINER TYPE ---------- */
   const handleDrop = (e) => {
     e.preventDefault();
 
+    e.stopPropagation();
+
     const type = e.dataTransfer.getData("text/plain");
+
     const newsId = e.dataTransfer.getData("newsId");
 
     if (!type) return;
 
-    // Check if type matches locked type (after first drop)
     if (lockedType && type !== lockedType) {
       alert(`This slider only accepts "${lockedType}" containers!`);
+
       return;
     }
 
-    // Generate consistent ID
     const slotId = `slider2_slot_${Date.now()}`;
 
-    // ✅ Add slot to Redux
     dispatch(
-      addSlotToSlider({
+      addSlotToContainerSlider({
         catName,
-        sliderId: id, // Changed from slider2Id to sliderId
+
+        containerId,
+
+        sliderId: id,
+
         containerType: type,
+
         slotId: slotId,
-      })
+
+        isNested,
+
+        parentContainerId,
+      }),
     );
 
-    // If news was dropped directly, assign it
     if (newsId) {
       dispatch(
-        dropNewsIntoSliderSlot({
+        dropNewsIntoContainerSliderSlot({
           catName,
-          sliderId: id, // Changed from slider2Id to sliderId
+
+          containerId,
+
+          sliderId: id,
+
           slotId: slotId,
+
           newsId: Number(newsId),
-        })
+
+          isNested,
+
+          parentContainerId,
+        }),
       );
     }
   };
@@ -115,97 +262,80 @@ export function EditableSlider2({
 
   const handleDeleteSlot = (slotId) => {
     dispatch(
-      removeSlotFromSlider({
+      removeSlotFromContainerSlider({
         catName,
-        sliderId: id, // Changed from slider2Id to sliderId
+
+        containerId,
+
+        sliderId: id,
+
         slotId,
-      })
+
+        isNested,
+
+        parentContainerId,
+      }),
     );
   };
 
-  /* ---------- RENDER ---------- */
   return (
-    <Rnd
-      size={{
-        width: size?.width ?? 1000,
-        height: size?.height ?? 150,
-      }}
-      position={{
-        x: position?.x ?? 50,
-        y: position?.y ?? 50,
-      }}
-      minWidth={400}
-      minHeight={100}
-      bounds="parent"
-      enableResizing
-      dragHandleClassName="drag-handle-slider2"
+    <div
+      ref={containerRef}
       style={{
         border: "2px dashed #ff6b35",
+
         background: "rgba(255, 107, 53, 0.05)",
-        position: "absolute",
-        cursor: "move",
+
+        position: "relative",
+
+        width: width > 0 ? `${width}px` : "100%",
+
+        minHeight: "120px",
+
+        pointerEvents: "auto",
       }}
-      onDragStop={(e, d) => {
-        dispatch(
-          updateSliderPosition({
-            catName,
-            sliderId: id, // Changed from slider2Id to sliderId
-            position: { x: d.x, y: d.y },
-          })
-        );
-      }}
-      onResizeStop={(e, dir, ref, delta, pos) => {
-        dispatch(
-          updateSliderSize({
-            catName,
-            sliderId: id, // Changed from slider2Id to sliderId
-            size: {
-              width: ref.offsetWidth,
-              height: ref.offsetHeight,
-            },
-          })
-        );
-        dispatch(
-          updateSliderPosition({
-            catName,
-            sliderId: id, // Changed from slider2Id to sliderId
-            position: pos,
-          })
-        );
-      }}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
     >
       <div
-        className="drag-handle-slider2"
         style={{
           width: "100%",
+
           height: "100%",
+
           position: "relative",
-          pointerEvents: "auto",
+
           overflow: "hidden",
         }}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
       >
-        {/* ---------- CONTROLS ---------- */}
         <div
           style={{
             position: "absolute",
+
             top: "8px",
+
             right: "8px",
+
             display: "flex",
+
             gap: "8px",
+
             zIndex: 1000,
+
             pointerEvents: "auto",
           }}
         >
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="control-btn edit-btn"
             style={{
               background: "#ff6b35",
+
               border: "none",
+
               borderRadius: "4px",
+
               padding: "6px",
+
               cursor: "pointer",
             }}
           >
@@ -214,13 +344,16 @@ export function EditableSlider2({
 
           <button
             onClick={handleDelete}
-            className="control-btn delete-btn"
             title="Double click to delete"
             style={{
               background: "red",
+
               border: "none",
+
               borderRadius: "4px",
+
               padding: "6px",
+
               cursor: "pointer",
             }}
           >
@@ -228,19 +361,25 @@ export function EditableSlider2({
           </button>
         </div>
 
-        {/* ---------- SETTINGS PANEL ---------- */}
         {showSettings && (
           <div
-            className="settings-panel"
             style={{
               position: "absolute",
+
               top: "50px",
+
               right: "8px",
+
               background: "white",
+
               border: "2px solid #ff6b35",
+
               borderRadius: "8px",
+
               padding: "15px",
+
               zIndex: 20,
+
               minWidth: "220px",
             }}
           >
@@ -253,86 +392,124 @@ export function EditableSlider2({
                 max="50"
                 onChange={(e) => {
                   const v = parseInt(e.target.value) || 0;
+
                   setGap(v);
+
                   dispatch(
-                    updateSliderGap({
+                    updateContainerSliderGap({
                       catName,
-                      sliderId: id, // Changed from slider2Id to sliderId
+
+                      containerId,
+
+                      sliderId: id,
+
                       gap: v,
-                    })
+
+                      isNested,
+
+                      parentContainerId,
+                    }),
                   );
                 }}
                 style={{
                   width: "100%",
+
                   marginTop: "8px",
+
                   padding: "4px",
                 }}
               />
             </div>
-            
+
             {lockedType && (
-              <div style={{ marginTop: "12px", fontSize: "12px", color: "#ff6b35" }}>
+              <div
+                style={{
+                  marginTop: "12px",
+                  fontSize: "12px",
+                  color: "#ff6b35",
+                }}
+              >
                 🔒 Locked to: {lockedType}
               </div>
             )}
           </div>
         )}
 
-        {/* ---------- EMPTY STATE ---------- */}
         {droppedContainers.length === 0 && (
           <div
             style={{
               display: "flex",
+
               alignItems: "center",
+
               justifyContent: "center",
+
               height: "100%",
+
+              minHeight: "120px",
+
               color: "#ff6b35",
+
               fontSize: "14px",
+
               textAlign: "center",
+
               padding: "20px",
             }}
           >
             Drop containers here (horizontal scroll)
             <br />
-            <span style={{ fontSize: "12px", marginTop: "8px", display: "block" }}>
+            <span
+              style={{ fontSize: "12px", marginTop: "8px", display: "block" }}
+            >
               (First drop locks the container type)
             </span>
           </div>
         )}
 
-        {/* ---------- HORIZONTAL SCROLLABLE CONTENT ---------- */}
         {droppedContainers.length > 0 && (
           <div
             style={{
               display: "flex",
+
               alignItems: "center",
+
               height: "100%",
+
               overflowX: "auto",
+
               overflowY: "hidden",
+
               gap: `${gap}px`,
+
               padding: "10px",
+
               pointerEvents: "none",
             }}
           >
             {droppedContainers.map((container) => {
               const Component = COMPONENT_MAP[container.containerType];
-              
+
               if (!Component) return null;
 
               return (
-                <div 
-                  key={container.slotId} 
-                  style={{ 
+                <div
+                  key={container.slotId}
+                  style={{
                     flexShrink: 0,
-                    pointerEvents: "auto"
+
+                    pointerEvents: "auto",
                   }}
                 >
                   <Component
                     border
                     slotId={container.slotId}
                     catName={catName}
-                    containerId={id}
+                    containerId={containerId}
+                    sliderId={id}
                     isSlider2={true}
+                    isNested={isNested}
+                    parentContainerId={parentContainerId}
                     onDelete={() => handleDeleteSlot(container.slotId)}
                   />
                 </div>
@@ -341,6 +518,28 @@ export function EditableSlider2({
           </div>
         )}
       </div>
-    </Rnd>
+
+      <div
+        ref={resizerRef}
+        onMouseDown={() => setIsResizing(true)}
+        style={{
+          position: "absolute",
+
+          right: 0,
+
+          top: 0,
+
+          bottom: 0,
+
+          width: "8px",
+
+          cursor: "ew-resize",
+
+          background: "transparent",
+
+          zIndex: 1001,
+        }}
+      />
+    </div>
   );
 }

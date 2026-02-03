@@ -23,6 +23,7 @@ const NorContainer1 = ({
   slotId,
   catName,
   containerId,
+  sliderId,
   isSlider = false,
   isSlider2 = false,
   isNested = false,
@@ -37,7 +38,8 @@ const NorContainer1 = ({
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
       const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
@@ -86,9 +88,12 @@ const NorContainer1 = ({
         dispatch(
           dropNewsIntoSliderSlot({
             catName,
-            sliderId: containerId,
+            sliderId: sliderId,
             slotId,
             newsId: Number(droppedId),
+            containerId,
+            isNested,
+            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -136,8 +141,11 @@ const NorContainer1 = ({
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -182,9 +190,7 @@ const NorContainer1 = ({
             .ep-nm-news-1 {
               width: 800px;
               height: fit-content;
-              margin: 5px;
               display: flex;
-              gap: 10px;
               transition: 0.5s ease-in-out;
               cursor: pointer;
             }
@@ -217,20 +223,16 @@ const NorContainer1 = ({
             .epnn1-hdln {
               font-size: 20px;
               font-weight: bold;
-              margin-bottom: 8px;
             }
             
             .epnn1-onln {
               font-size: 13px;
-              margin-bottom: 8px;
             }
 
             .ep-nm-news-2 {
               width: 800px;
               height: fit-content;
-              margin: 5px;
               display: flex;
-              gap: 10px;
               transition: 0.5s ease-in-out;
               cursor: pointer;
             }

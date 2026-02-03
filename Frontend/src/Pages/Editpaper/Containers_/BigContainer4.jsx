@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { HiOutlineMinus } from "react-icons/hi";
+import { useSelector, useDispatch } from "react-redux";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
@@ -15,15 +16,15 @@ import {
   toggleNestedSeparator,
 } from "../../Slice/editpaperslice";
 
-import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
 
-const BigNewsContainer4 = ({
+const BigNewsContainer4A = ({
   border = false,
   onDelete,
   slotId,
   catName,
   containerId,
+  size = 280,
   isSlider = false,
   isSlider2 = false,
   isNested = false,
@@ -33,12 +34,15 @@ const BigNewsContainer4 = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const { allNews, translatedNews, language } = useSelector(
+    (state) => state.newsform
+  );
 
   const showSeparator = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       const item = slider?.items.find((i) => i.slotId === slotId);
       return item?.showSeparator || false;
     } else if (isNested && parentContainerId) {
@@ -56,7 +60,8 @@ const BigNewsContainer4 = ({
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
       const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
@@ -69,7 +74,8 @@ const BigNewsContainer4 = ({
   });
 
   const newsId = slot?.newsId;
-  const news = allNews.find((n) => n.id === newsId);
+  const newsSource = language === "en" ? translatedNews : allNews;
+  const news = newsSource.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -104,9 +110,12 @@ const BigNewsContainer4 = ({
         dispatch(
           dropNewsIntoSliderSlot({
             catName,
-            sliderId: containerId,
+            sliderId: sliderId,
             slotId,
             newsId: Number(droppedId),
+            containerId,
+            isNested,
+            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -155,8 +164,11 @@ const BigNewsContainer4 = ({
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -181,7 +193,7 @@ const BigNewsContainer4 = ({
 
   return (
     <div
-      className="ep-bg-news-4-wrapper"
+      className="ep-bg-news-4a-wrapper"
       style={{
         position: "relative",
         width: "fit-content",
@@ -189,37 +201,35 @@ const BigNewsContainer4 = ({
     >
       <style>
         {`
-        .ep-bg-news-4-wrapper {
+        .ep-bg-news-4a-wrapper {
           display: inline-block;
         }
 
-        .ep-bg-news-4 {
-          width: 400px;
+        .ep-bg-news-4a {
+          width: ${size}px;
           height: fit-content;
-          margin: 5px;
           transition: 0.5s ease-in-out;
           cursor: pointer;
-          gap: 5px;
         }
 
-        .ep-bg-news-4:hover {
+        .ep-bg-news-4a:hover {
           color: rgb(237, 1, 141);
         }
 
-        .epbn4-img {
-          width: 400px;
-          height: 350px;
+        .epbn4a-img {
+          width: ${size}px;
+          height: ${size}px;
           border-radius: 5px;
           overflow: hidden;
         }
 
-        .epbn4-img img {
+        .epbn4a-img img {
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
 
-        .epbn4-hdln {
+        .epbn4a-hdln {
           font-size: 20px;
           font-weight: bold;
           word-wrap: break-word;
@@ -265,30 +275,29 @@ const BigNewsContainer4 = ({
 
         /* Tablet and below */
         @media (max-width: 1024px) {
-          .ep-bg-news-4 {
+          .ep-bg-news-4a {
             width: 100%;
-            max-width: 400px;
+            max-width: ${size}px;
           }
 
-          .epbn4-img {
+          .epbn4a-img {
             width: 100%;
             height: auto;
-            aspect-ratio: 8 / 7;
+            aspect-ratio: 1 / 1;
           }
         }
 
         /* Mobile */
         @media (max-width: 640px) {
-          .ep-bg-news-4 {
-            margin: 3px;
+          .ep-bg-news-4a {
+
           }
 
-          .epbn4-img {
-            aspect-ratio: 16 / 9;
+          .epbn4a-img {
             border-radius: 3px;
           }
 
-          .epbn4-hdln {
+          .epbn4a-hdln {
             font-size: 18px;
           }
 
@@ -302,15 +311,15 @@ const BigNewsContainer4 = ({
 
         /* Small mobile */
         @media (max-width: 480px) {
-          .epbn4-hdln {
+          .epbn4a-hdln {
             font-size: 16px;
           }
         }
-        `}
+      `}
       </style>
 
       <div
-        className="ep-bg-news-4"
+        className="ep-bg-news-4a"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onClick={handleNavigate}
@@ -332,7 +341,6 @@ const BigNewsContainer4 = ({
             <button onClick={handleChange} style={iconBtnStyle} title="Change layout">
               <TbArrowsExchange />
             </button>
-
             <button
               onDoubleClick={handleDelete}
               style={iconBtnStyle}
@@ -345,18 +353,18 @@ const BigNewsContainer4 = ({
 
         {version === 1 && (
           <>
-            <div className="epbn4-img">
+            <div className="epbn4a-img">
               <img src={renderData.image} alt="" />
             </div>
-            <div className="epbn4-hdln">{renderData.headline}</div>
+            <div className="epbn4a-hdln">{renderData.headline}</div>
             <div className="epn-tm">{renderData.time}</div>
           </>
         )}
 
         {version === 2 && (
           <>
-            <div className="epbn4-hdln">{renderData.headline}</div>
-            <div className="epbn4-img">
+            <div className="epbn4a-hdln">{renderData.headline}</div>
+            <div className="epbn4a-img">
               <img src={renderData.image} alt="" />
             </div>
             <div className="epn-tm">{renderData.time}</div>
@@ -392,4 +400,4 @@ const iconBtnStyle = {
   transition: "all 0.2s ease",
 };
 
-export default BigNewsContainer4;
+export default BigNewsContainer4A;

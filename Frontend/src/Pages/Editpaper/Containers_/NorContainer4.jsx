@@ -24,6 +24,7 @@ const NorContainer4 = ({
   slotId,
   catName,
   containerId,
+  sliderId,
   isSlider = false,
   isSlider2 = false,
   isNested = false,
@@ -38,7 +39,8 @@ const NorContainer4 = ({
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
       const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
@@ -87,9 +89,12 @@ const NorContainer4 = ({
         dispatch(
           dropNewsIntoSliderSlot({
             catName,
-            sliderId: containerId,
+            sliderId: sliderId,
             slotId,
             newsId: Number(droppedId),
+            containerId,
+            isNested,
+            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -162,8 +167,11 @@ const NorContainer4 = ({
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -211,10 +219,8 @@ const NorContainer4 = ({
               max-width: 300px;
               max-height: 100px;
               flex: 0 0 300px;
-              margin: 4px;
               overflow: hidden;
               display: flex;
-              gap: 10px;
               transition: 0.5s ease-in-out;
               cursor: pointer;
             }
@@ -255,10 +261,8 @@ const NorContainer4 = ({
               max-width: 300px;
               max-height: 100px;
               flex: 0 0 300px;
-              margin: 4px;
               overflow: hidden;
               display: flex;
-              gap: 10px;
               transition: 0.5s ease-in-out;
               cursor: pointer;
             }

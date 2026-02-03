@@ -5,15 +5,12 @@ import NewsFilter from "./Components/NewsFilter";
 import PageEditor from "./Components/PageEditor";
 import EditableContainer from "./Components/EditableContainer";
 import EditorSettings from "./Components/EditorSettings";
-import { EditableSlider } from "./Components/EditableSlider";
-import { EditableSlider2 } from "./Components/EditableSlider2";
 import EditableLine from "./Containers_/EditableLine";
 import Navbarr from "../Newspaper/Components/Navbarr";
 
 import { useDispatch, useSelector } from "react-redux";
 import { 
   addContainer,
-  addSlider,
 } from "../Slice/editpaperslice";
 
 import "./editpapercss.scss";
@@ -24,7 +21,6 @@ export default function Editpaper() {
 
   const currentPage = pages.find(p => p.catName === activePage);
   const containers = currentPage?.containers || [];
-  const sliders = currentPage?.sliders || [];
   const lines = currentPage?.lines || [];
   const pageSettings = currentPage?.settings || { height: 600, gridColumns: 12, gap: 10, padding: 20 };
 
@@ -32,16 +28,6 @@ export default function Editpaper() {
   const [showEditor, setShowEditor] = useState(false);
   const [nextId, setNextId] = useState(1);
   const [showNewsFilter, setShowNewsFilter] = useState(false);
-
-  const handleAddSlider = () => {
-    dispatch(addSlider(activePage, { x: 50, y: 100 }, "type1"));
-    setNextId(nextId + 1);
-  };
-
-  const handleAddSlider2 = () => {
-    dispatch(addSlider(activePage, { x: 50, y: 150 }, "type2"));
-    setNextId(nextId + 1);
-  };
 
   const handleCanvasDrop = (e) => {
     e.preventDefault();
@@ -69,8 +55,6 @@ export default function Editpaper() {
         open={showEditor} 
         onClose={() => setShowEditor(false)} 
         categories={categories}
-        onAddSlider={handleAddSlider}
-        onAddSlider2={handleAddSlider2}
       />
 
       {!showEditor && (
@@ -127,36 +111,6 @@ export default function Editpaper() {
             ))}
           </div>
 
-          {sliders.map((slider) => {
-            if (slider.type === "type1") {
-              return (
-                <EditableSlider
-                  key={slider.id}
-                  id={slider.id}
-                  catName={activePage}
-                  position={slider.position}
-                  size={slider.size}
-                  gap={slider.gap}
-                />
-              );
-            }
-            
-            if (slider.type === "type2") {
-              return (
-                <EditableSlider2
-                  key={slider.id}
-                  id={slider.id}
-                  catName={activePage}
-                  position={slider.position}
-                  size={slider.size}
-                  gap={slider.gap}
-                />
-              );
-            }
-            
-            return null;
-          })}
-
           {lines.map((line) => (
             <EditableLine
               key={line.id}
@@ -171,7 +125,7 @@ export default function Editpaper() {
             />
           ))}
 
-          {containers.length === 0 && sliders.length === 0 && lines.length === 0 && (
+          {containers.length === 0 && lines.length === 0 && (
             <div style={{ 
               padding: "40px", 
               textAlign: "center",

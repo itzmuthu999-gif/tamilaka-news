@@ -14,6 +14,9 @@ import {
   toggleContainerSeparator,
   toggleSliderSeparator,
   toggleNestedSeparator,
+  removeSlotFromContainer,
+  removeSlotFromSlider,
+  removeSlotFromNestedContainer,
 } from "../../Slice/editpaperslice";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -25,6 +28,7 @@ const BigNewsContainer2 = ({
   slotId,
   catName,
   containerId,
+  sliderId,
   isSlider = false,
   isSlider2 = false,
   isNested = false,
@@ -39,7 +43,8 @@ const BigNewsContainer2 = ({
   const showSeparator = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       const item = slider?.items.find((i) => i.slotId === slotId);
       return item?.showSeparator || false;
     } else if (isNested && parentContainerId) {
@@ -57,7 +62,8 @@ const BigNewsContainer2 = ({
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
       const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
@@ -105,9 +111,12 @@ const BigNewsContainer2 = ({
       dispatch(
         dropNewsIntoSliderSlot({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
           newsId: Number(droppedId),
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -157,8 +166,11 @@ const BigNewsContainer2 = ({
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
+          containerId,
+          isNested,
+          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -196,9 +208,7 @@ const BigNewsContainer2 = ({
 
         .ep-bg-news-2 {
           width: 800px;
-          margin: 5px;
           display: flex;
-          gap: 10px;
           transition: 0.5s ease-in-out;
           cursor: pointer;
           height: fit-content;
@@ -299,8 +309,6 @@ const BigNewsContainer2 = ({
         /* Mobile */
         @media (max-width: 640px) {
           .ep-bg-news-2 {
-            margin: 3px;
-            gap: 8px;
           }
 
           .epbn2-img {

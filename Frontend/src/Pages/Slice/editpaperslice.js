@@ -214,6 +214,18 @@ const pageLayoutSlice = createSlice({
       logState(state, "removeNewsFromSlot");
     },
 
+    removeSlotFromContainer(state, action) {
+      const { catName, containerId, slotId } = action.payload;
+      const container = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === containerId);
+
+      if (container) {
+        container.items = container.items.filter(i => i.slotId !== slotId);
+      }
+      logState(state, "removeSlotFromContainer");
+    },
+
     toggleContainerSeparator(state, action) {
       const { catName, containerId, slotId } = action.payload;
       const slot = state.pages
@@ -228,6 +240,228 @@ const pageLayoutSlice = createSlice({
     },
 
     /* -------------------- SLIDERS (UNIFIED - Type 1 & Type 2) -------------------- */
+
+    addSliderToContainer: {
+      reducer(state, action) {
+        const { catName, containerId, slider, isNested, parentContainerId } = action.payload;
+        
+        if (isNested && parentContainerId) {
+          const parentCont = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === parentContainerId);
+          const nestedCont = parentCont?.nestedContainers?.find(nc => nc.id === containerId);
+          
+          if (nestedCont) {
+            if (!nestedCont.sliders) nestedCont.sliders = [];
+            nestedCont.sliders.push(slider);
+          }
+        } else {
+          const cont = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === containerId);
+          
+          if (cont) {
+            if (!cont.sliders) cont.sliders = [];
+            cont.sliders.push(slider);
+          }
+        }
+        logState(state, "addSliderToContainer");
+      },
+      prepare(catName, containerId, sliderType = "type1", isNested = false, parentContainerId = null) {
+        return {
+          payload: {
+            catName,
+            containerId,
+            isNested,
+            parentContainerId,
+            slider: {
+              id: nanoid(),
+              type: sliderType,
+              size: { width: 0 },
+              gap: 10,
+              items: [],
+              lockedType: null
+            }
+          }
+        };
+      }
+    },
+
+    updateSliderWidth(state, action) {
+      const { catName, containerId, sliderId, width, isNested, parentContainerId } = action.payload;
+      
+      let slider = null;
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        slider = parentCont?.nestedContainers
+          ?.find(nc => nc.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      } else {
+        slider = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      }
+
+      if (slider) {
+        if (!slider.size) slider.size = {};
+        slider.size.width = width;
+      }
+      logState(state, "updateSliderWidth");
+    },
+
+    updateContainerSliderGap(state, action) {
+      const { catName, containerId, sliderId, gap, isNested, parentContainerId } = action.payload;
+      
+      let slider = null;
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        slider = parentCont?.nestedContainers
+          ?.find(nc => nc.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      } else {
+        slider = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      }
+
+      if (slider) slider.gap = gap;
+      logState(state, "updateContainerSliderGap");
+    },
+
+    deleteContainerSlider(state, action) {
+      const { catName, containerId, sliderId, isNested, parentContainerId } = action.payload;
+      
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        const nestedCont = parentCont?.nestedContainers?.find(nc => nc.id === containerId);
+        
+        if (nestedCont && nestedCont.sliders) {
+          nestedCont.sliders = nestedCont.sliders.filter(s => s.id !== sliderId);
+        }
+      } else {
+        const cont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId);
+        
+        if (cont && cont.sliders) {
+          cont.sliders = cont.sliders.filter(s => s.id !== sliderId);
+        }
+      }
+      logState(state, "deleteContainerSlider");
+    },
+
+    addSlotToContainerSlider(state, action) {
+      const { catName, containerId, sliderId, containerType, slotId, isNested, parentContainerId } = action.payload;
+      
+      let slider = null;
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        slider = parentCont?.nestedContainers
+          ?.find(nc => nc.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      } else {
+        slider = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      }
+
+      if (slider) {
+        if (slider.items.length === 0) {
+          slider.lockedType = containerType;
+        }
+
+        slider.items.push({
+          slotId: slotId || nanoid(),
+          newsId: null,
+          containerType,
+          showSeparator: false
+        });
+      }
+      logState(state, "addSlotToContainerSlider");
+    },
+
+    dropNewsIntoContainerSliderSlot(state, action) {
+      const { catName, containerId, sliderId, slotId, newsId, isNested, parentContainerId } = action.payload;
+      
+      let slot = null;
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        slot = parentCont?.nestedContainers
+          ?.find(nc => nc.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      } else {
+        slot = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      }
+
+      if (slot) slot.newsId = newsId;
+      logState(state, "dropNewsIntoContainerSliderSlot");
+    },
+
+    removeNewsFromContainerSliderSlot(state, action) {
+      const { catName, containerId, sliderId, slotId, isNested, parentContainerId } = action.payload;
+      
+      let slot = null;
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        slot = parentCont?.nestedContainers
+          ?.find(nc => nc.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      } else {
+        slot = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      }
+
+      if (slot) slot.newsId = null;
+      logState(state, "removeNewsFromContainerSliderSlot");
+    },
+
+    removeSlotFromContainerSlider(state, action) {
+      const { catName, containerId, sliderId, slotId, isNested, parentContainerId } = action.payload;
+      
+      let slider = null;
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        slider = parentCont?.nestedContainers
+          ?.find(nc => nc.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      } else {
+        slider = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId)
+          ?.sliders?.find(s => s.id === sliderId);
+      }
+
+      if (slider) {
+        slider.items = slider.items.filter(i => i.slotId !== slotId);
+      }
+      logState(state, "removeSlotFromContainerSlider");
+    },
 
     addSlider: {
       reducer(state, action) {
@@ -314,22 +548,68 @@ const pageLayoutSlice = createSlice({
     },
 
     dropNewsIntoSliderSlot(state, action) {
-      const { catName, sliderId, slotId, newsId } = action.payload;
-      const slot = state.pages
-        .find(p => p.catName === catName)
-        ?.sliders.find(s => s.id === sliderId)
-        ?.items.find(i => i.slotId === slotId);
+      const { catName, sliderId, slotId, newsId, isNested, parentContainerId, containerId } = action.payload;
+      
+      let slot = null;
+      
+      // Check if it's a slider inside a container
+      if (containerId) {
+        if (isNested && parentContainerId) {
+          const parentCont = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === parentContainerId);
+          slot = parentCont?.nestedContainers
+            ?.find(nc => nc.id === containerId)
+            ?.sliders?.find(s => s.id === sliderId)
+            ?.items.find(i => i.slotId === slotId);
+        } else {
+          slot = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === containerId)
+            ?.sliders?.find(s => s.id === sliderId)
+            ?.items.find(i => i.slotId === slotId);
+        }
+      } else {
+        // Page-level slider
+        slot = state.pages
+          .find(p => p.catName === catName)
+          ?.sliders.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      }
 
       if (slot) slot.newsId = newsId;
       logState(state, "dropNewsIntoSliderSlot");
     },
 
     removeNewsFromSliderSlot(state, action) {
-      const { catName, sliderId, slotId } = action.payload;
-      const slot = state.pages
-        .find(p => p.catName === catName)
-        ?.sliders.find(s => s.id === sliderId)
-        ?.items.find(i => i.slotId === slotId);
+      const { catName, sliderId, slotId, isNested, parentContainerId, containerId } = action.payload;
+      
+      let slot = null;
+      
+      // Check if it's a slider inside a container
+      if (containerId) {
+        if (isNested && parentContainerId) {
+          const parentCont = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === parentContainerId);
+          slot = parentCont?.nestedContainers
+            ?.find(nc => nc.id === containerId)
+            ?.sliders?.find(s => s.id === sliderId)
+            ?.items.find(i => i.slotId === slotId);
+        } else {
+          slot = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === containerId)
+            ?.sliders?.find(s => s.id === sliderId)
+            ?.items.find(i => i.slotId === slotId);
+        }
+      } else {
+        // Page-level slider
+        slot = state.pages
+          .find(p => p.catName === catName)
+          ?.sliders.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      }
 
       if (slot) slot.newsId = null;
       logState(state, "removeNewsFromSliderSlot");
@@ -352,11 +632,34 @@ const pageLayoutSlice = createSlice({
     },
 
     toggleSliderSeparator(state, action) {
-      const { catName, sliderId, slotId } = action.payload;
-      const slot = state.pages
-        .find(p => p.catName === catName)
-        ?.sliders.find(s => s.id === sliderId)
-        ?.items.find(i => i.slotId === slotId);
+      const { catName, sliderId, slotId, isNested, parentContainerId, containerId } = action.payload;
+      
+      let slot = null;
+      
+      // Check if it's a slider inside a container
+      if (containerId) {
+        if (isNested && parentContainerId) {
+          const parentCont = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === parentContainerId);
+          slot = parentCont?.nestedContainers
+            ?.find(nc => nc.id === containerId)
+            ?.sliders?.find(s => s.id === sliderId)
+            ?.items.find(i => i.slotId === slotId);
+        } else {
+          slot = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === containerId)
+            ?.sliders?.find(s => s.id === sliderId)
+            ?.items.find(i => i.slotId === slotId);
+        }
+      } else {
+        // Page-level slider
+        slot = state.pages
+          .find(p => p.catName === catName)
+          ?.sliders.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      }
 
       if (slot) {
         slot.showSeparator = !slot.showSeparator;
@@ -585,6 +888,19 @@ const pageLayoutSlice = createSlice({
       logState(state, "removeNewsFromNestedSlot");
     },
 
+    removeSlotFromNestedContainer(state, action) {
+      const { catName, parentContainerId, nestedContainerId, slotId } = action.payload;
+      const nestedCont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId)
+        ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
+
+      if (nestedCont) {
+        nestedCont.items = nestedCont.items.filter(i => i.slotId !== slotId);
+      }
+      logState(state, "removeSlotFromNestedContainer");
+    },
+
     toggleNestedSeparator(state, action) {
       const { catName, parentContainerId, nestedContainerId, slotId } = action.payload;
       const slot = state.pages
@@ -619,6 +935,7 @@ export const {
   addEmptySlot,
   dropNewsIntoSlot,
   removeNewsFromSlot,
+  removeSlotFromContainer,
   toggleContainerSeparator,
 
   addSlider,
@@ -632,6 +949,15 @@ export const {
   removeSlotFromSlider,
   toggleSliderSeparator,
 
+  addSliderToContainer,
+  updateSliderWidth,
+  updateContainerSliderGap,
+  deleteContainerSlider,
+  addSlotToContainerSlider,
+  dropNewsIntoContainerSliderSlot,
+  removeNewsFromContainerSliderSlot,
+  removeSlotFromContainerSlider,
+
   addNestedContainer,
   deleteNestedContainer,
   updateNestedContainerGrid,
@@ -640,6 +966,7 @@ export const {
   addEmptySlotToNested,
   dropNewsIntoNestedSlot,
   removeNewsFromNestedSlot,
+  removeSlotFromNestedContainer,
   toggleNestedSeparator,
 
   addLine,
@@ -650,4 +977,4 @@ export const {
   setActiveLine
 } = pageLayoutSlice.actions;
 
-export default pageLayoutSlice.reducer;
+export default pageLayoutSlice.reducer;      
