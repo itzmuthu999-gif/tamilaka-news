@@ -39,6 +39,7 @@ export default function EditorSettings() {
         className="editor-settings-btn"
         onClick={() => setIsOpen(!isOpen)}
         title="Editor Settings"
+        style={{zIndex: "1000"}}
       >
         <IoSettingsOutline size={20} />
       </button>

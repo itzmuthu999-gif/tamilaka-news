@@ -1,0 +1,45 @@
+/* MainPage.css */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.pages-box {
+  background: #d9d9d9;
+  min-height: 200px;
+  padding: 20px;
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.page-chip {
+  background: #f9a8d4;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  position: relative;
+}
+
+.page-chip b {
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.add-section {
+  margin-top: 30px;
+  background: #f9a8d4;
+  border: none;
+  padding: 10px 24px;
+  font-size: 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}

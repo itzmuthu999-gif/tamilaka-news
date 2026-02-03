@@ -316,7 +316,7 @@ export default function EditableContainer({
         borderRadius: "8px", 
         gridColumn: `span ${gridColumnSpan}`, 
         width: "100%", 
-        minHeight: nestedContainers.length === 0 && items.length === 0 ? "250px" : "auto", 
+        minHeight: nestedContainers.length === 0 && items.length === 0 ? "250px" : "fit-content", 
         position: "relative",
         margin: `${margin}px`,
       }}
@@ -467,7 +467,7 @@ export default function EditableContainer({
             position: "relative", 
             overflow: "visible", 
             padding: `${padding}px`, 
-            minHeight: nestedContainers.length === 0 && items.length === 0 && sliders.length === 0 ? "150px" : "auto" 
+            minHeight: nestedContainers.length === 0 && items.length === 0 && sliders.length === 0 ? "150px" : "fit-content" 
           }} 
           onDrop={handleDrop} 
           onDragOver={handleDragOver}
@@ -561,7 +561,9 @@ export default function EditableContainer({
                 style={{
                   pointerEvents: "auto",
                   position: "relative",
-                  zIndex: 10 + items.length + nestedContainers.length + index
+                  zIndex: 10 + items.length + nestedContainers.length + index,
+                  width: "100%",
+                  height: "fit-content"
                 }}
               >
                 {slider.type === "type1" ? (

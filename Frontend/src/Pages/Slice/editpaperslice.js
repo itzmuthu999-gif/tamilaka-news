@@ -914,7 +914,51 @@ const pageLayoutSlice = createSlice({
       }
       logState(state, "toggleNestedSeparator");
     }
+  },
+  updateContainerSliderHeader: (state, action) => {
+  const { catName, containerId, sliderId, enabled, title, isNested, parentContainerId } = action.payload;
+  
+  const page = state.pages.find(p => p.catName === catName);
+  if (!page) return;
+  
+  let container;
+  if (isNested && parentContainerId) {
+    const parentCont = page.containers.find(c => c.id === parentContainerId);
+    container = parentCont?.nestedContainers?.find(nc => nc.id === containerId);
+  } else {
+    container = page.containers.find(c => c.id === containerId);
   }
+  
+  if (!container) return;
+  
+  const slider = container.sliders?.find(s => s.id === sliderId);
+  if (slider) {
+    slider.header = { enabled, title };
+  }
+},
+
+updateContainerSliderPadding: (state, action) => {
+  const { catName, containerId, sliderId, padding, isNested, parentContainerId } = action.payload;
+  
+  const page = state.pages.find(p => p.catName === catName);
+  if (!page) return;
+  
+  let container;
+  if (isNested && parentContainerId) {
+    const parentCont = page.containers.find(c => c.id === parentContainerId);
+    container = parentCont?.nestedContainers?.find(nc => nc.id === containerId);
+  } else {
+    container = page.containers.find(c => c.id === containerId);
+  }
+  
+  if (!container) return;
+  
+  const slider = container.sliders?.find(s => s.id === sliderId);
+  if (slider) {
+    slider.padding = padding;
+  }
+},
+
 });
 
 /* ---------- exports ---------- */
@@ -974,7 +1018,10 @@ export const {
   updateLineLength,
   updateLineArguments,
   deleteLine,
-  setActiveLine
+  setActiveLine,
+    updateContainerSliderHeader,
+  updateContainerSliderPadding,
+
 } = pageLayoutSlice.actions;
 
 export default pageLayoutSlice.reducer;      

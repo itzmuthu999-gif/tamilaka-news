@@ -2,7 +2,7 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdminHome from './Pages/AdminHome';
-import AdminOverview from './Pages/AdminOverview';
+
 import Newsbund from './Pages/Newsbund';
 import Templatepage from './Pages/TemplatePage/Templatepage';
 import Newspaper from "./Trash/Newspaper";
@@ -11,6 +11,7 @@ import PreviewPage from './Pages/PreviewPage/PreviewPage';
 import NewsPaperM from './Pages/Newspaper/NewsPaperM';
 import Editpaper from './Pages/Editpaper/Editpaper';
 import Tryout from './Tryout';
+import Adminop from "./Pages/AdminOperationPage/Adminop"
 function App() {
 
 
@@ -19,7 +20,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AdminHome />} />
-          <Route path="/admin-overview" element={<AdminOverview />} />
+
           <Route path="/Newsbund" element={<Newsbund />} />
             <Route path="/Newsupload" element={<Templatepage />} />
             <Route path="/Newspaper" element={<NewsPaperM />} />
@@ -27,6 +28,7 @@ function App() {
 
                <Route path="/editpaper" element={<Editpaper />} />
                 <Route path="/Tryout" element={<Tryout />} />
+                  <Route path="/adminop" element={<Adminop />} />
 
       </Routes>
     </BrowserRouter>

@@ -82,7 +82,9 @@ export default function Editpaper() {
             height: `${pageSettings.height}px`,
             padding: `${pageSettings.padding}px`,
             position: 'relative',
-            overflow: 'auto'
+            overflow: 'visible',
+            width: '1250px',
+            maxWidth: '1250px'
           }}
           onDrop={handleCanvasDrop}
           onDragOver={handleCanvasDragOver}

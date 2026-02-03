@@ -225,6 +225,7 @@ const newsFormSlice = createSlice({
       }
     }
   },
+  
 });
 
 export const {

@@ -1,0 +1,40 @@
+/* Sidebar.css */
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.logo h1 {
+  color: #ec4899;
+  margin: 0;
+  font-size: 28px;
+}
+
+.logo span {
+  font-size: 12px;
+  color: #111;
+}
+
+.menu {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.menu-item {
+  background: none;
+  border: none;
+  font-size: 18px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.menu-item.active {
+  color: #000;
+}

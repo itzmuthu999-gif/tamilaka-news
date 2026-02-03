@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { X, Edit2, Space, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Edit2, Space, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import {
   updateSliderWidth,
   updateContainerSliderGap,
+  updateContainerSliderHeader,
+  updateContainerSliderPadding,
   addSlotToContainerSlider,
   dropNewsIntoContainerSliderSlot,
   deleteContainerSlider,
@@ -36,6 +38,8 @@ import NorContainer4 from "../Containers_/NorContainer4";
 import NorContainer4A from "../Containers_/NorContainer4A";
 
 import NorContainer5 from "../Containers_/NorContainer5";
+
+import Newsheader from "../../Newspaper/Components/Newsheader";
 
 const COMPONENT_MAP = {
   "Big Container Type 1": BigNewsContainer1,
@@ -108,6 +112,12 @@ export function EditableSlider({
 
   const [gap, setGap] = useState(slider?.gap ?? 10);
 
+  const [headerEnabled, setHeaderEnabled] = useState(slider?.header?.enabled || false);
+
+  const [headerTitle, setHeaderTitle] = useState(slider?.header?.title || "");
+
+  const [padding, setPadding] = useState(slider?.padding || 10);
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [width, setWidth] = useState(slider?.size?.width || 0);
@@ -157,8 +167,9 @@ export function EditableSlider({
     const handleMouseMove = (e) => {
       if (containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
-
-        const newWidth = Math.max(200, e.clientX - containerRect.left);
+        const parentContainer = containerRef.current.closest('.ep-ed-cont');
+        const parentWidth = parentContainer ? parentContainer.offsetWidth - 40 : 1250; // Account for padding
+        const newWidth = Math.max(200, Math.min(parentWidth, e.clientX - containerRect.left));
 
         setWidth(newWidth);
       }
@@ -260,8 +271,6 @@ export function EditableSlider({
         dropNewsIntoContainerSliderSlot({
           catName,
 
-          containerId,
-
           sliderId: id,
 
           slotId: slotId,
@@ -282,15 +291,10 @@ export function EditableSlider({
     dispatch(
       removeSlotFromContainerSlider({
         catName,
-
         containerId,
-
         sliderId: id,
-
         slotId,
-
         isNested,
-
         parentContainerId,
       }),
     );
@@ -313,45 +317,49 @@ export function EditableSlider({
       ref={containerRef}
       style={{
         border: "2px dashed #0066cc",
-
         background: "rgba(0, 102, 204, 0.05)",
-
         position: "relative",
-
         width: width > 0 ? `${width}px` : "100%",
-
-        minHeight: "200px",
-
+        minHeight: droppedContainers.length === 0 ? "200px" : "fit-content",
+        height: droppedContainers.length > 0 ? "fit-content" : "fit-content",
         pointerEvents: "auto",
+        display: "flex",
+        flexDirection: "column",
       }}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
+      {headerEnabled && (
+        <div style={{ 
+          padding: `${padding}px`, 
+          fontSize: "18px", 
+          fontWeight: "bold", 
+          flexShrink: 0, 
+          pointerEvents: "none",
+          background: "rgba(0, 102, 204, 0.05)"
+        }}>
+          <Newsheader name={headerTitle || "slider header"} />
+        </div>
+      )}
+
       <div
         style={{
           width: "100%",
-
-          height: "100%",
-
           position: "relative",
-
           overflow: "hidden",
+          flex: droppedContainers.length === 0 ? 1 : "0 0 auto",
+          height: droppedContainers.length > 0 ? "fit-content" : "auto",
+          padding: `${padding}px`,
         }}
       >
         <div
           style={{
             position: "absolute",
-
             top: "8px",
-
             right: "8px",
-
             display: "flex",
-
             gap: "8px",
-
             zIndex: 1000,
-
             pointerEvents: "auto",
           }}
         >
@@ -359,13 +367,9 @@ export function EditableSlider({
             onClick={() => setShowSettings(!showSettings)}
             style={{
               background: "#0066cc",
-
               border: "none",
-
               borderRadius: "4px",
-
               padding: "6px",
-
               cursor: "pointer",
             }}
           >
@@ -377,13 +381,9 @@ export function EditableSlider({
             title="Double click to delete"
             style={{
               background: "red",
-
               border: "none",
-
               borderRadius: "4px",
-
               padding: "6px",
-
               cursor: "pointer",
             }}
           >
@@ -395,26 +395,105 @@ export function EditableSlider({
           <div
             style={{
               position: "absolute",
-
               top: "50px",
-
               right: "8px",
-
               background: "white",
-
               border: "2px solid #0066cc",
-
               borderRadius: "8px",
-
               padding: "15px",
-
-              zIndex: 20,
-
+              zIndex: 1000,
               minWidth: "220px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
           >
+            <div style={{ marginBottom: "12px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input 
+                  type="checkbox" 
+                  checked={headerEnabled} 
+                  onChange={(e) => {
+                    const enabled = e.target.checked;
+                    setHeaderEnabled(enabled);
+                    dispatch(
+                      updateContainerSliderHeader({
+                        catName,
+                        containerId,
+                        sliderId: id,
+                        enabled,
+                        title: enabled ? headerTitle : "",
+                        isNested,
+                        parentContainerId,
+                      }),
+                    );
+                  }}
+                  style={{ cursor: "pointer" }} 
+                />
+                <span style={{ fontSize: "12px", fontWeight: "500" }}>Enable Header</span>
+              </label>
+            </div>
+
+            {headerEnabled && (
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "block" }}>Header Title</label>
+                <input 
+                  type="text" 
+                  value={headerTitle} 
+                  onChange={(e) => {
+                    const title = e.target.value;
+                    setHeaderTitle(title);
+                    dispatch(
+                      updateContainerSliderHeader({
+                        catName,
+                        containerId,
+                        sliderId: id,
+                        enabled: headerEnabled,
+                        title,
+                        isNested,
+                        parentContainerId,
+                      }),
+                    );
+                  }}
+                  placeholder="Enter header title..." 
+                  style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} 
+                />
+              </div>
+            )}
+
+            <div style={{ marginBottom: "12px" }}>
+              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Maximize2 size={16} /> Padding (px)
+              </label>
+              <input
+                type="number"
+                value={padding}
+                min="0"
+                max="100"
+                onChange={(e) => {
+                  const v = parseInt(e.target.value) || 0;
+                  setPadding(v);
+                  dispatch(
+                    updateContainerSliderPadding({
+                      catName,
+                      containerId,
+                      sliderId: id,
+                      padding: v,
+                      isNested,
+                      parentContainerId,
+                    }),
+                  );
+                }}
+                style={{
+                  width: "100%",
+                  marginTop: "8px",
+                  padding: "4px",
+                }}
+              />
+            </div>
+
             <div>
-              <Space size={16} /> Gap (px)
+              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Space size={16} /> Gap (px)
+              </label>
               <input
                 type="number"
                 value={gap}
@@ -443,9 +522,7 @@ export function EditableSlider({
                 }}
                 style={{
                   width: "100%",
-
                   marginTop: "8px",
-
                   padding: "4px",
                 }}
               />
@@ -469,21 +546,12 @@ export function EditableSlider({
           <div
             style={{
               display: "flex",
-
               alignItems: "center",
-
               justifyContent: "center",
-
               height: "100%",
-
-              minHeight: "200px",
-
               color: "#0066cc",
-
               fontSize: "14px",
-
               textAlign: "center",
-
               padding: "20px",
             }}
           >
@@ -506,33 +574,19 @@ export function EditableSlider({
                   disabled={currentIndex === 0}
                   style={{
                     position: "absolute",
-
                     left: "10px",
-
                     top: "50%",
-
                     transform: "translateY(-50%)",
-
                     background: "rgba(0, 0, 0, 0.5)",
-
                     border: "none",
-
                     borderRadius: "50%",
-
                     width: "40px",
-
                     height: "40px",
-
                     display: "flex",
-
                     alignItems: "center",
-
                     justifyContent: "center",
-
                     cursor: "pointer",
-
                     zIndex: 100,
-
                     opacity: currentIndex === 0 ? 0.3 : 1,
                   }}
                 >
@@ -544,33 +598,19 @@ export function EditableSlider({
                   disabled={currentIndex === droppedContainers.length - 1}
                   style={{
                     position: "absolute",
-
                     right: "10px",
-
                     top: "50%",
-
                     transform: "translateY(-50%)",
-
                     background: "rgba(0, 0, 0, 0.5)",
-
                     border: "none",
-
                     borderRadius: "50%",
-
                     width: "40px",
-
                     height: "40px",
-
                     display: "flex",
-
                     alignItems: "center",
-
                     justifyContent: "center",
-
                     cursor: "pointer",
-
                     zIndex: 100,
-
                     opacity:
                       currentIndex === droppedContainers.length - 1 ? 0.3 : 1,
                   }}
@@ -583,15 +623,9 @@ export function EditableSlider({
             <div
               style={{
                 display: "flex",
-
                 alignItems: "center",
-
                 justifyContent: "center",
-
-                height: "100%",
-
                 padding: "20px 60px",
-
                 pointerEvents: "none",
               }}
             >
@@ -627,17 +661,11 @@ export function EditableSlider({
             <div
               style={{
                 position: "absolute",
-
                 bottom: "10px",
-
                 left: "50%",
-
                 transform: "translateX(-50%)",
-
                 display: "flex",
-
                 gap: "8px",
-
                 zIndex: 100,
               }}
             >
@@ -647,13 +675,9 @@ export function EditableSlider({
                   onClick={() => setCurrentIndex(idx)}
                   style={{
                     width: "10px",
-
                     height: "10px",
-
                     borderRadius: "50%",
-
                     background: idx === currentIndex ? "#0066cc" : "#ccc",
-
                     cursor: "pointer",
                   }}
                 />
@@ -668,19 +692,12 @@ export function EditableSlider({
         onMouseDown={() => setIsResizing(true)}
         style={{
           position: "absolute",
-
           right: 0,
-
           top: 0,
-
           bottom: 0,
-
           width: "8px",
-
           cursor: "ew-resize",
-
           background: "transparent",
-
           zIndex: 1001,
         }}
       />

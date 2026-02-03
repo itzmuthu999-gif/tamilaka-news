@@ -66,10 +66,10 @@
   width: 1250px;
   height: fit-content;
   border: 1px solid;
- position: relative;
-  overflow: visible !important;
-
-
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
 }
 
 // .ep-fl1-btns
