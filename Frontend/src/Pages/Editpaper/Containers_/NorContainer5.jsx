@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
-import { RxDividerHorizontal } from "react-icons/rx";
+import { HiOutlineMinus } from "react-icons/hi";
+import { useSelector, useDispatch } from "react-redux";
+import jwt from "../../../assets/jwt.jpg";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
@@ -13,10 +15,9 @@ import {
   toggleContainerSeparator,
   toggleSliderSeparator,
   toggleNestedSeparator,
-} from "../../Slice/editpaperslice";
-
-import { useSelector, useDispatch } from "react-redux";
-import jwt from "../../../assets/jwt.jpg";
+  removeSlotFromContainer,
+  removeSlotFromNestedContainer,
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 const NorContainer5 = ({
   border = false,
@@ -34,8 +35,28 @@ const NorContainer5 = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Read newsId and showSeparator from Redux
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const allNews = useSelector((state) => state.newsform?.allNews || []);
+  
+  const showSeparator = useSelector((state) => {
+    const page = state.editpaper.pages.find((p) => p.catName === catName);
+    
+    if (isSlider || isSlider2) {
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
+      const item = slider?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    } else if (isNested && parentContainerId) {
+      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+        ?.nestedContainers?.find((nc) => nc.id === containerId);
+      const item = nestedCont?.items?.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    } else {
+      const container = page?.containers.find((c) => c.id === containerId);
+      const item = container?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    }
+  });
+  
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
@@ -54,7 +75,6 @@ const NorContainer5 = ({
   });
   
   const newsId = slot?.newsId;
-  const showSeparator = slot?.showSeparator || false;
   const news = allNews.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
@@ -125,34 +145,6 @@ const NorContainer5 = ({
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    
-    if (isSlider || isSlider2) {
-      dispatch(
-        removeNewsFromSliderSlot({
-          catName,
-          sliderId: containerId,
-          slotId,
-        })
-      );
-    } else if (isNested && parentContainerId) {
-      dispatch(
-        removeNewsFromNestedSlot({
-          catName,
-          parentContainerId,
-          nestedContainerId: containerId,
-          slotId,
-        })
-      );
-    } else {
-      dispatch(
-        removeNewsFromSlot({
-          catName,
-          containerId,
-          slotId,
-        })
-      );
-    }
-    
     onDelete?.();
   };
 
@@ -163,7 +155,7 @@ const NorContainer5 = ({
     setVersion((prev) => (prev === 3 ? 1 : prev + 1));
   };
 
-  const handleToggleSeparator = (e) => {
+  const toggleSeparator = (e) => {
     e.stopPropagation();
     
     if (isSlider || isSlider2) {
@@ -214,7 +206,6 @@ const NorContainer5 = ({
           position: "relative"
         }}
       >
-        {/* Top Action buttons */}
         {border && (
           <div
             style={{
@@ -226,7 +217,6 @@ const NorContainer5 = ({
               zIndex: 10,
             }}
           >
-            {/* Change layout */}
             <button
               onClick={handleChange}
               style={iconBtnStyle}
@@ -235,7 +225,6 @@ const NorContainer5 = ({
               <TbArrowsExchange />
             </button>
 
-            {/* Delete (double click) */}
             <button
               onDoubleClick={handleDelete}
               style={iconBtnStyle}
@@ -246,7 +235,6 @@ const NorContainer5 = ({
           </div>
         )}
 
-        {/* VERSION 1 */}
         {version === 1 && (
           <>
             <div className="epbn22-hdln">{renderData.headline}</div>
@@ -264,7 +252,6 @@ const NorContainer5 = ({
           </>
         )}
 
-        {/* VERSION 2 */}
         {version === 2 && (
           <>
             <div className="epbn23-hdln">{renderData.headline}</div>
@@ -281,24 +268,8 @@ const NorContainer5 = ({
             </div>
           </>
         )}
-
-        {/* Bottom Separator Toggle Button */}
-        {border && (
-          <button
-            onClick={handleToggleSeparator}
-            style={{
-              ...separatorBtnStyle,
-              backgroundColor: showSeparator ? "#666" : "#ddd",
-              color: showSeparator ? "#fff" : "#666",
-            }}
-            title={showSeparator ? "Remove separator" : "Add separator"}
-          >
-            <RxDividerHorizontal />
-          </button>
-        )}
       </div>
 
-      {/* Separator Line */}
       {showSeparator && (
         <div
           style={{
@@ -309,30 +280,47 @@ const NorContainer5 = ({
           }}
         />
       )}
+
+      {border && (
+        <button
+          onClick={toggleSeparator}
+          style={{
+            ...separatorBtnStyle,
+            backgroundColor: showSeparator ? "#666" : "#ddd",
+            color: showSeparator ? "#fff" : "#666",
+          }}
+          title={showSeparator ? "Remove separator" : "Add separator"}
+        >
+          <HiOutlineMinus />
+        </button>
+      )}
     </div>
   );
 };
 
 const iconBtnStyle = {
-  background: "transparent",
-  border: "none",
+  background: "rgba(255, 255, 255, 0.9)",
+  border: "1px solid #ccc",
+  borderRadius: "4px",
   cursor: "pointer",
   fontSize: "18px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  padding: "4px",
+  transition: "all 0.2s ease",
 };
 
 const separatorBtnStyle = {
   position: "absolute",
-  bottom: "-12px",
+  bottom: "-14px",
   left: "50%",
   transform: "translateX(-50%)",
   background: "#ddd",
   border: "1px solid #ccc",
   borderRadius: "50%",
-  width: "24px",
-  height: "24px",
+  width: "28px",
+  height: "28px",
   cursor: "pointer",
   fontSize: "16px",
   display: "flex",

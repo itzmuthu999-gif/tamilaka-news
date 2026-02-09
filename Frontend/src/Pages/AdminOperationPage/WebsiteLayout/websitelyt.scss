@@ -1,0 +1,145 @@
+.website-layout-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.layout-header {
+  text-align: center;
+  margin-bottom: 30px;
+  
+  h2 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: 600;
+  }
+  
+  p {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+.layout-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.layout-section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+.layout-encloser {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.layout {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  img {
+    display: block;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .layout-title {
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    background: rgba(255, 255, 255, 0.9);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+.layout-info {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .info-content {
+    p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 10px;
+      
+      strong {
+        color: #333;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .layout-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .layout-encloser {
+    flex-direction: column;
+  }
+  
+  .layout img {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .website-layout-container {
+    padding: 15px;
+  }
+  
+  .layout-header h2 {
+    font-size: 24px;
+  }
+  
+  .layout-header p {
+    font-size: 14px;
+  }
+  
+  .layout-section,
+  .layout-info {
+    padding: 20px;
+  }
+  
+  .layout img {
+    height: 120px;
+  }
+}

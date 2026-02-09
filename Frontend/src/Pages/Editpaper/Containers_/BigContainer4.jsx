@@ -4,6 +4,7 @@ import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { HiOutlineMinus } from "react-icons/hi";
 import { useSelector, useDispatch } from "react-redux";
+import jwt from "../../../assets/jwt.jpg";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
@@ -14,9 +15,9 @@ import {
   toggleContainerSeparator,
   toggleSliderSeparator,
   toggleNestedSeparator,
-} from "../../Slice/editpaperslice";
-
-import jwt from "../../../assets/jwt.jpg";
+  removeSlotFromContainer,
+  removeSlotFromNestedContainer,
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 const BigNewsContainer4A = ({
   border = false,
@@ -24,6 +25,7 @@ const BigNewsContainer4A = ({
   slotId,
   catName,
   containerId,
+  sliderId,
   size = 280,
   isSlider = false,
   isSlider2 = false,
@@ -34,8 +36,8 @@ const BigNewsContainer4A = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { allNews, translatedNews, language } = useSelector(
-    (state) => state.newsform
+  const { allNews = [], translatedNews = [], language } = useSelector(
+    (state) => state.newsform || {}
   );
 
   const showSeparator = useSelector((state) => {
@@ -273,7 +275,6 @@ const BigNewsContainer4A = ({
           border-color: #666;
         }
 
-        /* Tablet and below */
         @media (max-width: 1024px) {
           .ep-bg-news-4a {
             width: 100%;
@@ -287,12 +288,7 @@ const BigNewsContainer4A = ({
           }
         }
 
-        /* Mobile */
         @media (max-width: 640px) {
-          .ep-bg-news-4a {
-
-          }
-
           .epbn4a-img {
             border-radius: 3px;
           }
@@ -309,7 +305,6 @@ const BigNewsContainer4A = ({
           }
         }
 
-        /* Small mobile */
         @media (max-width: 480px) {
           .epbn4a-hdln {
             font-size: 16px;
@@ -372,17 +367,17 @@ const BigNewsContainer4A = ({
         )}
       </div>
 
-      {/* Separator line - OUTSIDE the container */}
       {showSeparator && <div className="separator-line"></div>}
 
-      {/* Separator toggle button */}
-      <button
-        onClick={toggleSeparator}
-        className={`separator-btn ${showSeparator ? "active" : ""}`}
-        title={showSeparator ? "Remove separator" : "Add separator"}
-      >
-        <HiOutlineMinus />
-      </button>
+      {border && (
+        <button
+          onClick={toggleSeparator}
+          className={`separator-btn ${showSeparator ? "active" : ""}`}
+          title={showSeparator ? "Remove separator" : "Add separator"}
+        >
+          <HiOutlineMinus />
+        </button>
+      )}
     </div>
   );
 };

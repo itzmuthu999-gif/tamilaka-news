@@ -25,9 +25,9 @@ import {
   updateContainerSliderGap,
   deleteContainerSlider,
   addSlotToContainerSlider,
-  dropNewsIntoContainerSliderSlot,
-  removeSlotFromContainerSlider
-} from "../../Slice/editpaperslice";
+  removeSlotFromContainerSlider,
+  addLine
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
 import BigNewsContainer2 from "../Containers_/BigContainer2";
@@ -46,6 +46,7 @@ import NorContainer5 from "../Containers_/NorContainer5";
 import Newsheader from "../../Newspaper/Components/Newsheader";
 import { EditableSlider } from "./EditableSlider";
 import { EditableSlider2 } from "./EditableSlider2";
+import EditableLine from "../Containers_/EditableLine";
 
 const COMPONENT_MAP = {
   "Big Container Type 1": BigNewsContainer1,
@@ -99,6 +100,7 @@ export default function EditableContainer({
   const nestedContainers = containerData?.nestedContainers || [];
   const items = containerData?.items || [];
   const sliders = containerData?.sliders || [];
+  const lines = containerData?.lines || [];
 
   const [showSettings, setShowSettings] = useState(false);
   const [columns, setColumns] = useState(grid.columns);
@@ -243,6 +245,17 @@ export default function EditableContainer({
     const type = e.dataTransfer.getData("text/plain");
     const newsId = e.dataTransfer.getData("newsId");
     const sliderType = e.dataTransfer.getData("sliderType");
+    const lineType = e.dataTransfer.getData("lineType");
+    const lineOrientation = e.dataTransfer.getData("lineOrientation");
+
+    if (lineType && lineOrientation) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      dispatch(addLine(catName, lineType, lineOrientation, { x, y }, id, parentContainerId));
+      return;
+    }
 
     if (sliderType) {
       dispatch(addSliderToContainer(catName, id, sliderType, isNested, parentContainerId));
@@ -586,6 +599,22 @@ export default function EditableContainer({
               </div>
             ))}
           </div>
+
+          {lines.map((line) => (
+            <EditableLine
+              key={line.id}
+              id={line.id}
+              lineType={line.lineType}
+              orientation={line.orientation}
+              length={line.length}
+              x={line.x}
+              y={line.y}
+              catName={catName}
+              isActive={false}
+              containerId={id}
+              parentContainerId={parentContainerId}
+            />
+          ))}
         </div>
       </div>
     </div>

@@ -10,10 +10,10 @@ import {
   updateContainerSliderHeader,
   updateContainerSliderPadding,
   addSlotToContainerSlider,
-  dropNewsIntoContainerSliderSlot,
   deleteContainerSlider,
   removeSlotFromContainerSlider,
-} from "../../Slice/editpaperslice";
+  dropNewsIntoSliderSlot,
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
 
@@ -128,6 +128,16 @@ export function EditableSlider({
 
   const lockedType = slider?.lockedType;
 
+  // Sync local state with Redux state when slider data changes
+  useEffect(() => {
+    if (slider) {
+      setGap(slider.gap ?? 10);
+      setHeaderEnabled(slider.header?.enabled || false);
+      setHeaderTitle(slider.header?.title || "");
+      setPadding(slider.padding || 10);
+    }
+  }, [slider]);
+
   useEffect(() => {
     if (containerRef.current && width === 0) {
       const containerWidth = containerRef.current.offsetWidth;
@@ -168,7 +178,7 @@ export function EditableSlider({
       if (containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
         const parentContainer = containerRef.current.closest('.ep-ed-cont');
-        const parentWidth = parentContainer ? parentContainer.offsetWidth - 40 : 1250; // Account for padding
+        const parentWidth = parentContainer ? parentContainer.offsetWidth - 40 : 1250;
         const newWidth = Math.max(200, Math.min(parentWidth, e.clientX - containerRect.left));
 
         setWidth(newWidth);
@@ -268,17 +278,13 @@ export function EditableSlider({
 
     if (newsId) {
       dispatch(
-        dropNewsIntoContainerSliderSlot({
+        dropNewsIntoSliderSlot({
           catName,
-
           sliderId: id,
-
-          slotId: slotId,
-
+          slotId,
           newsId: Number(newsId),
-
+          containerId,
           isNested,
-
           parentContainerId,
         }),
       );

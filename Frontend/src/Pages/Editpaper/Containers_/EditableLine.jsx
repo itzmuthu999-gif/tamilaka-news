@@ -5,7 +5,7 @@ import {
   updateLinePosition,
   updateLineLength,
   deleteLine,
-  setActiveLine} from "../../Slice/editpaperslice";
+  setActiveLine} from "../../Slice/editpaperSlice/editpaperslice";
 
 export default function EditableLine({
   id,
@@ -16,6 +16,8 @@ export default function EditableLine({
   y,
   catName,
   isActive,
+  containerId,
+  parentContainerId,
 }) {
   const dispatch = useDispatch();
 
@@ -26,7 +28,7 @@ export default function EditableLine({
   const handleDelete = (e) => {
     if (e.detail === 2) {
       e.stopPropagation();
-      dispatch(deleteLine({ catName, lineId: id }));
+      dispatch(deleteLine({ catName, lineId: id, containerId, parentContainerId }));
     }
   };
 
@@ -42,8 +44,8 @@ export default function EditableLine({
         ...baseStyle,
         backgroundColor: "#e91e63",
         ...(orientation === "horizontal"
-          ? { width: `${length}px`, height: "4px" }
-          : { width: "4px", height: `${length}px` }),
+          ? { width: `${length}px`, height: "2px" }
+          : { width: "2px", height: `${length}px` }),
       };
     } else {
       // light-grey
@@ -61,8 +63,8 @@ export default function EditableLine({
     <Rnd
       size={
         orientation === "horizontal"
-          ? { width: length, height: lineType === "pink-bold" ? 4 : 2 }
-          : { width: lineType === "pink-bold" ? 4 : 2, height: length }
+          ? { width: length, height: 2 }
+          : { width: 2, height: length }
       }
       position={{ x, y }}
       enableResizing={
@@ -96,6 +98,8 @@ export default function EditableLine({
             lineId: id,
             x: d.x,
             y: d.y,
+            containerId,
+            parentContainerId,
           })
         );
       }}
@@ -110,6 +114,8 @@ export default function EditableLine({
             catName,
             lineId: id,
             length: newLength,
+            containerId,
+            parentContainerId,
           })
         );
 
@@ -119,6 +125,8 @@ export default function EditableLine({
             lineId: id,
             x: position.x,
             y: position.y,
+            containerId,
+            parentContainerId,
           })
         );
       }}

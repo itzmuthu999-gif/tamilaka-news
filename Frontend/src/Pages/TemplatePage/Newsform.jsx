@@ -36,6 +36,7 @@ export default function Newsform({
   const [openForm, setOpenForm] = useState(false);
   const dispatch = useDispatch();
   const MLayout = useSelector((state) => state.newsform.MLayout);
+  const allPages = useSelector((state) => state.admin.allPages || []);
 
   const displayData = activeLang === "en" && englishBuffer ? englishBuffer : tamilBuffer;
 
@@ -153,7 +154,17 @@ export default function Newsform({
 
   const submit = (e) => {
     e && e.preventDefault();
-    onSave();
+    
+    // Get current form data based on active language
+    const currentFormData = activeLang === "en" && englishBuffer ? englishBuffer : tamilBuffer;
+    
+    try {
+      onSave(currentFormData);
+      console.log('onSave called successfully with:', currentFormData);
+    } catch (error) {
+      console.error('Error in submit function:', error);
+      alert('Error saving news: ' + error.message);
+    }
   };
 
   const handleContainerDragStart = (e) => {
@@ -351,16 +362,21 @@ export default function Newsform({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Zonar</label>
-                <textarea
+                <label className="form-label">Zonal</label>
+                <select
                   name="zonal"
                   value={displayData.zonal || ""}
                   onChange={handleChange}
-                  placeholder="Enter zone"
-                  className="form-textarea"
-                  rows="2"
+                  className="form-select"
                   required
-                />
+                >
+                  <option value="">Select a category</option>
+                  {allPages.filter(page => page.name.eng !== "Select District").map((page) => (
+                    <option key={page.id} value={page.name.eng}>
+                      {page.name.eng}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-group">

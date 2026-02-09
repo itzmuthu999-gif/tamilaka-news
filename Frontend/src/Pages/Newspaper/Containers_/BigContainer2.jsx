@@ -10,7 +10,7 @@ const BigNewsContainer2 = ({
   border = false,
 }) => {
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const allNews = useSelector((state) => state.newsform?.allNews || []);
 
   const news = allNews.find((n) => n.id === newsId);
 

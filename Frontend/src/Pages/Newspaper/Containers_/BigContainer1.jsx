@@ -6,8 +6,8 @@ import './containercss.scss'
 
 const BigNewsContainer1 = ({ newsId = null, version = 1, border = false }) => {
   const navigate = useNavigate();
-const { allNews, translatedNews, language } = useSelector(
-  (state) => state.newsform
+const { allNews = [], translatedNews = [], language } = useSelector(
+  (state) => state.newsform || {}
 );
 
 const newsToShow = language === "en" ? translatedNews : allNews;

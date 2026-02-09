@@ -7,10 +7,9 @@ import {
   updateContainerSliderHeader,
   updateContainerSliderPadding,
   addSlotToContainerSlider,
-  dropNewsIntoContainerSliderSlot,
   deleteContainerSlider,
   removeSlotFromContainerSlider,
-} from "../../Slice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
 import BigNewsContainer2 from "../Containers_/BigContainer2";
@@ -81,6 +80,16 @@ export function EditableSlider2({
 
   const droppedContainers = slider?.items || [];
   const lockedType = slider?.lockedType;
+
+  // Sync local state with Redux state when slider data changes
+  useEffect(() => {
+    if (slider) {
+      setGap(slider.gap ?? 10);
+      setHeaderEnabled(slider.header?.enabled || false);
+      setHeaderTitle(slider.header?.title || "");
+      setPadding(slider.padding || 10);
+    }
+  }, [slider]);
 
   // Calculate container width based on first container and gap
   useEffect(() => {
@@ -209,12 +218,12 @@ export function EditableSlider2({
 
     if (newsId) {
       dispatch(
-        dropNewsIntoContainerSliderSlot({
+        dropNewsIntoSliderSlot({
           catName,
-          containerId,
           sliderId: id,
-          slotId: slotId,
+          slotId,
           newsId: Number(newsId),
+          containerId,
           isNested,
           parentContainerId,
         }),

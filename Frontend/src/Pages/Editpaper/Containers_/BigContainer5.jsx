@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
-import { MdHorizontalRule } from "react-icons/md";
+import { HiOutlineMinus } from "react-icons/hi";
 import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
 import {
@@ -15,7 +15,9 @@ import {
   toggleContainerSeparator,
   toggleSliderSeparator,
   toggleNestedSeparator,
-} from "../../Slice/editpaperslice";
+  removeSlotFromContainer,
+  removeSlotFromNestedContainer,
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 const BigNewsContainer5 = ({
   border = false,
@@ -33,7 +35,28 @@ const BigNewsContainer5 = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const allNews = useSelector((state) => state.newsform?.allNews || []);
+  
+  const showSeparator = useSelector((state) => {
+    const page = state.editpaper.pages.find((p) => p.catName === catName);
+    
+    if (isSlider || isSlider2) {
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
+      const item = slider?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    } else if (isNested && parentContainerId) {
+      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+        ?.nestedContainers?.find((nc) => nc.id === containerId);
+      const item = nestedCont?.items?.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    } else {
+      const container = page?.containers.find((c) => c.id === containerId);
+      const item = container?.items.find((i) => i.slotId === slotId);
+      return item?.showSeparator || false;
+    }
+  });
+  
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     
@@ -52,7 +75,6 @@ const BigNewsContainer5 = ({
   });
   
   const newsId = slot?.newsId;
-  const showSeparator = slot?.showSeparator || false;
   const news = allNews.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
@@ -124,9 +146,6 @@ const BigNewsContainer5 = ({
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    
-    // Just call the onDelete prop passed from parent
-    // The parent will handle the Redux dispatch
     onDelete?.();
   };
 
@@ -135,7 +154,7 @@ const BigNewsContainer5 = ({
     setVersion((prev) => (prev === 2 ? 1 : 2));
   };
 
-  const handleToggleSeparator = (e) => {
+  const toggleSeparator = (e) => {
     e.stopPropagation();
     
     if (isSlider || isSlider2) {
@@ -244,12 +263,35 @@ const BigNewsContainer5 = ({
             margin-bottom: 8px;
           }
           
-          .separator-btn-wrapper {
+          .separator-btn {
             position: absolute;
-            bottom: -20px;
+            bottom: -14px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 15;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+          }
+
+          .separator-btn:hover {
+            background: rgba(240, 240, 240, 0.95);
+            border-color: #999;
+          }
+
+          .separator-btn.active {
+            background: rgba(153, 153, 153, 0.95);
+            color: #fff;
+            border-color: #666;
           }
           
           .separator-line {
@@ -259,7 +301,6 @@ const BigNewsContainer5 = ({
             margin-top: 10px;
           }
 
-          /* Responsive Styles */
           @media (max-width: 1200px) {
             .ep-bg-news5-1 {
               width: 100%;
@@ -330,7 +371,7 @@ const BigNewsContainer5 = ({
             <button onClick={handleChange} style={iconBtnStyle}>
               <TbArrowsExchange />
             </button>
-            <button onDoubleClick={handleDelete} style={iconBtnStyle}>
+            <button onDoubleClick={handleDelete} style={iconBtnStyle} title="Double click to delete">
               <IoIosClose />
             </button>
           </div>
@@ -359,40 +400,32 @@ const BigNewsContainer5 = ({
         )}
       </div>
 
-      {/* Separator Toggle Button */}
-      {border && (
-        <div className="separator-btn-wrapper">
-          <button
-            onClick={handleToggleSeparator}
-            style={{
-              ...iconBtnStyle,
-              backgroundColor: showSeparator ? "#666" : "#ccc",
-              borderRadius: "50%",
-              width: "28px",
-              height: "28px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "1px solid #999",
-            }}
-            title="Toggle separator line"
-          >
-            <MdHorizontalRule size={20} color={showSeparator ? "#fff" : "#666"} />
-          </button>
-        </div>
-      )}
-
-      {/* Separator Line */}
       {showSeparator && <div className="separator-line" />}
+
+      {border && (
+        <button
+          onClick={toggleSeparator}
+          className={`separator-btn ${showSeparator ? "active" : ""}`}
+          title={showSeparator ? "Remove separator" : "Add separator"}
+        >
+          <HiOutlineMinus />
+        </button>
+      )}
     </div>
   );
 };
 
 const iconBtnStyle = {
-  background: "transparent",
-  border: "none",
+  background: "rgba(255, 255, 255, 0.9)",
+  border: "1px solid #ccc",
+  borderRadius: "4px",
   cursor: "pointer",
   fontSize: "18px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "4px",
+  transition: "all 0.2s ease",
 };
 
 export default BigNewsContainer5;

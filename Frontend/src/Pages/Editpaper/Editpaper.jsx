@@ -11,7 +11,8 @@ import Navbarr from "../Newspaper/Components/Navbarr";
 import { useDispatch, useSelector } from "react-redux";
 import { 
   addContainer,
-} from "../Slice/editpaperslice";
+  addLine,
+} from "../Slice/editpaperSlice/editpaperslice";
 
 import "./editpapercss.scss";
 
@@ -34,6 +35,17 @@ export default function Editpaper() {
     e.stopPropagation();
     
     const isContainerOverlay = e.dataTransfer.getData("containerOverlay");
+    const lineType = e.dataTransfer.getData("lineType");
+    const lineOrientation = e.dataTransfer.getData("lineOrientation");
+    
+    if (lineType && lineOrientation) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left - pageSettings.padding;
+      const y = e.clientY - rect.top - pageSettings.padding;
+      
+      dispatch(addLine(activePage, lineType, lineOrientation, { x, y }));
+      return;
+    }
     
     if (isContainerOverlay === "true") {
       dispatch(addContainer(activePage));

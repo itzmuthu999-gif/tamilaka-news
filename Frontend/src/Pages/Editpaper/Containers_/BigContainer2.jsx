@@ -15,9 +15,8 @@ import {
   toggleSliderSeparator,
   toggleNestedSeparator,
   removeSlotFromContainer,
-  removeSlotFromSlider,
   removeSlotFromNestedContainer,
-} from "../../Slice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
@@ -38,7 +37,7 @@ const BigNewsContainer2 = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const allNews = useSelector((state) => state.newsform?.allNews || []);
 
   const showSeparator = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
@@ -143,8 +142,6 @@ const BigNewsContainer2 = ({
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    // Just call the onDelete prop passed from parent
-    // The parent will handle the Redux dispatch
     onDelete?.();
   };
 
@@ -287,7 +284,6 @@ const BigNewsContainer2 = ({
           border-color: #666;
         }
 
-        /* Tablet and below */
         @media (max-width: 1024px) {
           .ep-bg-news-2 {
             width: 100%;
@@ -306,11 +302,7 @@ const BigNewsContainer2 = ({
           }
         }
 
-        /* Mobile */
         @media (max-width: 640px) {
-          .ep-bg-news-2 {
-          }
-
           .epbn2-img {
             aspect-ratio: 16 / 9;
             border-radius: 3px;
@@ -332,7 +324,6 @@ const BigNewsContainer2 = ({
           }
         }
 
-        /* Small mobile */
         @media (max-width: 480px) {
           .epbn2-hdln {
             font-size: 16px;
@@ -405,17 +396,17 @@ const BigNewsContainer2 = ({
         )}
       </div>
 
-      {/* Separator line - OUTSIDE the container */}
       {showSeparator && <div className="separator-line"></div>}
 
-      {/* Separator toggle button */}
-      <button
-        onClick={toggleSeparator}
-        className={`separator-btn ${showSeparator ? "active" : ""}`}
-        title={showSeparator ? "Remove separator" : "Add separator"}
-      >
-        <HiOutlineMinus />
-      </button>
+      {border && (
+        <button
+          onClick={toggleSeparator}
+          className={`separator-btn ${showSeparator ? "active" : ""}`}
+          title={showSeparator ? "Remove separator" : "Add separator"}
+        >
+          <HiOutlineMinus />
+        </button>
+      )}
     </div>
   );
 };

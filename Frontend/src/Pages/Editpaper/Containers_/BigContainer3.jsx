@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { HiOutlineMinus } from "react-icons/hi";
+import { useSelector, useDispatch } from "react-redux";
+import jwt from "../../../assets/jwt.jpg";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
@@ -13,10 +15,9 @@ import {
   toggleContainerSeparator,
   toggleSliderSeparator,
   toggleNestedSeparator,
-} from "../../Slice/editpaperslice";
-
-import { useSelector, useDispatch } from "react-redux";
-import jwt from "../../../assets/jwt.jpg";
+  removeSlotFromContainer,
+  removeSlotFromNestedContainer,
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 const BigNewsContainer3 = ({
   border = false,
@@ -24,6 +25,7 @@ const BigNewsContainer3 = ({
   slotId,
   catName,
   containerId,
+  sliderId,
   isSlider = false,
   isSlider2 = false,
   isNested = false,
@@ -33,12 +35,13 @@ const BigNewsContainer3 = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const allNews = useSelector((state) => state.newsform?.allNews || []);
 
   const showSeparator = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       const item = slider?.items.find((i) => i.slotId === slotId);
       return item?.showSeparator || false;
     } else if (isNested && parentContainerId) {
@@ -56,7 +59,8 @@ const BigNewsContainer3 = ({
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
     if (isSlider || isSlider2) {
-      const slider = page?.sliders.find((s) => s.id === containerId);
+      const slider = page?.containers.find((c) => c.id === containerId)
+        ?.sliders?.find((s) => s.id === sliderId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
       const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
@@ -104,7 +108,7 @@ const BigNewsContainer3 = ({
         dispatch(
           dropNewsIntoSliderSlot({
             catName,
-            sliderId: containerId,
+            sliderId: sliderId,
             slotId,
             newsId: Number(droppedId),
             containerId,
@@ -158,7 +162,7 @@ const BigNewsContainer3 = ({
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: containerId,
+          sliderId: sliderId,
           slotId,
           containerId,
           isNested,
@@ -272,7 +276,6 @@ const BigNewsContainer3 = ({
           border-color: #666;
         }
 
-        /* Tablet and below */
         @media (max-width: 1024px) {
           .ep-bg-news-3 {
             width: 100%;
@@ -286,11 +289,7 @@ const BigNewsContainer3 = ({
           }
         }
 
-        /* Mobile */
         @media (max-width: 640px) {
-          .ep-bg-news-3 {
-          }
-
           .epbn3-img {
             aspect-ratio: 16 / 9;
             border-radius: 3px;
@@ -312,7 +311,6 @@ const BigNewsContainer3 = ({
           }
         }
 
-        /* Small mobile */
         @media (max-width: 480px) {
           .epbn3-hdln {
             font-size: 16px;
@@ -395,14 +393,15 @@ const BigNewsContainer3 = ({
         {showSeparator && <div className="separator-line"></div>}
       </div>
 
-      {/* Separator toggle button */}
-      <button
-        onClick={toggleSeparator}
-        className={`separator-btn ${showSeparator ? "active" : ""}`}
-        title={showSeparator ? "Remove separator" : "Add separator"}
-      >
-        <HiOutlineMinus />
-      </button>
+      {border && (
+        <button
+          onClick={toggleSeparator}
+          className={`separator-btn ${showSeparator ? "active" : ""}`}
+          title={showSeparator ? "Remove separator" : "Add separator"}
+        >
+          <HiOutlineMinus />
+        </button>
+      )}
     </div>
   );
 };

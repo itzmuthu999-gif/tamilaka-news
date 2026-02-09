@@ -14,6 +14,14 @@ const newsFormSlice = createSlice({
   initialState,
   reducers: {
     saveNews: (state, action) => {
+      console.log('saveNews action called with payload:', action.payload);
+      console.log('Current state.allNews:', state.allNews);
+      
+      // Ensure allNews is initialized
+      if (!state.allNews) {
+        state.allNews = [];
+      }
+      
       const news = {
         id: Date.now(),
         ...action.payload,
@@ -21,7 +29,9 @@ const newsFormSlice = createSlice({
         comments: [],
         containers: [] // Changed from contentContainers to containers
       };
+      console.log('Created news object:', news);
       state.allNews.push(news);
+      console.log('Updated allNews array:', state.allNews);
     },
 
     setCurrentNews: (state, action) => {

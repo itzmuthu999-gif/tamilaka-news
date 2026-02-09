@@ -1,0 +1,407 @@
+/* DistrictContainer.css - Royal Dark Pink Theme */
+.districts-wrapper {
+  padding: 24px;
+  background: linear-gradient(135deg, #2d1b38 0%, #1a0e1a 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(45, 27, 56, 0.3);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(219, 112, 147, 0.2);
+}
+
+.districts-wrapper:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(45, 27, 56, 0.4);
+}
+
+.districts-wrapper h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f8f9fa;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.districts-wrapper h2::before {
+  content: '🏛️';
+  font-size: 24px;
+}
+
+.districts-box {
+  background: linear-gradient(135deg, #2d1b38 0%, #1a0e1a 100%);
+  height: 320px;
+  padding: 24px;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 2px dashed rgba(219, 112, 147, 0.2);
+  position: relative;
+  align-content: flex-start;
+}
+
+.districts-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(219, 112, 147, 0.05) 0%, rgba(45, 27, 56, 0.05) 100%);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+/* Custom scrollbar styling */
+.districts-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.districts-box::-webkit-scrollbar-track {
+  background: rgba(45, 27, 56, 0.3);
+  border-radius: 4px;
+}
+
+.districts-box::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6 0%, #9333ea 100%);
+  border-radius: 4px;
+}
+
+.districts-box::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+}
+
+.district-chip {
+  background: linear-gradient(135deg, #3b82f6 0%, #9333ea 100%);
+  padding: 10px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  color: #f8f9fa;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.district-chip:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.district-chip .close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #ff6b9d 0%, #c9184a 100%);
+  color: #f8f9fa;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(219, 112, 147, 0.3);
+  transition: all 0.3s ease;
+  border: 2px solid #f8f9fa;
+}
+
+.district-chip .close:hover {
+  background: linear-gradient(135deg, #c9184a 0%, #ff6b9d 100%);
+  transform: scale(1.1);
+}
+
+.district-chip .edit-btn {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #f8f9fa;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+  border: 2px solid #f8f9fa;
+  cursor: pointer;
+}
+
+.district-chip .edit-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Edit Modal Styles */
+.edit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(45, 27, 56, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.edit-modal-content {
+  background: linear-gradient(135deg, #2d1b38 0%, #1a0e1a 100%);
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+  min-width: 400px;
+  max-width: 500px;
+  border: 2px solid #3b82f6;
+  animation: modalSlideIn 0.3s ease;
+}
+
+.edit-modal-content h3 {
+  color: #f8f9fa;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.edit-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.edit-primary-input,
+.edit-translation-input {
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  font-size: 16px;
+  width: 100%;
+  transition: all 0.3s ease;
+  background: #2d1b38;
+  color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(45, 27, 56, 0.2);
+}
+
+.edit-translation-input {
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.edit-primary-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4);
+  transform: translateY(-2px);
+}
+
+.edit-translation-input:focus {
+  outline: none;
+  border-color: #059669;
+  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.4);
+  transform: translateY(-2px);
+}
+
+.edit-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #9333ea 100%);
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #f8f9fa;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.cancel-btn {
+  background: linear-gradient(135deg, #453847 0%, #2d1b38 100%);
+  border: 2px solid #3b82f6;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #f8f9fa;
+  box-shadow: 0 4px 16px rgba(45, 27, 56, 0.3);
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background: linear-gradient(135deg, #5a4a5e 0%, #453847 100%);
+  transform: translateY(-2px);
+  border-color: #2563eb;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.add-area {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.translate-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #f8f9fa;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+.translate-btn:hover {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.translate-btn:active {
+  transform: translateY(0);
+}
+
+.primary-input {
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  font-size: 15px;
+  width: 200px;
+  transition: all 0.3s ease;
+  background: #2d1b38;
+  color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.translation-input {
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid #10b981;
+  font-size: 15px;
+  width: 200px;
+  transition: all 0.3s ease;
+  background: #2d1b38;
+  color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.primary-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4);
+  transform: translateY(-2px);
+}
+
+.translation-input:focus {
+  outline: none;
+  border-color: #059669;
+  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.4);
+  transform: translateY(-2px);
+}
+
+.add-area button {
+  background: linear-gradient(135deg, #3b82f6 0%, #9333ea 100%);
+  border: none;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #f8f9fa;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-end;
+}
+
+.add-area button::before {
+  content: '+';
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.add-area button:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Empty state */
+.districts-box:empty::after {
+  content: 'No districts added yet. Click below to add your first district!';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(248, 249, 250, 0.7);
+  font-style: italic;
+  font-size: 16px;
+  text-align: center;
+  width: 80%;
+}

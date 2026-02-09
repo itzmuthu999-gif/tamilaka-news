@@ -9,11 +9,11 @@ const NorContainer1 = ({
   border = false,
 }) => {
   const navigate = useNavigate();
-const { allNews, translatedNews, language } = useSelector(
-  (state) => state.newsform
+const { allNews = [], translatedNews = [], language } = useSelector(
+  (state) => state.newsform || {}
 );
 
-const newsToShow = language === "en" ? translatedNews : allNews;
+const newsToShow = (language === "en" ? translatedNews : allNews) || [];
 
   const news = newsToShow.find((n) => n.id === newsId);
 

@@ -5,33 +5,19 @@ import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
 
 import { 
-
   FiHome, 
-
-  FiFileText, 
-
-  FiEdit3, 
-
-  FiLayers, 
-
+  FiFileText,
+  FiEdit3,
+  FiLayers,
   FiSettings,
-
   FiUser,
-
   FiLogOut,
-
   FiChevronDown,
-
   FiGrid,
-
   FiTrendingUp,
-
   FiUsers,
-
   FiCalendar,
-
   FiBell
-
 } from "react-icons/fi";
 
 import "./Adminhome.scss";
@@ -116,11 +102,11 @@ export default function AdminHome() {
 
             <li className="nav-item">
 
-              <Link to="/analytics" className="nav-link">
+              <Link to="/adminop" className="nav-link">
 
                 <FiTrendingUp className="nav-icon" />
 
-                <span>Analytics</span>
+                <span>Admin Operation</span>
 
               </Link>
 
@@ -137,8 +123,6 @@ export default function AdminHome() {
               </Link>
 
             </li>
-
-
 
             <li className="nav-item">
 
@@ -223,69 +207,29 @@ export default function AdminHome() {
             <h2>Quick Actions</h2>
 
             <div className="actions-grid">
-
               <Link to="/Newsbund" className="action-card">
-
                 <div className="action-icon">
-
                   <FiFileText />
-
                 </div>
-
-                <h3>Manage News</h3>
-
-                <p>Add, edit, and organize news articles</p>
-
+                <h3>Raw News</h3>
+                <p>Manage and organize news articles</p>
               </Link>
-
               
-
               <Link to="/editpaper" className="action-card">
-
                 <div className="action-icon">
-
                   <FiEdit3 />
-
                 </div>
-
                 <h3>Edit Paper</h3>
-
                 <p>Design and layout newspaper pages</p>
-
               </Link>
-
               
-
               <Link to="/Newspaper" className="action-card">
-
                 <div className="action-icon">
-
                   <FiLayers />
-
                 </div>
-
-                <h3>View Newspaper</h3>
-
+                <h3>Newspaper</h3>
                 <p>Preview and publish newspaper</p>
-
               </Link>
-
-              
-
-              <Link to="/analytics" className="action-card">
-
-                <div className="action-icon">
-
-                  <FiTrendingUp />
-
-                </div>
-
-                <h3>Analytics</h3>
-
-                <p>View performance metrics and insights</p>
-
-              </Link>
-
             </div>
 
           </div>
@@ -304,7 +248,7 @@ export default function AdminHome() {
 
                 <div className="activity-icon">
 
-                  <FiEdit3 />
+                  <FiFileText />
 
                 </div>
 
