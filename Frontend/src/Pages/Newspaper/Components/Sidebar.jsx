@@ -1,9 +1,19 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { IoClose } from "react-icons/io5";
 import logo from "../../../assets/logo1.png";
 import { IoSearchSharp } from "react-icons/io5";
+
 export default function Sidebar({ open, onClose }) {
   const [active, setActive] = useState(null);
+
+  // Get navigation data from Redux store
+  const { allPages, selectedDistrict2 } = useSelector((state) => state.admin);
+
+  // Filter and sort pages that should appear in sidebar (sidenavpos is not null)
+  const sidebarPages = allPages
+    .filter((page) => page.sidenavpos !== null)
+    .sort((a, b) => a.sidenavpos - b.sidenavpos);
 
   const toggle = (name) => {
     setActive(active === name ? null : name);
@@ -18,60 +28,62 @@ export default function Sidebar({ open, onClose }) {
 
       {/* Sidebar */}
       <div className="sb-container">
-                    <div className="nav-c1-logo-v2" style={{position: "relative"}}>
-                       <div className="nav-c1l-t1-v2" > <img src={logo}/></div>
-                       <div className="nav-c1l-t2-v2" style={{position: "absolute", transform: "translateY(20px)"}}>நடுநிலை நாளிதழ்</div>
-                    </div>
+        <div className="nav-c1-logo-v2" style={{ position: "relative" }}>
+          <div className="nav-c1l-t1-v2">
+            <img src={logo} />
+          </div>
+          <div
+            className="nav-c1l-t2-v2"
+            style={{ position: "absolute", transform: "translateY(20px)" }}
+          >
+            நடுநிலை நாளிதழ்
+          </div>
+        </div>
         <div className="sb-header">
           <div className="search-bar">
-  <input
-    type="text"
-    placeholder="Search..."
-    className="search-input"
-  />
-  <IoSearchSharp className="search-icon" />
-</div>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="search-input"
+            />
+            <IoSearchSharp className="search-icon" />
+          </div>
         </div>
 
         <div className="sb-content">
+          {sidebarPages.map((page) => {
+            // Special handling for District selector
+            if (page.districts) {
+              return (
+                <SidebarItem
+                  key={page.id}
+                  title={page.name.tam}
+                  active={active}
+                  toggle={toggle}
+                >
+                  {page.districts.map((district, index) => (
+                    <li key={index}>{district.tam}</li>
+                  ))}
+                </SidebarItem>
+              );
+            }
 
-          <SidebarItem title="அரசியல்" active={active} toggle={toggle}>
-            <li>தமிழ்நாடு அரசியல்</li>
-            <li>தேசிய அரசியல்</li>
-            <li>தேர்தல்கள்</li>
-          </SidebarItem>
-
-          <SidebarItem title="வானிலை" active={active} toggle={toggle}>
-            <li>இன்றைய வானிலை</li>
-            <li>மாவட்ட வானிலை</li>
-            <li>மழை செய்திகள்</li>
-          </SidebarItem>
-
-          <SidebarItem title="சினிமா" active={active} toggle={toggle}>
-            <li>தமிழ் சினிமா</li>
-            <li>திரை விமர்சனம்</li>
-            <li>நட்சத்திர செய்திகள்</li>
-          </SidebarItem>
-
-          <SidebarItem title="விளையாட்டு" active={active} toggle={toggle}>
-            <li>கிரிக்கெட்</li>
-            <li>கால்பந்து</li>
-            <li>ஒலிம்பிக்</li>
-          </SidebarItem>
-
-          <SidebarItem title="ஜோதிடம்" active={active} toggle={toggle}>
-            <li>இன்றைய ராசிபலன்</li>
-            <li>வார ராசிபலன்</li>
-            <li>பரிகாரங்கள்</li>
-          </SidebarItem>
-
+            // Regular page items without sub-items
+            return (
+              <div key={page.id} className="sb-item">
+                <div className="sb-title-simple">
+                  {page.name.tam}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
   );
 }
 
-/* Reusable item */
+/* Reusable item with dropdown */
 function SidebarItem({ title, children, active, toggle }) {
   const isOpen = active === title;
 

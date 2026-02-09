@@ -6,31 +6,21 @@ import userReducer from "./Pages/Slice/userSlice.js";
 
 const loadState = () => {
   try {
-    const newsData = localStorage.getItem("news-data");
-    const usersData = localStorage.getItem("users-data");
-    
-    return {
-      newsform: newsData ? JSON.parse(newsData) : undefined,
-      users: usersData ? JSON.parse(usersData) : undefined
-    };
+    const serializedState = localStorage.getItem("redux-state");
+    if (serializedState === null) {
+      return undefined;
+    }
+    return JSON.parse(serializedState);
   } catch (err) {
-    return {
-      newsform: undefined,
-      users: undefined
-    };
+    console.error('Error loading state from localStorage:', err);
+    return undefined;
   }
 };
 
 const saveState = (state) => {
   try {
-    if (state.newsform) {
-      const newsSerialized = JSON.stringify(state.newsform);
-      localStorage.setItem("news-data", newsSerialized);
-    }
-    if (state.users) {
-      const usersSerialized = JSON.stringify(state.users);
-      localStorage.setItem("users-data", usersSerialized);
-    }
+    const serializedState = JSON.stringify(state);
+    localStorage.setItem("redux-state", serializedState);
   } catch (err) {
     console.error('Error saving state to localStorage:', err);
   }

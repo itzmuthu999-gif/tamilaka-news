@@ -509,95 +509,137 @@ export default function EditableContainer({
               position: "relative"
             }}
           >
-            {items.map((item, index) => {
-              const Component = COMPONENT_MAP[item.containerType];
-              if (!Component) return null;
+            {(() => {
+              const extractTimestamp = (item) => {
+                if (item.slotId) {
+                  const match = item.slotId.match(/slot_(\d+)/);
+                  return match ? parseInt(match[1]) : 0;
+                }
+                if (item.id) {
+                  // Extract timestamp from the end of the ID string
+                  // Works for formats like: nested_container_1234567890, slider_1234567890, etc.
+                  const match = item.id.toString().match(/_(\d+)$/);
+                  return match ? parseInt(match[1]) : 0;
+                }
+                return 0;
+              };
+
+              const allElements = [
+                ...items.map(item => ({ 
+                  type: 'item', 
+                  data: item, 
+                  timestamp: extractTimestamp(item)
+                })),
+                ...nestedContainers.map(nested => ({ 
+                  type: 'nested', 
+                  data: nested, 
+                  timestamp: extractTimestamp(nested)
+                })),
+                ...sliders.map(slider => ({ 
+                  type: 'slider', 
+                  data: slider, 
+                  timestamp: extractTimestamp(slider)
+                }))
+              ];
               
-              return (
-                <div 
-                  key={item.slotId} 
-                  style={{ 
-                    pointerEvents: "auto",
-                    position: "relative",
-                    zIndex: 10 + index
-                  }}
-                >
-                  <Component 
-                    border 
-                    slotId={item.slotId} 
-                    catName={catName} 
-                    containerId={id}
-                    isNested={isNested}
-                    parentContainerId={parentContainerId}
-                    onDelete={() => {
-                      if (isNested && parentContainerId) {
-                        dispatch(removeSlotFromNestedContainer({
-                          catName,
-                          parentContainerId,
-                          nestedContainerId: id,
-                          slotId: item.slotId
-                        }));
-                      } else {
-                        dispatch(removeSlotFromContainer({ 
-                          catName, 
-                          containerId: id, 
-                          slotId: item.slotId 
-                        }));
-                      }
-                    }}
-                  />
-                </div>
-              );
-            })}
-
-            {nestedContainers.map((nested, index) => (
-              <div 
-                key={nested.id} 
-                style={{ 
-                  pointerEvents: "auto",
-                  position: "relative",
-                  zIndex: 10 + items.length + index
-                }}
-              >
-                <EditableContainer
-                  id={nested.id}
-                  catName={catName}
-                  isNested={true}
-                  parentContainerId={id}
-                />
-              </div>
-            ))}
-
-            {sliders.map((slider, index) => (
-              <div
-                key={slider.id}
-                style={{
-                  pointerEvents: "auto",
-                  position: "relative",
-                  zIndex: 10 + items.length + nestedContainers.length + index,
-                  width: "100%",
-                  height: "fit-content"
-                }}
-              >
-                {slider.type === "type1" ? (
-                  <EditableSlider
-                    id={slider.id}
-                    catName={catName}
-                    containerId={id}
-                    isNested={isNested}
-                    parentContainerId={parentContainerId}
-                  />
-                ) : (
-                  <EditableSlider2
-                    id={slider.id}
-                    catName={catName}
-                    containerId={id}
-                    isNested={isNested}
-                    parentContainerId={parentContainerId}
-                  />
-                )}
-              </div>
-            ))}
+              allElements.sort((a, b) => a.timestamp - b.timestamp);
+              
+              return allElements.map((element, index) => {
+                if (element.type === 'item') {
+                  const item = element.data;
+                  const Component = COMPONENT_MAP[item.containerType];
+                  if (!Component) return null;
+                  
+                  return (
+                    <div 
+                      key={item.slotId} 
+                      style={{ 
+                        pointerEvents: "auto",
+                        position: "relative",
+                        zIndex: 10 + index
+                      }}
+                    >
+                      <Component 
+                        border 
+                        slotId={item.slotId} 
+                        catName={catName} 
+                        containerId={id}
+                        isNested={isNested}
+                        parentContainerId={parentContainerId}
+                        onDelete={() => {
+                          if (isNested && parentContainerId) {
+                            dispatch(removeSlotFromNestedContainer({
+                              catName,
+                              parentContainerId,
+                              nestedContainerId: id,
+                              slotId: item.slotId
+                            }));
+                          } else {
+                            dispatch(removeSlotFromContainer({ 
+                              catName, 
+                              containerId: id, 
+                              slotId: item.slotId 
+                            }));
+                          }
+                        }}
+                      />
+                    </div>
+                  );
+                } else if (element.type === 'nested') {
+                  const nested = element.data;
+                  return (
+                    <div 
+                      key={nested.id} 
+                      style={{ 
+                        pointerEvents: "auto",
+                        position: "relative",
+                        zIndex: 10 + index
+                      }}
+                    >
+                      <EditableContainer
+                        id={nested.id}
+                        catName={catName}
+                        isNested={true}
+                        parentContainerId={id}
+                      />
+                    </div>
+                  );
+                } else if (element.type === 'slider') {
+                  const slider = element.data;
+                  return (
+                    <div
+                      key={slider.id}
+                      style={{
+                        pointerEvents: "auto",
+                        position: "relative",
+                        zIndex: 10 + index,
+                        width: "100%",
+                        height: "fit-content"
+                      }}
+                    >
+                      {slider.type === "type1" ? (
+                        <EditableSlider
+                          id={slider.id}
+                          catName={catName}
+                          containerId={id}
+                          isNested={isNested}
+                          parentContainerId={parentContainerId}
+                        />
+                      ) : (
+                        <EditableSlider2
+                          id={slider.id}
+                          catName={catName}
+                          containerId={id}
+                          isNested={isNested}
+                          parentContainerId={parentContainerId}
+                        />
+                      )}
+                    </div>
+                  );
+                }
+                return null;
+              });
+            })()}
           </div>
 
           {lines.map((line) => (

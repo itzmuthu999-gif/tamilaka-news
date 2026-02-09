@@ -36,7 +36,7 @@ export const sliderReducers = {
           isNested,
           parentContainerId,
           slider: {
-            id: nanoid(),
+            id: `slider_${Date.now()}`,
             type: sliderType,
             header: { enabled: false, title: "" }, 
             padding: 10,                              

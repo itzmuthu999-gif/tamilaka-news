@@ -23,7 +23,7 @@ export const nestedReducers = {
           catName,
           parentContainerId,
           container: {
-            id: nanoid(),
+            id: `nested_container_${Date.now()}`,
             grid: {
               columns: 2,
               gap: 10

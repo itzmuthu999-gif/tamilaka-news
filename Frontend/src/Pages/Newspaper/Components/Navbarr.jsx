@@ -18,51 +18,24 @@ export default function Navbarr({ setIsOn, isOn, openSidebar }) {
 const { allNews, language } = useSelector(
   (state) => state.newsform
 );
+const { allPages, selectedDistrict1 } = useSelector(
+  (state) => state.admin
+);
 const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
   const [districtDropdownOpen, setDistrictDropdownOpen] = useState(false);
   const [menuPortalPosition, setMenuPortalPosition] = useState(null);
   const districtDropdownRef = useRef(null);
 
-  const districts = [
-    "சென்னை",
-    "கோயம்புத்தூர்",
-    "மதுரை",
-    "திருச்சிராப்பள்ளி (திருச்சி)",
-    "சேலம்",
-    "திருப்பூர்",
-    "தஞ்சாவூர்",
-    "கன்னியாகுமரி",
-    "திருநெல்வேலி",
-    "ஈரோடு",
-    "வேலூர்",
-    "திருவள்ளூர்",
-    "காஞ்சிபுரம்",
-    "செங்கல்பட்டு",
-    "விழுப்புரம்",
-    "கடலூர்",
-    "நாமக்கல்",
-    "கரூர்",
-    "திண்டுக்கல்",
-    "தேனி",
-    "சிவகங்கை",
-    "விருதுநகர்",
-    "ராமநாதபுரம்",
-    "புதுக்கோட்டை",
-    "பெரம்பலூர்",
-    "அரியலூர்",
-    "தருமபுரி",
-    "கிருஷ்ணகிரி",
-    "திருவண்ணாமலை",
-    "திருவாரூர்",
-    "நாகப்பட்டினம்",
-    "மயிலாடுதுறை",
-    "நீலகிரி",
-    "கள்ளக்குறிச்சி",
-    "ராணிப்பேட்டை",
-    "திருப்பத்தூர்",
-    "தென்காசி",
-    "காஞ்சிபுரம்",
-  ];
+  // Get pages that should appear in top navigation (topnavpos is not null)
+  // and sort them by topnavpos value
+  const topNavPages = allPages
+    .filter(page => page.topnavpos !== null)
+    .sort((a, b) => a.topnavpos - b.topnavpos);
+
+  // Find the district page (it has a 'districts' property)
+  const districtPage = allPages.find(page => page.districts);
+  const districts = districtPage?.districts || [];
+
 useEffect(() => {
   const handleResize = () => {
     setIsMobile(window.innerWidth > 768);
@@ -165,43 +138,49 @@ const handleLanguageToggle = async () => {
 </div> }
 
             <div className="nav-c3-sections-v2">
-               <div>வர்த்தகம்</div>
-              <div>உலகம்</div>
-              <div>இந்தியா</div>
-              {(
-                <div ref={districtDropdownRef} className="nav-district-dropdown">
-                  <div
-                    className="nav-district-trigger"
-                    onClick={() => setDistrictDropdownOpen((prev) => !prev)}
-                  >
-                    தமிழக நியூஸ் ▾
-                  </div>
-                  {districtDropdownOpen && menuPortalPosition && ReactDOM.createPortal(
-                    <div
-                      className={`nav-district-menu nav-district-menu-portal${isOn ? " nav-district-menu-dark" : ""}`}
-                      style={{
-                        position: "fixed",
-                        top: menuPortalPosition.top,
-                        left: menuPortalPosition.left,
-                      }}
-                    >
-                      {districts.map((district) => (
+              {topNavPages.map((page) => {
+                // Check if this is the district page (has districts property)
+                if (page.districts) {
+                  return (
+                    <div key={page.id} ref={districtDropdownRef} className="nav-district-dropdown">
+                      <div
+                        className="nav-district-trigger"
+                        onClick={() => setDistrictDropdownOpen((prev) => !prev)}
+                      >
+                        {language === "ta" ? page.name.tam : page.name.eng} ▾
+                      </div>
+                      {districtDropdownOpen && menuPortalPosition && ReactDOM.createPortal(
                         <div
-                          key={district}
-                          className="nav-district-item"
-                          onClick={() => setDistrictDropdownOpen(false)}
+                          className={`nav-district-menu nav-district-menu-portal${isOn ? " nav-district-menu-dark" : ""}`}
+                          style={{
+                            position: "fixed",
+                            top: menuPortalPosition.top,
+                            left: menuPortalPosition.left,
+                          }}
                         >
-                          {district}
-                        </div>
-                      ))}
-                    </div>,
-                    document.body
-                  )}
-                </div>
-              )}
-              <div>அரசியல்</div>
-              <div>விளையாட்டு</div>
-              <div>ட்ரெண்டிங்</div>
+                          {districts.map((district, index) => (
+                            <div
+                              key={index}
+                              className="nav-district-item"
+                              onClick={() => setDistrictDropdownOpen(false)}
+                            >
+                              {language === "ta" ? district.tam : district.eng}
+                            </div>
+                          ))}
+                        </div>,
+                        document.body
+                      )}
+                    </div>
+                  );
+                }
+                
+                // Regular page (not district)
+                return (
+                  <div key={page.id}>
+                    {language === "ta" ? page.name.tam : page.name.eng}
+                  </div>
+                );
+              })}
             </div>
           { isMobile &&             <div className="nav-c3-dm-v2">
           {isOn ?   <IoSunnySharp onClick={() => setIsOn(!isOn)} />:<HiMiniMoon onClick={() => setIsOn(!isOn)} />}
