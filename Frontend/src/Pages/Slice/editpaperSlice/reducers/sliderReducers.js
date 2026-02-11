@@ -38,7 +38,7 @@ export const sliderReducers = {
           slider: {
             id: `slider_${Date.now()}`,
             type: sliderType,
-            header: { enabled: false, title: "" }, 
+            dimensions: { containerWidth: 400, containerHeight: 300, imgWidth: 200, imgHeight: 150, padding: 10 },
             padding: 10,                              
             size: { width: 0 },
             gap: 10,
@@ -122,7 +122,7 @@ export const sliderReducers = {
   },
 
   addSlotToContainerSlider(state, action) {
-    const { catName, containerId, sliderId, containerType, slotId, isNested, parentContainerId } = action.payload;
+    const { catName, containerId, sliderId, containerType, slotId, isNested, parentContainerId, presetId } = action.payload;
     
     let slider = null;
     if (isNested && parentContainerId) {
@@ -144,11 +144,34 @@ export const sliderReducers = {
         slider.lockedType = containerType;
       }
 
+      // Find preset dimensions if presetId is provided
+      let presetDimensions = null;
+      if (presetId) {
+        const preset = state.presetContainers.find(p => p.id === presetId);
+        if (preset) {
+          presetDimensions = preset.dimensions;
+        }
+      }
+
+      // Default dimensions
+      const defaultDimensions = {
+        containerWidth: 800,
+        containerHeight: 300,
+        imgWidth: 750,
+        imgHeight: 300,
+        padding: 8
+      };
+
       slider.items.push({
         slotId: slotId || nanoid(),
         newsId: null,
         containerType,
-        showSeparator: false
+        showSeparator: false,
+        shfval: 1,
+        // Add dimensions for Universal Container at slot level
+        ...(containerType === "Universal Container" && {
+          dimensions: presetDimensions || defaultDimensions
+        })
       });
     }
     logState(state, "addSlotToContainerSlider");
@@ -282,8 +305,76 @@ export const sliderReducers = {
     logState(state, "toggleSliderSeparator");
   },
 
-  updateContainerSliderHeader(state, action) {
-    const { catName, containerId, sliderId, enabled, title, isNested, parentContainerId } = action.payload;
+  updateSliderShfval(state, action) {
+    const { catName, sliderId, slotId, shfval, isNested, parentContainerId, containerId } = action.payload;
+    
+    let slot = null;
+    
+    // Check if it's a slider inside a container
+    if (containerId) {
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        const nestedCont = parentCont?.nestedContainers?.find(nc => nc.id === containerId);
+        slot = nestedCont?.sliders?.find(s => s.id === sliderId)?.items.find(i => i.slotId === slotId);
+      } else {
+        const cont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId);
+        slot = cont?.sliders?.find(s => s.id === sliderId)?.items.find(i => i.slotId === slotId);
+      }
+    } else {
+      // Standalone slider
+      slot = state.pages
+        .find(p => p.catName === catName)
+        ?.sliders.find(s => s.id === sliderId)
+        ?.items.find(i => i.slotId === slotId);
+    }
+
+    if (slot) {
+      slot.shfval = shfval;
+    }
+    logState(state, "updateSliderShfval");
+  },
+
+  updateSliderSlotShfval: {
+    reducer(state, action) {
+      const { catName, sliderId, slotId, shfval, isNested, parentContainerId, containerId } = action.payload;
+      
+      let slot = null;
+      
+      // Check if it's a slider inside a container
+      if (containerId) {
+        if (isNested && parentContainerId) {
+          const parentCont = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === parentContainerId);
+          const nestedCont = parentCont?.nestedContainers?.find(nc => nc.id === containerId);
+          slot = nestedCont?.sliders?.find(s => s.id === sliderId)?.items.find(i => i.slotId === slotId);
+        } else {
+          const cont = state.pages
+            .find(p => p.catName === catName)
+            ?.containers.find(c => c.id === containerId);
+          slot = cont?.sliders?.find(s => s.id === sliderId)?.items.find(i => i.slotId === slotId);
+        }
+      } else {
+        // Standalone slider
+        slot = state.pages
+          .find(p => p.catName === catName)
+          ?.sliders.find(s => s.id === sliderId)
+          ?.items.find(i => i.slotId === slotId);
+      }
+
+      if (slot) {
+        slot.shfval = shfval;
+      }
+      logState(state, "updateSliderSlotShfval");
+    },
+  },
+
+  updateContainerSliderDimensions(state, action) {
+    const { catName, containerId, sliderId, containerWidth, containerHeight, imgWidth, imgHeight, padding, isNested, parentContainerId } = action.payload;
     
     const page = state.pages.find(p => p.catName === catName);
     if (!page) return;
@@ -300,11 +391,14 @@ export const sliderReducers = {
     
     const slider = container.sliders?.find(s => s.id === sliderId);
     if (slider) {
-      if (!slider.header) slider.header = { enabled: false, title: "" };
-      slider.header.enabled = enabled;
-      slider.header.title = title;
+      if (!slider.dimensions) slider.dimensions = { containerWidth: 400, containerHeight: 300, imgWidth: 200, imgHeight: 150, padding: 10 };
+      if (containerWidth !== undefined) slider.dimensions.containerWidth = containerWidth;
+      if (containerHeight !== undefined) slider.dimensions.containerHeight = containerHeight;
+      if (imgWidth !== undefined) slider.dimensions.imgWidth = imgWidth;
+      if (imgHeight !== undefined) slider.dimensions.imgHeight = imgHeight;
+      if (padding !== undefined) slider.dimensions.padding = padding;
     }
-    logState(state, "updateContainerSliderHeader");
+    logState(state, "updateContainerSliderDimensions");
   },
 
   updateContainerSliderPadding(state, action) {
@@ -328,5 +422,64 @@ export const sliderReducers = {
       }
     }
     logState(state, "updateContainerSliderPadding");
+  },
+
+  // FIXED: Changed slot.slots to slot.items throughout this function
+  updateSliderSlotDimensions(state, action) {
+    const { catName, sliderId, slotId, containerWidth, containerHeight, imgWidth, imgHeight, padding, isNested, parentContainerId, containerId } = action.payload;
+    
+    let slot = null;
+    
+    // Check if it's a slider inside a container
+    if (containerId) {
+      if (isNested && parentContainerId) {
+        const parentCont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === parentContainerId);
+        const nestedCont = parentCont?.nestedContainers?.find(nc => nc.id === containerId);
+        
+        if (nestedCont) {
+          // FIXED: Changed from .slots to .items
+          slot = nestedCont.sliders?.find(s => s.id === sliderId)?.items?.find(item => item.slotId === slotId);
+        }
+      } else {
+        const cont = state.pages
+          .find(p => p.catName === catName)
+          ?.containers.find(c => c.id === containerId);
+        
+        if (cont) {
+          // FIXED: Changed from .slots to .items
+          slot = cont.sliders?.find(s => s.id === sliderId)?.items?.find(item => item.slotId === slotId);
+        }
+      }
+    } else {
+      // Direct slider (not in container)
+      const slider = state.pages
+        .find(p => p.catName === catName)
+        ?.sliders.find(s => s.id === sliderId);
+      
+      if (slider) {
+        // FIXED: Changed from .slots to .items
+        slot = slider.items?.find(item => item.slotId === slotId);
+      }
+    }
+
+    if (slot) {
+      if (!slot.dimensions) {
+        slot.dimensions = { 
+          containerWidth: 800, 
+          containerHeight: 300, 
+          imgWidth: 750, 
+          imgHeight: 300, 
+          padding: 8 
+        };
+      }
+      if (containerWidth !== undefined) slot.dimensions.containerWidth = containerWidth;
+      if (containerHeight !== undefined) slot.dimensions.containerHeight = containerHeight;
+      if (imgWidth !== undefined) slot.dimensions.imgWidth = imgWidth;
+      if (imgHeight !== undefined) slot.dimensions.imgHeight = imgHeight;
+      if (padding !== undefined) slot.dimensions.padding = padding;
+    }
+    logState(state, "updateSliderSlotDimensions");
   }
 };

@@ -44,19 +44,25 @@ export default function PreviewSlider({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const slider = useSelector((state) => {
-    if (isNested && parentContainerId) {
-      const parentCont = state.editpaper.pages
-        .find((p) => p.catName === catName)
-        ?.containers.find((c) => c.id === parentContainerId);
-      return parentCont?.nestedContainers
-        ?.find((nc) => nc.id === containerId)
-        ?.sliders?.find((s) => s.id === id);
-    } else {
-      return state.editpaper.pages
-        .find((p) => p.catName === catName)
-        ?.containers.find((c) => c.id === containerId)
-        ?.sliders?.find((s) => s.id === id);
+    const page = state.editpaper.pages.find((p) => p.catName === catName);
+    
+    if (!page) return null;
+    
+    // If this slider is at page level (no containerId)
+    if (!containerId) {
+      return page.sliders?.find((s) => s.id === id);
     }
+    
+    // If this slider is inside a nested container
+    if (isNested && parentContainerId) {
+      const parentCont = page.containers.find((c) => c.id === parentContainerId);
+      const nestedCont = parentCont?.nestedContainers?.find((nc) => nc.id === containerId);
+      return nestedCont?.sliders?.find((s) => s.id === id);
+    }
+    
+    // If this slider is inside a regular container
+    const container = page.containers.find((c) => c.id === containerId);
+    return container?.sliders?.find((s) => s.id === id);
   });
 
   if (!slider) return null;
@@ -151,6 +157,7 @@ export default function PreviewSlider({
                 const Component = COMPONENT_MAP[item.containerType];
                 if (!Component) return null;
 
+                // FIXED: Pass newsId instead of slotId to the news container components
                 return (
                   <div
                     key={item.slotId}
@@ -160,13 +167,9 @@ export default function PreviewSlider({
                     }}
                   >
                     <Component
+                      newsId={item.newsId}  
                       border={false}
-                      slotId={item.slotId}
-                      catName={catName}
-                      containerId={containerId}
-                      isNested={isNested}
-                      parentContainerId={parentContainerId}
-                      isPreview={true}
+                      version={item.version || 1}  
                     />
                   </div>
                 );

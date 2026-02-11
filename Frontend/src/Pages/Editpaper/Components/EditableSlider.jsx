@@ -1,13 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { X, Edit2, Space, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import {
+  X,
+  Edit2,
+  Space,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+} from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import {
   updateSliderWidth,
   updateContainerSliderGap,
-  updateContainerSliderHeader,
+  updateContainerSliderDimensions,
   updateContainerSliderPadding,
   addSlotToContainerSlider,
   deleteContainerSlider,
@@ -16,32 +23,26 @@ import {
 } from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
-
 import BigNewsContainer2 from "../Containers_/BigContainer2";
-
 import BigNewsContainer3 from "../Containers_/BigContainer3";
-
 import BigNewsContainer4 from "../Containers_/BigContainer4";
-
 import BigNewsContainer4A from "../Containers_/BigContainer4A";
-
 import BigNewsContainer5 from "../Containers_/BigContainer5";
-
+import UniversalNewsContainer from "../Containers_/UniversalNewsContainer";
 import NorContainer1 from "../Containers_/NorContainer1";
-
 import NorContainer2 from "../Containers_/NorContainer2";
-
 import NorContainer3 from "../Containers_/NorContainer3";
-
 import NorContainer4 from "../Containers_/NorContainer4";
-
 import NorContainer4A from "../Containers_/NorContainer4A";
+
+// FIX 1: Import NorContainer4B
+import NorContainer4B from "../Containers_/NorContainer4B";
 
 import NorContainer5 from "../Containers_/NorContainer5";
 
-import Newsheader from "../../Newspaper/Components/Newsheader";
 
 const COMPONENT_MAP = {
+    "Universal Container": UniversalNewsContainer,
   "Big Container Type 1": BigNewsContainer1,
 
   "Big Container Type 2": BigNewsContainer2,
@@ -64,9 +65,33 @@ const COMPONENT_MAP = {
 
   "Normal Container Type 4A": NorContainer4A,
 
+  // FIX 2: Register NorContainer4B in the map
+  "Normal Container Type 4B": NorContainer4B,
+
   "Normal Container Type 5": NorContainer5,
 };
-
+// Helper function to get default config for Universal Container
+const getUniversalContainerDefaults = (containerType) => {
+  const configMap = {
+    "Big Container Type 1": { width: 800, height: 500, layout: 1 },
+    "Big Container Type 2": { width: 500, height: 350, layout: 4 },
+    "Big Container Type 3": { width: 400, height: 350, layout: 1 },
+    "Big Container Type 4": { width: 280, height: 280, layout: 1 },
+    "Big Container Type 4A": { width: 280, height: 280, layout: 1 },
+    "Big Container Type 5": { width: 500, height: 300, layout: 4 },
+    "Normal Container Type 1": { width: 390, height: 200, layout: 4 },
+    "Normal Container Type 2": { width: 200, height: 100, layout: 8 },
+    "Normal Container Type 3": { width: 200, height: 100, layout: 6 },
+    "Normal Container Type 4": { width: 100, height: 100, layout: 6 },
+    "Normal Container Type 4A": { width: 100, height: 100, layout: 6 },
+    "Normal Container Type 4B": { width: 300, height: 80, layout: 10 },
+    "Normal Container Type 5": { width: 400, height: 200, layout: 4 },
+    "Universal Container": { width: 400, height: 300, layout: 1 },
+    "Universal Container": { width: 400, height: 300, layout: 1 },
+  };
+  
+  return configMap[containerType] || { width: 400, height: 300, layout: 1 };
+};
 export function EditableSlider({
   id,
 
@@ -112,11 +137,7 @@ export function EditableSlider({
 
   const [gap, setGap] = useState(slider?.gap ?? 10);
 
-  const [headerEnabled, setHeaderEnabled] = useState(slider?.header?.enabled || false);
-
-  const [headerTitle, setHeaderTitle] = useState(slider?.header?.title || "");
-
-  const [padding, setPadding] = useState(slider?.padding || 10);
+  const [sliderPadding, setSliderPadding] = useState(slider?.padding || 10);
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -132,9 +153,7 @@ export function EditableSlider({
   useEffect(() => {
     if (slider) {
       setGap(slider.gap ?? 10);
-      setHeaderEnabled(slider.header?.enabled || false);
-      setHeaderTitle(slider.header?.title || "");
-      setPadding(slider.padding || 10);
+      setSliderPadding(slider.padding || 10);
     }
   }, [slider]);
 
@@ -177,9 +196,14 @@ export function EditableSlider({
     const handleMouseMove = (e) => {
       if (containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
-        const parentContainer = containerRef.current.closest('.ep-ed-cont');
-        const parentWidth = parentContainer ? parentContainer.offsetWidth - 40 : 1250;
-        const newWidth = Math.max(200, Math.min(parentWidth, e.clientX - containerRect.left));
+        const parentContainer = containerRef.current.closest(".ep-ed-cont");
+        const parentWidth = parentContainer
+          ? parentContainer.offsetWidth - 40
+          : 1250;
+        const newWidth = Math.max(
+          200,
+          Math.min(parentWidth, e.clientX - containerRect.left),
+        );
 
         setWidth(newWidth);
       }
@@ -247,6 +271,8 @@ export function EditableSlider({
     const type = e.dataTransfer.getData("text/plain");
 
     const newsId = e.dataTransfer.getData("newsId");
+    
+    const presetId = e.dataTransfer.getData("presetId"); // Get presetId from drag data
 
     if (!type) return;
 
@@ -273,6 +299,8 @@ export function EditableSlider({
         isNested,
 
         parentContainerId,
+        
+        presetId: presetId || undefined, // Pass presetId if available
       }),
     );
 
@@ -335,19 +363,6 @@ export function EditableSlider({
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      {headerEnabled && (
-        <div style={{ 
-          padding: `${padding}px`, 
-          fontSize: "18px", 
-          fontWeight: "bold", 
-          flexShrink: 0, 
-          pointerEvents: "none",
-          background: "rgba(0, 102, 204, 0.05)"
-        }}>
-          <Newsheader name={headerTitle || "slider header"} />
-        </div>
-      )}
-
       <div
         style={{
           width: "100%",
@@ -355,7 +370,7 @@ export function EditableSlider({
           overflow: "hidden",
           flex: droppedContainers.length === 0 ? 1 : "0 0 auto",
           height: droppedContainers.length > 0 ? "fit-content" : "auto",
-          padding: `${padding}px`,
+          padding: `${sliderPadding}px`,
         }}
       >
         <div
@@ -413,70 +428,26 @@ export function EditableSlider({
             }}
           >
             <div style={{ marginBottom: "12px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-                <input 
-                  type="checkbox" 
-                  checked={headerEnabled} 
-                  onChange={(e) => {
-                    const enabled = e.target.checked;
-                    setHeaderEnabled(enabled);
-                    dispatch(
-                      updateContainerSliderHeader({
-                        catName,
-                        containerId,
-                        sliderId: id,
-                        enabled,
-                        title: enabled ? headerTitle : "",
-                        isNested,
-                        parentContainerId,
-                      }),
-                    );
-                  }}
-                  style={{ cursor: "pointer" }} 
-                />
-                <span style={{ fontSize: "12px", fontWeight: "500" }}>Enable Header</span>
-              </label>
-            </div>
-
-            {headerEnabled && (
-              <div style={{ marginBottom: "12px" }}>
-                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "block" }}>Header Title</label>
-                <input 
-                  type="text" 
-                  value={headerTitle} 
-                  onChange={(e) => {
-                    const title = e.target.value;
-                    setHeaderTitle(title);
-                    dispatch(
-                      updateContainerSliderHeader({
-                        catName,
-                        containerId,
-                        sliderId: id,
-                        enabled: headerEnabled,
-                        title,
-                        isNested,
-                        parentContainerId,
-                      }),
-                    );
-                  }}
-                  placeholder="Enter header title..." 
-                  style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} 
-                />
-              </div>
-            )}
-
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+              <label
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "500",
+                  marginBottom: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
                 <Maximize2 size={16} /> Padding (px)
               </label>
               <input
                 type="number"
-                value={padding}
+                value={sliderPadding}
                 min="0"
                 max="100"
                 onChange={(e) => {
                   const v = parseInt(e.target.value) || 0;
-                  setPadding(v);
+                  setSliderPadding(v);
                   dispatch(
                     updateContainerSliderPadding({
                       catName,
@@ -497,7 +468,16 @@ export function EditableSlider({
             </div>
 
             <div>
-              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+              <label
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "500",
+                  marginBottom: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
                 <Space size={16} /> Gap (px)
               </label>
               <input

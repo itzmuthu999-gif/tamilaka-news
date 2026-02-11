@@ -6,11 +6,13 @@ import { sliderReducers } from "./reducers/sliderReducers";
 import { nestedReducers } from "./reducers/nestedReducers";
 import { lineReducers } from "./reducers/lineReducers";
 import { syncReducers } from "./reducers/syncReducers";
+import { presetReducers } from "./reducers/presetReducers";
 
 /* ---------- initial state ---------- */
 const initialState = {
   activePage: "main",
   activeLineId: null,
+  presetContainers: [], // Array to store saved preset containers
   pages: [
     {
       catName: "main",
@@ -217,7 +219,8 @@ const pageLayoutSlice = createSlice({
     ...sliderReducers,
     ...nestedReducers,
     ...lineReducers,
-    ...syncReducers
+    ...syncReducers,
+    ...presetReducers
   }
 });
 
@@ -232,9 +235,10 @@ export const {
   // Container actions
   addContainer,
   updateContainerGrid,
+  updateContainerDimensions,
+  updateContainerSpacing,
   deleteContainer,
   updateContainerHeader,
-  updateContainerSpacing,
 
   // Slot actions
   addEmptySlot,
@@ -242,24 +246,32 @@ export const {
   removeNewsFromSlot,
   removeSlotFromContainer,
   toggleContainerSeparator,
+  updateSlotShfval,
+  updateSlotDimensions,
 
   // Slider actions
   addSliderToContainer,
   updateSliderWidth,
   updateContainerSliderGap,
+  updateContainerSliderDimensions,
   deleteContainerSlider,
   addSlotToContainerSlider,
   dropNewsIntoSliderSlot,
   removeNewsFromSliderSlot,
   removeSlotFromContainerSlider,
   toggleSliderSeparator,
+  updateSliderShfval,
+  updateSliderSlotShfval,
   updateContainerSliderHeader,
   updateContainerSliderPadding,
+  updateSliderSlotDimensions,
+
 
   // Nested container actions
   addNestedContainer,
   deleteNestedContainer,
   updateNestedContainerGrid,
+  updateNestedContainerDimensions,
   updateNestedContainerHeader,
   updateNestedContainerSpacing,
   addEmptySlotToNested,
@@ -267,6 +279,8 @@ export const {
   removeNewsFromNestedSlot,
   removeSlotFromNestedContainer,
   toggleNestedSeparator,
+  updateNestedSlotShfval,
+  updateNestedSlotDimensions,
 
   // Line actions
   addLine,
@@ -277,7 +291,12 @@ export const {
   setActiveLine,
 
   // Sync actions
-  syncPagesFromAdmin
+  syncPagesFromAdmin,
+
+  // Preset actions
+  addPresetContainer,
+  deletePresetContainer,
+  updatePresetContainer
 } = pageLayoutSlice.actions;
 
 export default pageLayoutSlice.reducer;

@@ -3,10 +3,16 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { X, Plus } from "lucide-react";
 
 import { GrRevert } from "react-icons/gr";
+import { IoIosClose } from "react-icons/io";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import { addLine, updateLineArguments, setActivePage } from "../../Slice/editpaperSlice/editpaperslice";
+import {
+  addLine,
+  updateLineArguments,
+  setActivePage,
+  deletePresetContainer,
+} from "../../Slice/editpaperSlice/editpaperslice";
 import { selectAllPages, selectDistrictPage } from "../../Slice/adminSelectors";
 
 import "./pageeditor.scss";
@@ -26,8 +32,124 @@ import ncont2 from "../../../assets/Containers/ncont2.png";
 import ncont3 from "../../../assets/Containers/ncont3.png";
 
 import ncont4 from "../../../assets/Containers/ncont4.png";
+import ncont4B from "../../../assets/Containers/ncont4.png";
 
 import ncont5 from "../../../assets/Containers/ncont5.png";
+import Universalcont from "../../../assets/Containers/ncont5.png";
+
+// PresetsTab Component
+const PresetsTab = () => {
+  const dispatch = useDispatch();
+  const presets = useSelector((state) => state.editpaper.presetContainers || []);
+
+  const handleDeletePreset = (presetId, presetName) => {
+    if (window.confirm(`Are you sure you want to delete preset "${presetName}"?`)) {
+      dispatch(deletePresetContainer({ presetId }));
+    }
+  };
+
+  if (presets.length === 0) {
+    return (
+      <div style={{ 
+        padding: "40px 20px", 
+        textAlign: "center",
+        color: "#666" 
+      }}>
+        <div style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px" }}>
+          No Presets Yet
+        </div>
+        <div style={{ fontSize: "13px", color: "#999" }}>
+          Create a Universal Container and click "Save as Preset" to add one here
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <div style={{ 
+        fontSize: "14px", 
+        fontWeight: "600", 
+        marginBottom: "15px",
+        color: "#333" 
+      }}>
+        Saved Presets ({presets.length})
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {presets.map((preset) => (
+          <div
+            key={preset.id}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("presetId", preset.id);
+              e.dataTransfer.setData("text/plain", "Universal Container");
+              e.dataTransfer.effectAllowed = "copy";
+            }}
+            style={{
+              position: "relative",
+              padding: "15px",
+              background: "#f8f9fa",
+              border: "2px solid #e0e0e0",
+              borderRadius: "8px",
+              cursor: "grab",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#e3f2fd";
+              e.currentTarget.style.borderColor = "#2196F3";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#f8f9fa";
+              e.currentTarget.style.borderColor = "#e0e0e0";
+            }}
+          >
+            <button
+              onClick={() => handleDeletePreset(preset.id, preset.presetName)}
+              style={{
+                position: "absolute",
+                top: "8px",
+                right: "8px",
+                background: "rgba(255, 255, 255, 0.9)",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2px",
+                color: "red",
+                transition: "all 0.2s ease",
+              }}
+              title="Delete preset"
+            >
+              <IoIosClose />
+            </button>
+            
+            <div style={{ fontWeight: "600", fontSize: "14px", marginBottom: "8px", color: "#333" }}>
+              {preset.presetName}
+            </div>
+            
+            <div style={{ fontSize: "11px", color: "#666", fontFamily: "monospace" }}>
+              <div>Container: {preset.dimensions.containerWidth}×{preset.dimensions.containerHeight}px</div>
+              <div>Image: {preset.dimensions.imgWidth}×{preset.dimensions.imgHeight}px</div>
+              <div>Padding: {preset.dimensions.padding}px</div>
+            </div>
+            
+            <div style={{ 
+              marginTop: "8px", 
+              fontSize: "10px", 
+              color: "#999",
+              fontStyle: "italic" 
+            }}>
+              Drag and drop to use this preset
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default function PageEditor({
   open = false,
@@ -70,7 +192,7 @@ export default function PageEditor({
   });
 
   const [categories, setCategories] = useState(
-    regularPages.map(page => page.name.tam)
+    regularPages.map((page) => page.name.tam),
   );
 
   const [activeCategory, setActiveCategory] = useState(
@@ -79,7 +201,7 @@ export default function PageEditor({
 
   // Memoize categories to prevent infinite re-renders
   const memoizedCategories = useMemo(() => {
-    return regularPages.map(page => page.name.tam);
+    return regularPages.map((page) => page.name.tam);
   }, [regularPages]);
 
   const [activeTab, setActiveTab] = useState("containers");
@@ -107,7 +229,7 @@ export default function PageEditor({
   // Update categories when pages change
   useEffect(() => {
     setCategories(memoizedCategories);
-    
+
     // Only update active category if it's not in the new categories or if no active category exists
     if (!activeCategory || !memoizedCategories.includes(activeCategory)) {
       setActiveCategory(memoizedCategories[0] || "");
@@ -120,11 +242,15 @@ export default function PageEditor({
       setActiveCategory("main");
     } else {
       // Find the page in regularPages or districts
-      const regularPage = regularPages.find(p => p.name.eng.toLowerCase() === activePage);
+      const regularPage = regularPages.find(
+        (p) => p.name.eng.toLowerCase() === activePage,
+      );
       if (regularPage) {
         setActiveCategory(regularPage.name.tam);
       } else {
-        const districtMatch = districts.find(d => d.eng.toLowerCase() === activePage);
+        const districtMatch = districts.find(
+          (d) => d.eng.toLowerCase() === activePage,
+        );
         if (districtMatch) {
           setActiveCategory(districtMatch.tam);
         }
@@ -137,19 +263,19 @@ export default function PageEditor({
   // Helper function to get English name from Tamil name
   const getEnglishName = (tamilName) => {
     if (tamilName === "main") return "main";
-    
+
     // Check regular pages
-    const regularPage = regularPages.find(p => p.name.tam === tamilName);
+    const regularPage = regularPages.find((p) => p.name.tam === tamilName);
     if (regularPage) {
       return regularPage.name.eng.toLowerCase();
     }
-    
+
     // Check districts
-    const district = districts.find(d => d.tam === tamilName);
+    const district = districts.find((d) => d.tam === tamilName);
     if (district) {
       return district.eng.toLowerCase();
     }
-    
+
     return tamilName;
   };
 
@@ -204,6 +330,7 @@ export default function PageEditor({
 
   const containerTypes = [
     { id: 1, img: bcont1, label: "Big Container Type 1" },
+    
 
     { id: 2, img: bcont2, label: "Big Container Type 2" },
 
@@ -226,6 +353,8 @@ export default function PageEditor({
     { id: 11, img: ncont4, label: "Normal Container Type 4A" },
 
     { id: 12, img: ncont5, label: "Normal Container Type 5" },
+    { id: 13, img: ncont4, label: "Normal Container Type 4B" },
+      { id: 14, img: bcont1, label: "Universal Container" },
   ];
 
   const sliderTypes = [
@@ -442,7 +571,7 @@ export default function PageEditor({
           )}
 
           <div className="tabs-container">
-            {["containers", "sliders", "lines", "ad"].map((tab) => (
+            {["containers", "sliders", "lines", "ad", "presets"].map((tab) => (
               <div
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -691,6 +820,9 @@ export default function PageEditor({
                   )}
                 </div>
               </div>
+            ) : activeTab === "presets" ? (
+              /* PRESETS TAB */
+              <PresetsTab />
             ) : (
               /* OTHER TABS */
 

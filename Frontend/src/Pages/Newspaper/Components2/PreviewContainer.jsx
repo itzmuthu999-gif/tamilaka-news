@@ -1,37 +1,38 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import BigNewsContainer1 from "../Containers_/BigContainer1";
-import BigNewsContainer2 from "../Containers_/BigContainer2";
-import BigNewsContainer3 from "../Containers_/BigContainer3";
-import BigNewsContainer4 from "../Containers_/BigContainer4";
-import BigNewsContainer4A from "../Containers_/BigContainer4A";
-import BigNewsContainer5 from "../Containers_/BigContainer5";
-
-import NorContainer1 from "../Containers_/NorContainer1";
-import NorContainer2 from "../Containers_/NorContainer2";
-import NorContainer3 from "../Containers_/NorContainer3";
-import NorContainer4 from "../Containers_/NorContainer4";
-import NorContainer4A from "../Containers_/NorContainer4A";
-import NorContainer5 from "../Containers_/NorContainer5";
+// Import all preview components
+import PreviewBigContainer1 from "../PreviewContainers/PreviewBigContainer1";
+import PreviewBigContainer2 from "../PreviewContainers/PreviewBigContainer2";
+import PreviewBigContainer3 from "../PreviewContainers/PreviewBigContainer3";
+import PreviewBigContainer4A from "../PreviewContainers/PreviewBigContainer4A";
+import PreviewBigContainer5 from "../PreviewContainers/PreviewBigContainer5";
+import PreviewNorContainer1 from "../PreviewContainers/PreviewNorContainer1";
+import PreviewNorContainer2 from "../PreviewContainers/PreviewNorContainer2";
+import PreviewNorContainer3 from "../PreviewContainers/PreviewNorContainer3";
+import PreviewNorContainer4 from "../PreviewContainers/PreviewNorContainer4";
+import PreviewNorContainer4B from "../PreviewContainers/PreviewNorContainer4B";
+import PreviewNorContainer5 from "../PreviewContainers/PreviewNorContainer5";
 
 import Newsheader from "../Components/Newsheader";
 import PreviewSlider from "./PreviewSlider";
 import PreviewLine from "./PreviewLine";
 
+// Component mapping
 const COMPONENT_MAP = {
-  "Big Container Type 1": BigNewsContainer1,
-  "Big Container Type 2": BigNewsContainer2,
-  "Big Container Type 3": BigNewsContainer3,
-  "Big Container Type 4": BigNewsContainer4,
-  "Big Container Type 4A": BigNewsContainer4A,
-  "Big Container Type 5": BigNewsContainer5,
-  "Normal Container Type 1": NorContainer1,
-  "Normal Container Type 2": NorContainer2,
-  "Normal Container Type 3": NorContainer3,
-  "Normal Container Type 4": NorContainer4,
-  "Normal Container Type 4A": NorContainer4A,
-  "Normal Container Type 5": NorContainer5,
+  "Big Container Type 1": PreviewBigContainer1,
+  "Big Container Type 2": PreviewBigContainer2,
+  "Big Container Type 3": PreviewBigContainer3,
+  "Big Container Type 4": PreviewBigContainer4A,
+  "Big Container Type 4A": PreviewBigContainer4A,
+  "Big Container Type 5": PreviewBigContainer5,
+  "Normal Container Type 1": PreviewNorContainer1,
+  "Normal Container Type 2": PreviewNorContainer2,
+  "Normal Container Type 3": PreviewNorContainer3,
+  "Normal Container Type 4": PreviewNorContainer4,
+  "Normal Container Type 4A": PreviewNorContainer4,
+  "Normal Container Type 4B": PreviewNorContainer4B,
+  "Normal Container Type 5": PreviewNorContainer5,
 };
 
 export default function PreviewContainer({ 
@@ -177,13 +178,8 @@ export default function PreviewContainer({
                     }}
                   >
                     <Component 
-                      border={false}
-                      slotId={item.slotId} 
-                      catName={catName} 
-                      containerId={id}
-                      isNested={isNested}
-                      parentContainerId={parentContainerId}
-                      isPreview={true}
+                      newsId={item.newsId} 
+                      version={item.version || 1} 
                     />
                   </div>
                 );

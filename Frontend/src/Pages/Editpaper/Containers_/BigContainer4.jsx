@@ -17,6 +17,9 @@ import {
   toggleNestedSeparator,
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
+  updateSlotShfval,
+  updateNestedSlotShfval,
+  updateSliderSlotShfval,
 } from "../../Slice/editpaperSlice/editpaperslice";
 
 const BigNewsContainer4A = ({
@@ -32,7 +35,6 @@ const BigNewsContainer4A = ({
   isNested = false,
   parentContainerId = null,
 }) => {
-  const [version, setVersion] = useState(1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -76,6 +78,7 @@ const BigNewsContainer4A = ({
   });
 
   const newsId = slot?.newsId;
+  const version = slot?.shfval ?? 1;
   const newsSource = language === "en" ? translatedNews : allNews;
   const news = newsSource.find((n) => n.id === newsId);
 
@@ -152,7 +155,14 @@ const BigNewsContainer4A = ({
 
   const handleChange = (e) => {
     e.stopPropagation();
-    setVersion((prev) => (prev === 2 ? 1 : 2));
+    const nextVal = version === 1 ? 2 : 1;
+    if (isSlider || isSlider2) {
+      dispatch(updateSliderSlotShfval({ catName, sliderId, slotId, containerId, isNested, parentContainerId, shfval: nextVal }));
+    } else if (isNested && parentContainerId) {
+      dispatch(updateNestedSlotShfval({ catName, parentContainerId, nestedContainerId: containerId, slotId, shfval: nextVal }));
+    } else {
+      dispatch(updateSlotShfval({ catName, containerId, slotId, shfval: nextVal }));
+    }
   };
 
   const handleNavigate = () => {

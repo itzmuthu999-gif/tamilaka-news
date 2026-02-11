@@ -17,6 +17,9 @@ import {
   toggleNestedSeparator,
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
+  updateSlotShfval,
+  updateNestedSlotShfval,
+  updateSliderSlotShfval,
 } from "../../Slice/editpaperSlice/editpaperslice";
 
 const BigNewsContainer3 = ({
@@ -31,7 +34,6 @@ const BigNewsContainer3 = ({
   isNested = false,
   parentContainerId = null,
 }) => {
-  const [version, setVersion] = useState(1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -73,6 +75,7 @@ const BigNewsContainer3 = ({
   });
 
   const newsId = slot?.newsId;
+  const version = slot?.shfval ?? 1;
   const news = allNews.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
@@ -148,7 +151,14 @@ const BigNewsContainer3 = ({
 
   const handleChange = (e) => {
     e.stopPropagation();
-    setVersion((prev) => (prev === 3 ? 1 : prev + 1));
+    const nextVal = version >= 3 ? 1 : version + 1;
+    if (isSlider || isSlider2) {
+      dispatch(updateSliderSlotShfval({ catName, sliderId, slotId, containerId, isNested, parentContainerId, shfval: nextVal }));
+    } else if (isNested && parentContainerId) {
+      dispatch(updateNestedSlotShfval({ catName, parentContainerId, nestedContainerId: containerId, slotId, shfval: nextVal }));
+    } else {
+      dispatch(updateSlotShfval({ catName, containerId, slotId, shfval: nextVal }));
+    }
   };
 
   const handleNavigate = () => {

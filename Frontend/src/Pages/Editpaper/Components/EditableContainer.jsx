@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   updateContainerGrid,
-  updateContainerHeader,
+  // NOTE: updateContainerDimensions and updateNestedContainerDimensions removed - dimensions are managed at slot level
   updateContainerSpacing,
   addEmptySlot,
   dropNewsIntoSlot,
@@ -12,7 +12,7 @@ import {
   addNestedContainer,
   deleteNestedContainer,
   updateNestedContainerGrid,
-  updateNestedContainerHeader,
+  // updateNestedContainerDimensions - removed, see above
   updateNestedContainerSpacing,
   addEmptySlotToNested,
   dropNewsIntoNestedSlot,
@@ -41,14 +41,16 @@ import NorContainer2 from "../Containers_/NorContainer2";
 import NorContainer3 from "../Containers_/NorContainer3";
 import NorContainer4 from "../Containers_/NorContainer4";
 import NorContainer4A from "../Containers_/NorContainer4A";
+import NorContainer4B from "../Containers_/NorContainer4B";
 import NorContainer5 from "../Containers_/NorContainer5";
+import UniversalNewsContainer from "../Containers_/UniversalNewsContainer";
 
-import Newsheader from "../../Newspaper/Components/Newsheader";
 import { EditableSlider } from "./EditableSlider";
 import { EditableSlider2 } from "./EditableSlider2";
 import EditableLine from "../Containers_/EditableLine";
 
 const COMPONENT_MAP = {
+  "Universal Container": UniversalNewsContainer,
   "Big Container Type 1": BigNewsContainer1,
   "Big Container Type 2": BigNewsContainer2,
   "Big Container Type 3": BigNewsContainer3,
@@ -60,7 +62,30 @@ const COMPONENT_MAP = {
   "Normal Container Type 3": NorContainer3,
   "Normal Container Type 4": NorContainer4,
   "Normal Container Type 4A": NorContainer4A,
+  "Normal Container Type 4B": NorContainer4B,
   "Normal Container Type 5": NorContainer5,
+};
+
+// Helper function to get default dimensions for Universal Container
+const getUniversalContainerDefaults = (containerType) => {
+  const defaultsMap = {
+    "Big Container Type 1": { width: 800, height: 500, layout: 3 },
+    "Big Container Type 2": { width: 500, height: 350, layout: 4 },
+    "Big Container Type 3": { width: 400, height: 350, layout: 1 },
+    "Big Container Type 4": { width: 280, height: 280, layout: 6 },
+    "Big Container Type 4A": { width: 280, height: 280, layout: 6 },
+    "Big Container Type 5": { width: 500, height: 300, layout: 4 },
+    "Normal Container Type 1": { width: 300, height: 200, layout: 10 },
+    "Normal Container Type 2": { width: 200, height: 100, layout: 8 },
+    "Normal Container Type 3": { width: 300, height: 150, layout: 6 },
+    "Normal Container Type 4": { width: 300, height: 200, layout: 11 },
+    "Normal Container Type 4A": { width: 100, height: 100, layout: 6 },
+    "Normal Container Type 4B": { width: 300, height: 80, layout: 10 },
+    "Normal Container Type 5": { width: 400, height: 300, layout: 1 },
+    "Universal Container": { width: 400, height: 300, layout: 1 },
+  };
+  
+  return defaultsMap[containerType] || { width: 400, height: 300, layout: 1 };
 };
 
 export default function EditableContainer({ 
@@ -94,8 +119,7 @@ export default function EditableContainer({
   });
 
   const grid = containerData?.grid || { columns: 2, gap: 10 };
-  const headerEnabled = containerData?.header?.enabled || false;
-  const headerTitle = containerData?.header?.title || "";
+  // NOTE: Dimensions are now managed at slot level for Universal Container, not at container level
   const spacing = containerData?.spacing || { padding: 10, margin: 0 };
   const nestedContainers = containerData?.nestedContainers || [];
   const items = containerData?.items || [];
@@ -105,7 +129,7 @@ export default function EditableContainer({
   const [showSettings, setShowSettings] = useState(false);
   const [columns, setColumns] = useState(grid.columns);
   const [gap, setGap] = useState(grid.gap);
-  const [localHeaderTitle, setLocalHeaderTitle] = useState(headerTitle);
+  // NOTE: Container-level dimensions removed - Universal Container manages its own dimensions at slot level
   const [padding, setPadding] = useState(spacing.padding);
   const [margin, setMargin] = useState(spacing.margin);
   const [gridColumnSpan, setGridColumnSpan] = useState(1);
@@ -125,46 +149,7 @@ export default function EditableContainer({
     }
   };
 
-  const handleToggleHeader = (enabled) => {
-    if (isNested && parentContainerId) {
-      dispatch(updateNestedContainerHeader({
-        catName,
-        parentContainerId,
-        nestedContainerId: id,
-        enabled,
-        title: enabled ? localHeaderTitle : ""
-      }));
-    } else {
-      dispatch(updateContainerHeader({ 
-        catName, 
-        containerId: id, 
-        enabled, 
-        title: enabled ? localHeaderTitle : "" 
-      }));
-    }
-  };
-
-  const handleHeaderTitleChange = (e) => {
-    const newTitle = e.target.value;
-    setLocalHeaderTitle(newTitle);
-    
-    if (isNested && parentContainerId) {
-      dispatch(updateNestedContainerHeader({
-        catName,
-        parentContainerId,
-        nestedContainerId: id,
-        enabled: headerEnabled,
-        title: newTitle
-      }));
-    } else {
-      dispatch(updateContainerHeader({ 
-        catName, 
-        containerId: id, 
-        enabled: headerEnabled, 
-        title: newTitle 
-      }));
-    }
-  };
+  // NOTE: handleDimensionChange removed - Universal Container manages dimensions at slot level, not container level
 
   const handlePaddingChange = (e) => {
     const newPadding = parseInt(e.target.value) || 0;
@@ -247,6 +232,7 @@ export default function EditableContainer({
     const sliderType = e.dataTransfer.getData("sliderType");
     const lineType = e.dataTransfer.getData("lineType");
     const lineOrientation = e.dataTransfer.getData("lineOrientation");
+    const presetId = e.dataTransfer.getData("presetId"); // Get presetId from drag data
 
     if (lineType && lineOrientation) {
       const rect = e.currentTarget.getBoundingClientRect();
@@ -277,13 +263,15 @@ export default function EditableContainer({
           nestedContainerId: id,
           containerType: type,
           slotId,
+          presetId: presetId || undefined, // Pass presetId if available
         }));
       } else {
         dispatch(addEmptySlot({ 
           catName, 
           containerId: id, 
           containerType: type, 
-          slotId 
+          slotId,
+          presetId: presetId || undefined, // Pass presetId if available
         }));
       }
       return;
@@ -420,19 +408,7 @@ export default function EditableContainer({
               <input type="number" value={gridColumnSpan} min="1" max="12" onChange={(e) => setGridColumnSpan(parseInt(e.target.value) || 1)} style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
             </div>
 
-            <div style={{ marginBottom: "12px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-                <input type="checkbox" checked={headerEnabled} onChange={(e) => handleToggleHeader(e.target.checked)} style={{ cursor: "pointer" }} />
-                <span style={{ fontSize: "10px", fontWeight: "500" }}>Enable Header</span>
-              </label>
-            </div>
-
-            {headerEnabled && (
-              <div style={{ marginBottom: "12px" }}>
-                <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "block" }}>Header Title</label>
-                <input type="text" value={localHeaderTitle} onChange={handleHeaderTitleChange} placeholder="Enter header title..." style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }} />
-              </div>
-            )}
+            {/* NOTE: Container and Image dimensions removed - Universal Container manages these at slot level, not container level */}
 
             <div style={{display:"flex",alignItems: "center",justifyContent: "space-between"}}>
               <div style={{ marginBottom: "12px" }}>
@@ -468,11 +444,6 @@ export default function EditableContainer({
           </div>
         )}
 
-        {headerEnabled && (
-          <div style={{ padding: `${padding}px`, fontSize: "18px", fontWeight: "bold", flexShrink: 0, pointerEvents: "none" }}>
-            <Newsheader name={headerTitle || (isNested ? "nested header" : "header")} />
-          </div>
-        )}
 
         <div 
           style={{ 
@@ -549,7 +520,12 @@ export default function EditableContainer({
                   const item = element.data;
                   const Component = COMPONENT_MAP[item.containerType];
                   if (!Component) return null;
-                  
+                   
+                  // Get defaults if this is a Universal Container
+                  const defaults = item.containerType === "Universal Container" 
+                    ? getUniversalContainerDefaults(item.containerType)
+                    : getUniversalContainerDefaults(item.containerType); // Also works for old types
+                   
                   return (
                     <div 
                       key={item.slotId} 
@@ -566,6 +542,10 @@ export default function EditableContainer({
                         containerId={id}
                         isNested={isNested}
                         parentContainerId={parentContainerId}
+                        // Pass defaults for Universal Container
+                        defaultWidth={defaults.width}
+                        defaultHeight={defaults.height}
+                        defaultLayout={defaults.layout}
                         onDelete={() => {
                           if (isNested && parentContainerId) {
                             dispatch(removeSlotFromNestedContainer({
