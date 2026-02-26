@@ -22,7 +22,6 @@ import "./Previewpge.scss";
 import timeFun from "../Newspaper/Containers_/timeFun";
 import AdBox from '../Newspaper/Components/AdBox';
 import Newsheader from '../Newspaper/Components/Newsheader';
-import NorContainer5 from "../Newspaper/Containers_/NorContainer5";
 import Line from "../Newspaper/Components/Line";
 import { useEffect } from "react";
 import { RxFontSize } from "react-icons/rx";
@@ -36,6 +35,7 @@ import {
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import BigNewsContainer4B from "../Newspaper/Containers_/BigContainer4B";
+import PreviewNorContainer5 from "../Newspaper/PreviewContainers/PreviewNorContainer5";
 
 export default function PreviewPage() {
   const { id } = useParams();
@@ -232,6 +232,8 @@ export default function PreviewPage() {
                       <ParagraphResponsive box={box} />
                     ) : box.type === "image" ? (
                       <ImageResponsive box={box} />
+                    ) : box.type === "video" ? (
+                      <VideoResponsive box={box} isMobile={isMobile} />
                     ) : null}
                   </div>
                 ))}
@@ -320,6 +322,8 @@ function ContainerView({ container, isMobile, fontSizePercent = 100 }) {
               <ParagraphResponsive box={box} />
             ) : box.type === "image" ? (
               <ImageResponsive box={box} />
+            ) : box.type === "video" ? (
+              <VideoResponsive box={box} isMobile={isMobile} />
             ) : null}
           </div>
         ))
@@ -390,15 +394,15 @@ function Melumnews() {
           <Newsheader name={"Top news"} />
         </div>
         <div className="mens-in-cont">
-          <NorContainer5/>
+          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
           <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <NorContainer5/>
+          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
           <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <NorContainer5/>
+          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
           <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <NorContainer5/>
+          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
           <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <NorContainer5/>
+          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
           <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
         </div>
       </div>
@@ -451,6 +455,126 @@ function ImageResponsive({ box }) {
           objectFit: "cover",
         }}
       />
+    </div>
+  );
+}
+
+function VideoResponsive({ box, isMobile = false }) {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  const videoData = box.videoData || null;
+
+  // Nothing to render if no video has been configured yet
+  if (!videoData) return null;
+
+  // On desktop: render at exactly the pixel width the author set in the template.
+  // On mobile: collapse to 100% of the available column (responsive).
+  const authorWidth    = box.dimensions?.width || 560;
+  const containerWidth = isMobile ? "100%" : `${authorWidth}px`;
+
+  // Aspect ratio: device videos may be portrait; YouTube is always 16:9.
+  const aspectRatio    = 16 / 9;
+  const paddingBottom  = `${(1 / aspectRatio) * 100}%`;
+
+  return (
+    <div
+      className="preview-video-responsive"
+      style={{
+        // Desktop: exact author-set pixel width.
+        // Mobile: fluid 100% so it fits the narrower column.
+        width: containerWidth,
+        // Safety net — never overflow parent if column is narrower than author width.
+        maxWidth: "100%",
+        margin: "0 auto",
+        borderRadius: "8px",
+        overflow: "hidden",
+        background: "#000",
+      }}
+    >
+      {/* ── Thumbnail + play button (shown before the user presses play) ── */}
+      {!isPlaying && (
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            paddingBottom,
+            background: "#000",
+            cursor: "pointer",
+          }}
+          onClick={() => setIsPlaying(true)}
+        >
+          {videoData.thumbnail && (
+            <img
+              src={videoData.thumbnail}
+              alt="video thumbnail"
+              style={{
+                position: "absolute",
+                top: 0, left: 0,
+                width: "100%", height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          )}
+          {/* Play button overlay */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%", left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "72px", height: "72px",
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.88)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
+              transition: "transform 0.2s",
+            }}
+          >
+            {/* inline SVG play triangle — no icon library needed */}
+            <svg
+              viewBox="0 0 24 24"
+              width="30"
+              height="30"
+              fill="#333"
+              style={{ marginLeft: "4px" }}
+            >
+              <polygon points="5,3 19,12 5,21" />
+            </svg>
+          </div>
+        </div>
+      )}
+
+      {/* ── Actual player (shown after play is pressed) ── */}
+      {isPlaying && (
+        <div style={{ position: "relative", width: "100%", paddingBottom }}>
+          {videoData.type === "youtube" ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoData.videoId}?autoplay=1`}
+              style={{
+                position: "absolute",
+                top: 0, left: 0,
+                width: "100%", height: "100%",
+                border: "none",
+              }}
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              title="YouTube video"
+            />
+          ) : (
+            <video
+              src={videoData.videoUrl}
+              controls
+              autoPlay
+              style={{
+                position: "absolute",
+                top: 0, left: 0,
+                width: "100%", height: "100%",
+                objectFit: "contain",
+              }}
+              onEnded={() => setIsPlaying(false)}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

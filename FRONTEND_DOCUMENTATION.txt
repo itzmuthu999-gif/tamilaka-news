@@ -1,0 +1,193 @@
+FRONTEND DOCUMENTATION (Tamilaka News React App)
+
+Overview
+This Frontend is a React + Redux application for creating, managing, and publishing news content. It has three main flows:
+1) Admin + operations UI to configure site structure, pages, districts, and users.
+2) News creation and editing flow for individual articles.
+3) Newspaper layout editor and live preview that renders the final site using the saved layout and content.
+
+Entry Point
+- `Frontend/src/main.jsx` bootstraps React, wraps the app with Redux Provider, and mounts `App`.
+- `Frontend/src/store.js` sets up Redux, registers slices, and persists the entire Redux state to localStorage on every change.
+
+Routing (defined in `Frontend/src/App.jsx`)
+- `/` -> `Login`
+- `/AdminHome` -> `AdminHome`
+- `/Newsbund` -> `Newsbund` (news list)
+- `/Newsupload` -> `Templatepage` (news editor)
+- `/Newspaper` -> `NewsPaperM` (public-facing newspaper)
+- `/preview/:id` -> `PreviewPage` (article preview)
+- `/editpaper` -> `Editpaper` (layout editor)
+- `/Tryout` -> `Tryout` (drag-drop demo)
+- `/adminop` -> `Adminop` (admin operations panel)
+
+Note: Some links rendered by `AdminHome` are not routed in `App.jsx` (for example `/admin-overview`, `/users`, `/settings`, `/notifications`, `/logout`). These currently lead to empty routes unless added later.
+
+Redux State (high-level)
+- `newsform` slice: stores all news items, current news item, layout choice, comments, translation state.
+- `admin` slice: stores page list and nav configuration (top nav + side nav) and district list.
+- `editpaper` slice: stores the newspaper layout tree (pages -> containers -> slots -> nested containers -> sliders -> lines).
+- `users` slice: stores local admin users for Manage Users UI.
+
+Data Flow Summary
+- Create or edit news in `Templatepage` -> saves to `newsform.allNews`.
+- `Newsbund` lists `newsform.allNews` -> opens `Templatepage` for editing or `/preview/:id` for preview.
+- `Editpaper` uses `editpaper` slice to build the layout, and `NewsFilter` supplies news items for drag-drop into slots.
+- `NewsPaperM` renders the layout using `PagePreview` and reads data from `editpaper` + `newsform` + `admin` slices.
+- `Adminop` modifies `admin` pages/districts and syncs them into `editpaper` pages via `syncPagesFromAdmin`.
+
+Pages (Routed)
+1. Login (`Frontend/src/Pages/Login.jsx`, route `/`)
+Purpose: Basic sign-in UI with local state. Simulates login and routes to `/AdminHome` after a delay.
+Connections: Always navigates to `AdminHome` on submit. No backend auth.
+State usage: Local state only.
+
+2. AdminHome (`Frontend/src/Pages/AdminHome.jsx`, route `/AdminHome`)
+Purpose: Admin dashboard shell with sidebar and quick actions.
+Connections: Links to `/Newsbund`, `/editpaper`, `/Newspaper`, `/adminop` and several non-routed links (see routing note).
+State usage: None; UI is static.
+
+3. Newsbund (`Frontend/src/Pages/Newsbund.jsx`, route `/Newsbund`)
+Purpose: News listing and management hub.
+State usage: Reads `newsform.allNews`. Uses `setCurrentNews` and `deleteNews` actions.
+Connections:
+- Upload button and card click -> `/Newsupload` (opens Templatepage).
+- Preview button -> `/preview/:id`.
+- Delete -> removes from `newsform` (moves to trash in slice).
+
+4. Templatepage (`Frontend/src/Pages/TemplatePage/Templatepage.jsx`, route `/Newsupload`)
+Purpose: Full news editor. Builds the content layout for a single article.
+Key behavior:
+- Uses `Newsform` for metadata (headline, one-liner, author, thumbnail, zonal category).
+- Drag and drop paragraph, image, and video boxes onto a main canvas.
+- Add “container overlays” to organize content into grid layouts.
+- Supports per-article settings (height, padding, grid columns, gap) and hidden elements (thumbnail/author/zonal display).
+State usage:
+- Reads `newsform.currentNews` and `newsform.MLayout`.
+- Saves updates via `saveNews` or `updateNews` in `newsformslice`.
+Connections:
+- Receives `currentNews` from `Newsbund` for editing.
+- Saved data is rendered later in `/preview/:id` and can appear in layout containers.
+
+5. PreviewPage (`Frontend/src/Pages/PreviewPage/PreviewPage.jsx`, route `/preview/:id`)
+Purpose: Full article reading view and comments.
+Key behavior:
+- Renders article metadata and content boxes (paragraph/image/video) plus container overlays.
+- Includes theme toggle, font-size controls, and comment section.
+- Uses Newspaper UI components (Navbarr, Sidebar, Footer) for a real-site experience.
+State usage:
+- Reads `newsform.allNews` for article data.
+- Uses `newsform.MLayout` for side news layout.
+- Adds comments via `addComment` in `newsformslice`.
+Connections:
+- Navigated to from Newsbund cards, many container components, and search suggestions in Navbarr/Sidebar.
+
+6. Editpaper (`Frontend/src/Pages/Editpaper/Editpaper.jsx`, route `/editpaper`)
+Purpose: Newspaper layout editor (drag-drop layout builder).
+Key behavior:
+- PageEditor panel allows switching pages, adding containers, sliders, lines, presets, polls, and video blocks.
+- NewsFilter panel lets you drag news into slots by category (from `newsform` slice).
+- EditableContainer supports nested containers and sliders, plus per-container header and spacing settings.
+State usage: Heavy use of `editpaper` slice (pages, containers, slots, sliders, lines, presets).
+Connections:
+- Uses `admin` slice pages/districts to build page tabs in PageEditor.
+- Output is rendered in `/Newspaper` via PagePreview.
+
+7. NewsPaperM (`Frontend/src/Pages/Newspaper/NewsPaperM.jsx`, route `/Newspaper`)
+Purpose: Public-facing newspaper view rendered from the layout editor.
+Key behavior:
+- Navbarr + Sidebar allow page switching, search, language toggle, and district selection.
+- PagePreview renders the selected page from `editpaper` slice.
+State usage:
+- Reads `admin` slice for nav structure and districts.
+- Reads `editpaper` slice for layout.
+- Reads `newsform` slice for news content.
+Connections:
+- Clicking a news card navigates to `/preview/:id`.
+- Page switches are local state but use admin config to populate nav/side items.
+
+8. Adminop (`Frontend/src/Pages/AdminOperationPage/Adminop.jsx`, route `/adminop`)
+Purpose: Admin operations hub with its own sidebar and tools.
+Key behavior:
+- Handle Pages: manage pages, districts, and top nav positions.
+- Website Layout: set the global layout preference (`newsform.MLayout`).
+- Manage Users: add/edit/delete users in local Redux.
+State usage:
+- Uses `admin` slice to modify pages/districts and nav ordering.
+- Syncs `admin` -> `editpaper` via `syncPagesFromAdmin`.
+- Uses `users` slice for user management.
+Connections:
+- Acts as the primary admin tooling hub from AdminHome.
+
+9. Tryout (`Frontend/src/Tryout.jsx`, route `/Tryout`)
+Purpose: Standalone drag-drop demo not connected to the main app data model.
+Connections: None.
+
+Non-routed or Legacy Pages
+- `Frontend/src/Pages/Trash.jsx` appears incomplete and is not routed.
+- `Frontend/src/Pages/Newspaper/Pages/Main.jsx` and `Politics.jsx` provide static layouts and are not used in current routing.
+- `Frontend/src/Trash/*` contains older or experimental components (not wired in routes).
+
+Components by Feature Area
+
+A) Template Page (news editor)
+Files: `Frontend/src/Pages/TemplatePage/*`
+- `Newsform.jsx`: Floating form panel for headline, one-liner, author, thumbnail, and zonal category. Provides language switching (Tamil/English) and translation via `translate.js` (LibreTranslate API).
+- `ContainerOverlay.jsx`: Draggable grid container for grouping paragraph/image/video boxes.
+- `ParagraphBox.jsx`: Editable paragraph block with drag/resize support.
+- `ImageBox.jsx`: Upload and display image block (supports resizing and edit).
+- `NewsVideoBox.jsx`: Video block with YouTube or local upload, width controls, and thumbnail preview.
+- `NewsContainerSettings.jsx`: Panel for container height, padding, columns, gap.
+- `Melumnews.jsx`: Side-news UI block used when layout 1 is active.
+
+B) Editpaper (layout editor)
+Files: `Frontend/src/Pages/Editpaper/*`
+- `PageEditor.jsx`: Control panel for switching pages, dragging container types, sliders, lines, presets, poll, and video containers. Uses admin pages and districts.
+- `NewsFilter.jsx`: Floating list of news items to drag into slots, filtered by category.
+- `EditableContainer.jsx`: The core layout unit, supporting nested containers, sliders, slot drop zones, headers, spacing, and drag-drop of news.
+- `EditableSlider.jsx`, `EditableSlider2.jsx`: Slider containers supporting multiple news blocks, width controls, gap/padding, and header settings.
+- `EditorSettings.jsx`: Page-level settings (height, columns, padding, gap).
+- `Containers_/*`: Visual container types (BigContainer*, NorContainer*, Universal, Poll, Video) used inside EditableContainer.
+
+C) Newspaper (public rendering)
+Files: `Frontend/src/Pages/Newspaper/*`
+- `Components/Navbarr.jsx`: Top nav with page links, district dropdown, search, language toggle, and theme toggle. Uses admin config and navigates to previews.
+- `Components/Sidebar.jsx`: Side navigation drawer with search and page/district navigation.
+- `Components/Footer.jsx`, `Components/AdBox.jsx`, `Components/Line.jsx`, `Components/Newsheader.jsx`, `Components/WeatherBox.jsx`, `Components/AutoScrollContainer.jsx`: Supporting UI widgets.
+- `Components2/PagePreview.jsx`: Renders layout pages based on `editpaper` slice, with mobile responsiveness.
+- `Components2/PreviewContainer.jsx`: Renders container slots, nested containers, sliders, and lines in read-only mode.
+- `Components2/PreviewSlider.jsx`: Read-only slider renderer.
+- `Containers_/*`: News display blocks used to render individual news items; many include click handlers to open `/preview/:id`.
+- `PreviewContainers/*`: Read-only equivalents of container types used by PreviewContainer.
+
+D) PreviewPage
+Files: `Frontend/src/Pages/PreviewPage/*`
+- `PreviewPage.jsx`: Full article view with theme, font-size controls, and content rendering.
+- `CommentSection.jsx`: Adds and displays comments for a news item.
+
+E) Admin Operation
+Files: `Frontend/src/Pages/AdminOperationPage/*`
+- `Sidebar.jsx`: Admin tool navigation with logout confirmation.
+- `HandlePages.jsx`: UI to manage top nav headers and their order for two nav bars.
+- `PageContainer/PagesContainer.jsx`: Add/edit/delete pages (Tamil + English names) in `admin` slice.
+- `DistrictContainer/DistrictContainer.jsx`: Add/edit/delete districts in the “Select District” page.
+- `WebsiteLayout/Websitelyt.jsx`: Sets `newsform.MLayout` for the site layout style.
+- `Manageuser/Manageuser.jsx`: CRUD UI for users (stored locally in Redux).
+
+Utilities and Supporting Files
+- `Frontend/src/Pages/Slice/translate.js`: Calls LibreTranslate API for Tamil -> English translation.
+- `Frontend/src/Pages/Newspaper/Containers_/timeFun.js`: Formats time values for display.
+- `Frontend/src/Pages/Newspaper/Components/getTodayInTamil.js`: Generates the Tamil date string used in the navbar.
+
+Important Connections and Behavior Notes
+- Admin pages/districts (admin slice) drive navigation in Newspaper Navbarr/Sidebar and also determine the pages available in the Editpaper layout editor.
+- The Editpaper layout (editpaper slice) is the single source of truth for the Newspaper page rendering.
+- News content (newsform slice) is the single source of truth for all article display in Newsbund, PreviewPage, and Newspaper containers.
+- LocalStorage persistence means all slices are saved and restored between reloads.
+
+Known Gaps (from code behavior)
+- Some routes linked in `AdminHome` do not exist in the router yet.
+- `Pages/Trash.jsx` appears incomplete and is not wired into routing.
+- `AdminSelectors` include references to `state.admin.allDistricts`, but districts are actually stored inside the last item of `allPages`.
+
+End of document

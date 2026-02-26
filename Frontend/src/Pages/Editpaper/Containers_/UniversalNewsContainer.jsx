@@ -458,12 +458,12 @@ const UniversalNewsContainer = ({
     const headlineStyle = {
       fontSize: "20px",
       fontWeight: "bold",
-      marginBottom: "8px",
+  
     };
 
     const contentStyle = {
       fontSize: "14px",
-      marginBottom: "8px",
+     
     };
 
     const timeStyle = {
@@ -475,7 +475,7 @@ const UniversalNewsContainer = ({
       // Layout 1: Headline -> Image -> OneLiner
       case 1:
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={headlineStyle}>{renderData.headline}</div>
             <div style={imageStyle}>{renderMedia()}</div>
             <div style={contentStyle}>{renderData.content}</div>
@@ -486,7 +486,7 @@ const UniversalNewsContainer = ({
       // Layout 2: Headline + OneLiner -> Image
       case 2:
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={headlineStyle}>{renderData.headline}</div>
             <div style={contentStyle}>{renderData.content}</div>
             <div style={timeStyle}>{renderData.time}</div>
@@ -497,7 +497,7 @@ const UniversalNewsContainer = ({
       // Layout 3: Image -> Headline + OneLiner
       case 3:
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={imageStyle}>{renderMedia()}</div>
             <div style={headlineStyle}>{renderData.headline}</div>
             <div style={contentStyle}>{renderData.content}</div>
@@ -570,7 +570,7 @@ const UniversalNewsContainer = ({
       // Layout 9: OneLiner (left) | Image (right)
       case 9:
         return (
-          <div style={{ display: "flex", gap: "15px", alignItems: "flex-start" }}>
+          <div style={{ display: "flex", alignItems: "flex-start" }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={contentStyle}>{renderData.content}</div>
               <div style={timeStyle}>{renderData.time}</div>

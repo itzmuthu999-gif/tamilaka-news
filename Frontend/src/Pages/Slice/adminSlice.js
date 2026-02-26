@@ -12,7 +12,7 @@ const updateAllPagePositions = (state) => {
     page.topnavpos = null;
     page.sidenavpos = null;
   });
-  
+
   // Update topnavpos based on topNavHeaders1
   // Position depends on dropdown placement
   state.topNavHeaders1.forEach((pageId, index) => {
@@ -23,7 +23,7 @@ const updateAllPagePositions = (state) => {
       page.topnavpos = actualPosition; // 0-indexed position
     }
   });
-  
+
   // Update sidenavpos based on topNavHeaders2
   state.topNavHeaders2.forEach((pageId, index) => {
     const page = state.allPages.find(p => p.id === pageId);
@@ -60,7 +60,7 @@ const removePageFromNavigations = (state, pageId) => {
     state.topNavHeaders1.splice(nav1Index, 1);
     validateDropdownPosition(state, 1);
   }
-  
+
   // Remove from nav 2
   const nav2Index = state.topNavHeaders2.indexOf(pageId);
   if (nav2Index !== -1) {
@@ -128,7 +128,7 @@ const initialState = {
     },
     {
       id: nanoid(),
-      name: { tam: "Select District", eng: "Select District" },
+      name: { tam: "மாவட்டம்", eng: "Select District" },
       districts: [
         { tam: "சென்னை", eng: "Chennai" },
         { tam: "கோயம்புத்தூர்", eng: "Coimbatore" },
@@ -157,17 +157,17 @@ const adminSlice = createSlice({
     addPage: (state, action) => {
       const newPage = {
         id: nanoid(),
-        name: { 
-          tam: action.payload.tam, 
-          eng: action.payload.eng 
+        name: {
+          tam: action.payload.tam,
+          eng: action.payload.eng
         },
         topnavpos: null,
         sidenavpos: null
       };
-      
+
       // Insert before the last item (district selector)
       state.allPages.splice(state.allPages.length - 1, 0, newPage);
-      
+
       // Update all positions (in case this affects anything)
       updateAllPagePositions(state);
     },
@@ -185,14 +185,14 @@ const adminSlice = createSlice({
     deletePage: (state, action) => {
       const { id } = action.payload;
       const pageIndex = state.allPages.findIndex(p => p.id === id);
-      
+
       if (pageIndex !== -1) {
         // Remove from all navigations
         removePageFromNavigations(state, id);
-        
+
         // Remove page
         state.allPages.splice(pageIndex, 1);
-        
+
         // Update all positions after deletion
         updateAllPagePositions(state);
       }
@@ -202,7 +202,7 @@ const adminSlice = createSlice({
     addDistrict: (state, action) => {
       const { tam, eng } = action.payload;
       const districtPage = state.allPages[state.allPages.length - 1];
-      
+
       if (districtPage && districtPage.districts) {
         districtPage.districts.push({ tam, eng });
       }
@@ -212,11 +212,11 @@ const adminSlice = createSlice({
     updateDistrict: (state, action) => {
       const { index, tam, eng } = action.payload;
       const districtPage = state.allPages[state.allPages.length - 1];
-      
+
       if (districtPage && districtPage.districts && districtPage.districts[index]) {
         const oldDistrict = districtPage.districts[index];
         districtPage.districts[index] = { tam, eng };
-        
+
         // Update selected districts if they were using the old values
         if (state.selectedDistrict1 === oldDistrict.tam || state.selectedDistrict1 === oldDistrict.eng) {
           state.selectedDistrict1 = tam; // Update to new Tamil name
@@ -230,20 +230,20 @@ const adminSlice = createSlice({
     deleteDistrict: (state, action) => {
       const { index } = action.payload;
       const districtPage = state.allPages[state.allPages.length - 1];
-      
+
       if (districtPage && districtPage.districts) {
         const deletedDistrict = districtPage.districts[index];
-        
+
         // Clear selected districts if they match (check both languages)
-        if (state.selectedDistrict1 === deletedDistrict.tam || 
-            state.selectedDistrict1 === deletedDistrict.eng) {
+        if (state.selectedDistrict1 === deletedDistrict.tam ||
+          state.selectedDistrict1 === deletedDistrict.eng) {
           state.selectedDistrict1 = "";
         }
-        if (state.selectedDistrict2 === deletedDistrict.tam || 
-            state.selectedDistrict2 === deletedDistrict.eng) {
+        if (state.selectedDistrict2 === deletedDistrict.tam ||
+          state.selectedDistrict2 === deletedDistrict.eng) {
           state.selectedDistrict2 = "";
         }
-        
+
         districtPage.districts.splice(index, 1);
       }
     },
@@ -251,11 +251,11 @@ const adminSlice = createSlice({
     // -------------------- TOP NAV 1 MANAGEMENT --------------------
     addTopNavHeader1: (state, action) => {
       const { pageId } = action.payload;
-      
+
       // Prevent duplicates
       if (!state.topNavHeaders1.includes(pageId)) {
         state.topNavHeaders1.push(pageId);
-        
+
         // CRITICAL: Update all page positions after adding
         updateAllPagePositions(state);
       }
@@ -263,10 +263,10 @@ const adminSlice = createSlice({
 
     updateTopNavHeader1: (state, action) => {
       const { index, pageId } = action.payload;
-      
+
       if (index >= 0 && index < state.topNavHeaders1.length) {
         state.topNavHeaders1[index] = pageId;
-        
+
         // CRITICAL: Update all page positions after changing
         updateAllPagePositions(state);
       }
@@ -274,13 +274,13 @@ const adminSlice = createSlice({
 
     deleteTopNavHeader1: (state, action) => {
       const { index } = action.payload;
-      
+
       if (index >= 0 && index < state.topNavHeaders1.length) {
         state.topNavHeaders1.splice(index, 1);
-        
+
         // Validate dropdown position
         validateDropdownPosition(state, 1);
-        
+
         // CRITICAL: Update all page positions after deletion
         updateAllPagePositions(state);
       }
@@ -288,17 +288,17 @@ const adminSlice = createSlice({
 
     reorderTopNavHeaders1: (state, action) => {
       const { sourceIndex, targetIndex } = action.payload;
-      
-      if (sourceIndex !== targetIndex && 
-          sourceIndex >= 0 && sourceIndex < state.topNavHeaders1.length &&
-          targetIndex >= 0 && targetIndex <= state.topNavHeaders1.length) {
-        
+
+      if (sourceIndex !== targetIndex &&
+        sourceIndex >= 0 && sourceIndex < state.topNavHeaders1.length &&
+        targetIndex >= 0 && targetIndex <= state.topNavHeaders1.length) {
+
         // Remove from source
         const [removed] = state.topNavHeaders1.splice(sourceIndex, 1);
-        
+
         // Insert at target
         state.topNavHeaders1.splice(targetIndex, 0, removed);
-        
+
         // CRITICAL: Update all page positions after reordering
         updateAllPagePositions(state);
       }
@@ -306,11 +306,11 @@ const adminSlice = createSlice({
 
     setDropdownPosition1: (state, action) => {
       const newPosition = action.payload;
-      
+
       // Validate position
       if (newPosition >= 0 && newPosition <= state.topNavHeaders1.length) {
         state.dropdownPosition1 = newPosition;
-        
+
         // CRITICAL: Dropdown position affects all page positions!
         updateAllPagePositions(state);
       }
@@ -324,11 +324,11 @@ const adminSlice = createSlice({
     // -------------------- TOP NAV 2 MANAGEMENT --------------------
     addTopNavHeader2: (state, action) => {
       const { pageId } = action.payload;
-      
+
       // Prevent duplicates
       if (!state.topNavHeaders2.includes(pageId)) {
         state.topNavHeaders2.push(pageId);
-        
+
         // CRITICAL: Update all page positions after adding
         updateAllPagePositions(state);
       }
@@ -336,10 +336,10 @@ const adminSlice = createSlice({
 
     updateTopNavHeader2: (state, action) => {
       const { index, pageId } = action.payload;
-      
+
       if (index >= 0 && index < state.topNavHeaders2.length) {
         state.topNavHeaders2[index] = pageId;
-        
+
         // CRITICAL: Update all page positions after changing
         updateAllPagePositions(state);
       }
@@ -347,13 +347,13 @@ const adminSlice = createSlice({
 
     deleteTopNavHeader2: (state, action) => {
       const { index } = action.payload;
-      
+
       if (index >= 0 && index < state.topNavHeaders2.length) {
         state.topNavHeaders2.splice(index, 1);
-        
+
         // Validate dropdown position
         validateDropdownPosition(state, 2);
-        
+
         // CRITICAL: Update all page positions after deletion
         updateAllPagePositions(state);
       }
@@ -361,17 +361,17 @@ const adminSlice = createSlice({
 
     reorderTopNavHeaders2: (state, action) => {
       const { sourceIndex, targetIndex } = action.payload;
-      
-      if (sourceIndex !== targetIndex && 
-          sourceIndex >= 0 && sourceIndex < state.topNavHeaders2.length &&
-          targetIndex >= 0 && targetIndex <= state.topNavHeaders2.length) {
-        
+
+      if (sourceIndex !== targetIndex &&
+        sourceIndex >= 0 && sourceIndex < state.topNavHeaders2.length &&
+        targetIndex >= 0 && targetIndex <= state.topNavHeaders2.length) {
+
         // Remove from source
         const [removed] = state.topNavHeaders2.splice(sourceIndex, 1);
-        
+
         // Insert at target
         state.topNavHeaders2.splice(targetIndex, 0, removed);
-        
+
         // CRITICAL: Update all page positions after reordering
         updateAllPagePositions(state);
       }
@@ -379,11 +379,11 @@ const adminSlice = createSlice({
 
     setDropdownPosition2: (state, action) => {
       const newPosition = action.payload;
-      
+
       // Validate position
       if (newPosition >= 0 && newPosition <= state.topNavHeaders2.length) {
         state.dropdownPosition2 = newPosition;
-        
+
         // CRITICAL: Dropdown position affects all page positions!
         updateAllPagePositions(state);
       }
@@ -395,7 +395,7 @@ const adminSlice = createSlice({
     },
 
     // -------------------- UTILITY ACTIONS --------------------
-    
+
     /**
      * Manual position recalculation trigger
      * Useful for edge cases or after batch operations

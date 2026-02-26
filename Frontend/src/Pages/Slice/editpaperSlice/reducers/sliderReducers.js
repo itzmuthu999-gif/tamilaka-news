@@ -43,7 +43,11 @@ export const sliderReducers = {
             size: { width: 0 },
             gap: 10,
             items: [],
-            lockedType: null
+            lockedType: null,
+            header: {
+              enabled: false,
+              title: ""
+            }
           }
         }
       };
@@ -481,5 +485,31 @@ export const sliderReducers = {
       if (padding !== undefined) slot.dimensions.padding = padding;
     }
     logState(state, "updateSliderSlotDimensions");
+  },
+
+  updateContainerSliderHeader(state, action) {
+    const { catName, containerId, sliderId, enabled, title, isNested, parentContainerId } = action.payload;
+
+    let slider = null;
+    if (isNested && parentContainerId) {
+      const parentCont = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === parentContainerId);
+      slider = parentCont?.nestedContainers
+        ?.find(nc => nc.id === containerId)
+        ?.sliders?.find(s => s.id === sliderId);
+    } else {
+      slider = state.pages
+        .find(p => p.catName === catName)
+        ?.containers.find(c => c.id === containerId)
+        ?.sliders?.find(s => s.id === sliderId);
+    }
+
+    if (slider) {
+      if (!slider.header) slider.header = { enabled: false, title: "" };
+      if (enabled !== undefined) slider.header.enabled = enabled;
+      if (title !== undefined) slider.header.title = title;
+    }
+    logState(state, "updateContainerSliderHeader");
   }
 };

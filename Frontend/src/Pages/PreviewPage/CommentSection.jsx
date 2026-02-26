@@ -37,7 +37,7 @@ export default function CommentSection({ newsId, comments = [] }) {
   return (
     <div className="comment-section">
       <div className="comment-header">
-        <h3>{comments.length} peoples commented on this news</h3>
+        <h3>இந்த செய்திக்கு {comments.length} பேர் கருத்து தெரிவித்துள்ளார்.</h3>
       </div>
 
       {/* Comments Display */}
@@ -81,7 +81,7 @@ export default function CommentSection({ newsId, comments = [] }) {
         <input
           type="text"
           className="comment-input comment-text-input"
-          placeholder="Add your comment here ..."
+          placeholder="உங்கள் கருத்தை இங்கே சேர்க்கவும் ..."
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           onKeyPress={handleKeyPress}

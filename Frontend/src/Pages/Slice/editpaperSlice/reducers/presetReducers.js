@@ -28,12 +28,13 @@ export const presetReducers = {
       console.log('✅ Preset added. New presetContainers:', state.presetContainers);
       logState(state, "addPresetContainer");
     },
-    prepare(presetName, dimensions) {
+    prepare(presetName, dimensions, shfval) {
       return {
         payload: {
           preset: {
             id: nanoid(),
             presetName,
+            shfval: (shfval && shfval >= 1 && shfval <= 12) ? shfval : 1,
             dimensions: {
               containerWidth: dimensions.containerWidth || 800,
               containerHeight: dimensions.containerHeight || 300,

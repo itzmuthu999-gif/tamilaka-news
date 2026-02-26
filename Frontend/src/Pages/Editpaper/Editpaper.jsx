@@ -40,8 +40,8 @@ export default function Editpaper() {
     
     if (lineType && lineOrientation) {
       const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left - pageSettings.padding;
-      const y = e.clientY - rect.top - pageSettings.padding;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
       
       dispatch(addLine(activePage, lineType, lineOrientation, { x, y }));
       return;

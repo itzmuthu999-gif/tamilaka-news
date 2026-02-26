@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
-import { HiOutlineMinus } from "react-icons/hi";
-import { useSelector, useDispatch } from "react-redux";
-import jwt from "../../../assets/jwt.jpg";
+import { RxDividerHorizontal } from "react-icons/rx";
 import {
   dropNewsIntoSlot,
   removeNewsFromSlot,
@@ -15,12 +13,13 @@ import {
   toggleContainerSeparator,
   toggleSliderSeparator,
   toggleNestedSeparator,
-  removeSlotFromContainer,
-  removeSlotFromNestedContainer,
   updateSlotShfval,
-  updateNestedSlotShfval,
   updateSliderSlotShfval,
+  updateNestedSlotShfval,
 } from "../../Slice/editpaperSlice/editpaperslice";
+
+import { useSelector, useDispatch } from "react-redux";
+import jwt from "../../../assets/jwt.jpg";
 
 const NorContainer5 = ({
   border = false,
@@ -28,7 +27,6 @@ const NorContainer5 = ({
   slotId,
   catName,
   containerId,
-  sliderId,
   isSlider = false,
   isSlider2 = false,
   isNested = false,
@@ -37,37 +35,16 @@ const NorContainer5 = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const allNews = useSelector((state) => state.newsform?.allNews || []);
-  
-  const showSeparator = useSelector((state) => {
-    const page = state.editpaper.pages.find((p) => p.catName === catName);
-    
-    if (isSlider || isSlider2) {
-      const slider = page?.containers.find((c) => c.id === containerId)
-        ?.sliders?.find((s) => s.id === sliderId);
-      const item = slider?.items.find((i) => i.slotId === slotId);
-      return item?.showSeparator || false;
-    } else if (isNested && parentContainerId) {
-      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
-        ?.nestedContainers?.find((nc) => nc.id === containerId);
-      const item = nestedCont?.items?.find((i) => i.slotId === slotId);
-      return item?.showSeparator || false;
-    } else {
-      const container = page?.containers.find((c) => c.id === containerId);
-      const item = container?.items.find((i) => i.slotId === slotId);
-      return item?.showSeparator || false;
-    }
-  });
-  
+  const allNews = useSelector((state) => state.newsform.allNews);
   const slot = useSelector((state) => {
     const page = state.editpaper.pages.find((p) => p.catName === catName);
-    
+
     if (isSlider || isSlider2) {
-      const slider = page?.containers.find((c) => c.id === containerId)
-        ?.sliders?.find((s) => s.id === sliderId);
+      const slider = page?.sliders.find((s) => s.id === containerId);
       return slider?.items.find((i) => i.slotId === slotId);
     } else if (isNested && parentContainerId) {
-      const nestedCont = page?.containers.find((c) => c.id === parentContainerId)
+      const nestedCont = page?.containers
+        .find((c) => c.id === parentContainerId)
         ?.nestedContainers?.find((nc) => nc.id === containerId);
       return nestedCont?.items?.find((i) => i.slotId === slotId);
     } else {
@@ -75,8 +52,9 @@ const NorContainer5 = ({
       return container?.items.find((i) => i.slotId === slotId);
     }
   });
-  
+
   const newsId = slot?.newsId;
+  const showSeparator = slot?.showSeparator || false;
   const version = slot?.shfval ?? 1;
   const news = allNews.find((n) => n.id === newsId);
 
@@ -93,10 +71,8 @@ const NorContainer5 = ({
         image: (() => {
           const thumb = news.data?.thumbnail;
           if (!thumb) return DEFAULT_DATA.image;
-
           if (typeof thumb === "string") return thumb;
           if (thumb instanceof File) return URL.createObjectURL(thumb);
-
           return DEFAULT_DATA.image;
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
@@ -115,12 +91,9 @@ const NorContainer5 = ({
         dispatch(
           dropNewsIntoSliderSlot({
             catName,
-            sliderId: sliderId,
+            sliderId: containerId,
             slotId,
             newsId: Number(droppedId),
-            containerId,
-            isNested,
-            parentContainerId,
           })
         );
       } else if (isNested && parentContainerId) {
@@ -148,35 +121,84 @@ const NorContainer5 = ({
 
   const handleDelete = (e) => {
     e.stopPropagation();
+
+    if (isSlider || isSlider2) {
+      dispatch(
+        removeNewsFromSliderSlot({
+          catName,
+          sliderId: containerId,
+          slotId,
+        })
+      );
+    } else if (isNested && parentContainerId) {
+      dispatch(
+        removeNewsFromNestedSlot({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
+          slotId,
+        })
+      );
+    } else {
+      dispatch(
+        removeNewsFromSlot({
+          catName,
+          containerId,
+          slotId,
+        })
+      );
+    }
+
     onDelete?.();
   };
 
   const handleDragOver = (e) => e.preventDefault();
 
+  // Cycle between version 1 and 2, persisted in Redux
   const handleChange = (e) => {
     e.stopPropagation();
-    const nextVal = version === 1 ? 2 : 1;
+    const newVersion = version === 1 ? 2 : 1;
+
     if (isSlider || isSlider2) {
-      dispatch(updateSliderSlotShfval({ catName, sliderId, slotId, containerId, isNested, parentContainerId, shfval: nextVal }));
+      dispatch(
+        updateSliderSlotShfval({
+          catName,
+          sliderId: containerId,
+          slotId,
+          shfval: newVersion,
+        })
+      );
     } else if (isNested && parentContainerId) {
-      dispatch(updateNestedSlotShfval({ catName, parentContainerId, nestedContainerId: containerId, slotId, shfval: nextVal }));
+      dispatch(
+        updateNestedSlotShfval({
+          catName,
+          parentContainerId,
+          nestedContainerId: containerId,
+          slotId,
+          shfval: newVersion,
+        })
+      );
     } else {
-      dispatch(updateSlotShfval({ catName, containerId, slotId, shfval: nextVal }));
+      dispatch(
+        updateSlotShfval({
+          catName,
+          containerId,
+          slotId,
+          shfval: newVersion,
+        })
+      );
     }
   };
 
-  const toggleSeparator = (e) => {
+  const handleToggleSeparator = (e) => {
     e.stopPropagation();
-    
+
     if (isSlider || isSlider2) {
       dispatch(
         toggleSliderSeparator({
           catName,
-          sliderId: sliderId,
+          sliderId: containerId,
           slotId,
-          containerId,
-          isNested,
-          parentContainerId,
         })
       );
     } else if (isNested && parentContainerId) {
@@ -205,7 +227,33 @@ const NorContainer5 = ({
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", display: "inline-flex", flexDirection: "column", width: "fit-content" }}>
+      <style>
+        {`
+          .ep-nm2-news-2,
+          .ep-nm2-news-3 {
+            display: flex;
+            flex-direction: column;
+            width: 430px;
+            height: fit-content;
+            min-width: 430px;
+            min-height: 100px;
+          }
+
+          @media (max-width: 768px) {
+            .ep-nm2-news-2,
+            .ep-nm2-news-3 {
+              width: 100%;
+              min-width: unset;
+              max-width: 550px;
+              height: fit-content;
+              min-height: 120px;
+            }
+          }
+        `}
+      </style>
+
+      {/* Main content box */}
       <div
         className={version === 1 ? "ep-nm2-news-2" : "ep-nm2-news-3"}
         onDrop={handleDrop}
@@ -213,9 +261,12 @@ const NorContainer5 = ({
         onClick={handleNavigate}
         style={{
           border: border ? "2px dotted #999" : "none",
-          position: "relative"
+          position: "relative",
+          // Extra bottom padding to make room for the separator toggle button
+          paddingBottom: border ? "5px" : "0",
         }}
       >
+        {/* Top Action buttons */}
         {border && (
           <div
             style={{
@@ -245,92 +296,115 @@ const NorContainer5 = ({
           </div>
         )}
 
+        {/* VERSION 1 */}
         {version === 1 && (
           <>
-            <div className="epbn22-hdln">{renderData.headline}</div>
-
-            <div className="ep-nm22-sbc">
+            <div className="epbn22-hdln" style={{ fontWeight: "bold", fontSize: "13px" }}>
+              {renderData.headline}
+            </div>
+            <div className="ep-nm22-sbc" style={maincontstyle}>
+              <div className="epnn22-img" style={imgoverly}>
+                <img style={imgstyle} src={renderData.image} alt="" />
+              </div>
               <div className="ep-nm22sbc-c1">
+                <div className="epnn22-onln" style={{ fontSize: "12px" }}>
+                  {renderData.content}
+                </div>
+                <div className="epn-tm">{renderData.time}</div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* VERSION 2 */}
+        {version === 2 && (
+          <>
+            <div className="epbn22-hdln" style={{ fontWeight: "bold", fontSize: "13px" }}>
+              {renderData.headline}
+            </div>
+            <div className="ep-nm22-sbc" style={maincontstyle}>
+              <div className="ep-nm22sbc-c1" style={{ fontSize: "12px" }}>
                 <div className="epnn22-onln">{renderData.content}</div>
                 <div className="epn-tm">{renderData.time}</div>
               </div>
-
-              <div className="epnn22-img">
-                <img src={renderData.image} alt="" />
+              <div className="epnn22-img" style={imgoverly}>
+                <img style={imgstyle} src={renderData.image} alt="" />
               </div>
             </div>
           </>
         )}
 
-        {version === 2 && (
-          <>
-            <div className="epbn23-hdln">{renderData.headline}</div>
-
-            <div className="ep-nm23-sbc">
-              <div className="epnn23-img">
-                <img src={renderData.image} alt="" />
-              </div>
-
-              <div className="ep-nm23sbc-c1">
-                <div className="epnn23-onln">{renderData.content}</div>
-                <div className="epn-tm">{renderData.time}</div>
-              </div>
-            </div>
-          </>
+        {/* Separator Toggle Button — sits at bottom center of the content box */}
+        {border && (
+          <button
+            onClick={handleToggleSeparator}
+            style={{
+              ...separatorBtnStyle,
+              backgroundColor: showSeparator ? "#666" : "#ddd",
+              color: showSeparator ? "#fff" : "#666",
+            }}
+            title={showSeparator ? "Remove separator" : "Add separator"}
+          >
+            <RxDividerHorizontal />
+          </button>
         )}
       </div>
 
+      {/* FIX: Separator line — same width as container, directly below, no extra space */}
       {showSeparator && (
         <div
           style={{
             width: "100%",
             height: "1px",
             backgroundColor: "#999",
-            marginTop: "8px",
+            flexShrink: 0,
           }}
         />
-      )}
-
-      {border && (
-        <button
-          onClick={toggleSeparator}
-          style={{
-            ...separatorBtnStyle,
-            backgroundColor: showSeparator ? "#666" : "#ddd",
-            color: showSeparator ? "#fff" : "#666",
-          }}
-          title={showSeparator ? "Remove separator" : "Add separator"}
-        >
-          <HiOutlineMinus />
-        </button>
       )}
     </div>
   );
 };
 
+const maincontstyle = {
+  display: "flex",
+  gap: "12px",
+  alignItems: "flex-start",
+};
+
+const imgoverly = {
+  width: "150px",
+  minWidth: "150px",
+  height: "100%",
+  display: "flex",
+  borderRadius: "5px"
+};
+
+const imgstyle = {
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+};
+
 const iconBtnStyle = {
-  background: "rgba(255, 255, 255, 0.9)",
-  border: "1px solid #ccc",
-  borderRadius: "4px",
+  background: "transparent",
+  border: "none",
   cursor: "pointer",
   fontSize: "18px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: "4px",
-  transition: "all 0.2s ease",
 };
 
 const separatorBtnStyle = {
   position: "absolute",
-  bottom: "-14px",
+  bottom: "-2px",
   left: "50%",
   transform: "translateX(-50%)",
   background: "#ddd",
   border: "1px solid #ccc",
   borderRadius: "50%",
-  width: "28px",
-  height: "28px",
+  width: "24px",
+  height: "24px",
   cursor: "pointer",
   fontSize: "16px",
   display: "flex",

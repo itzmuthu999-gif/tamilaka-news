@@ -6,11 +6,13 @@ import {
   updateContainerSliderGap,
   updateContainerSliderDimensions,
   updateContainerSliderPadding,
+  updateContainerSliderHeader,
   addSlotToContainerSlider,
   deleteContainerSlider,
   removeSlotFromContainerSlider,
   // FIX 1: Import the missing dropNewsIntoSliderSlot action
   dropNewsIntoSliderSlot,
+  addVideoSlotToSlider,
 } from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
@@ -28,6 +30,7 @@ import NorContainer4A from "../Containers_/NorContainer4A";
 // FIX 2: Import NorContainer4B
 import NorContainer4B from "../Containers_/NorContainer4B";
 import NorContainer5 from "../Containers_/NorContainer5";
+import VideoContainer from "../Containers_/VideoContainer";
 
 const COMPONENT_MAP = {
   "Universal Container": UniversalNewsContainer,
@@ -45,6 +48,7 @@ const COMPONENT_MAP = {
   // FIX 3: Register NorContainer4B in the map
   "Normal Container Type 4B": NorContainer4B,
   "Normal Container Type 5": NorContainer5,
+  "Video Container": VideoContainer,
 };
 
 export function EditableSlider2({
@@ -82,6 +86,8 @@ export function EditableSlider2({
   const [isResizing, setIsResizing] = useState(false);
   const [translateX, setTranslateX] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [headerEnabled, setHeaderEnabled] = useState(slider?.header?.enabled || false);
+  const [headerTitle, setHeaderTitle] = useState(slider?.header?.title || "");
 
   const droppedContainers = slider?.items || [];
   const lockedType = slider?.lockedType;
@@ -137,10 +143,7 @@ export function EditableSlider2({
     const handleMouseMove = (e) => {
       if (containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
-        const parentContainer = containerRef.current.closest('.ep-ed-cont');
-        const parentWidth = parentContainer ? parentContainer.offsetWidth - 40 : 1250;
-        const newWidth = Math.max(200, Math.min(parentWidth, e.clientX - containerRect.left));
-
+        const newWidth = Math.max(200, e.clientX - containerRect.left);
         setWidth(newWidth);
       }
     };
@@ -198,6 +201,22 @@ export function EditableSlider2({
     const type = e.dataTransfer.getData("text/plain");
     const newsId = e.dataTransfer.getData("newsId");
     const presetId = e.dataTransfer.getData("presetId"); // Get presetId from drag data
+    const isVideo = e.dataTransfer.getData("isVideo");
+
+    if (isVideo === "true") {
+      const slotId = `slider2_slot_${Date.now()}`;
+      dispatch(
+        addVideoSlotToSlider({
+          catName,
+          containerId,
+          sliderId: id,
+          slotId,
+          isNested,
+          parentContainerId,
+        })
+      );
+      return;
+    }
 
     if (!type) return;
 
@@ -294,69 +313,62 @@ export function EditableSlider2({
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
+      {/* Edit/Delete buttons — outside overflow:hidden so they are always visible */}
       <div
         style={{
-          width: "100%",
-          height: droppedContainers.length > 0 ? "fit-content" : "auto",
-          padding: `${sliderPadding}px`,
-          position: "relative",
-          overflow: "hidden",
+          position: "absolute",
+          top: "8px",
+          right: "8px",
+          display: "flex",
+          gap: "8px",
+          zIndex: 99999,
+          pointerEvents: "auto",
         }}
       >
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          style={{
+            background: "#ff6b35",
+            border: "none",
+            borderRadius: "4px",
+            padding: "6px",
+            cursor: "pointer",
+          }}
+        >
+          <Edit2 size={18} color="white" />
+        </button>
+
+        <button
+          onClick={handleDelete}
+          title="Double click to delete"
+          style={{
+            background: "red",
+            border: "none",
+            borderRadius: "4px",
+            padding: "6px",
+            cursor: "pointer",
+          }}
+        >
+          <X size={18} color="white" />
+        </button>
+      </div>
+
+      {/* Settings popup — outside overflow:hidden so it is never clipped */}
+      {showSettings && (
         <div
           style={{
             position: "absolute",
-            top: "8px",
+            top: "50px",
             right: "8px",
-            display: "flex",
-            gap: "8px",
-            zIndex: 1000,
-            pointerEvents: "auto",
+            background: "white",
+            border: "2px solid #ff6b35",
+            borderRadius: "8px",
+            padding: "15px",
+            zIndex: 99999,
+            minWidth: "220px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           }}
         >
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            style={{
-              background: "#ff6b35",
-              border: "none",
-              borderRadius: "4px",
-              padding: "6px",
-              cursor: "pointer",
-            }}
-          >
-            <Edit2 size={18} color="white" />
-          </button>
-
-          <button
-            onClick={handleDelete}
-            title="Double click to delete"
-            style={{
-              background: "red",
-              border: "none",
-              borderRadius: "4px",
-              padding: "6px",
-              cursor: "pointer",
-            }}
-          >
-            <X size={18} color="white" />
-          </button>
-        </div>
-
-        {showSettings && (
-          <div
-            style={{
-              position: "absolute",
-              top: "50px",
-              right: "8px",
-              background: "white",
-              border: "2px solid #ff6b35",
-              borderRadius: "8px",
-              padding: "15px",
-              zIndex: 1000,
-              minWidth: "220px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            }}
-          >
             <div style={{ marginBottom: "12px" }}>
               <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
                 <Maximize2 size={16} /> Padding (px)
@@ -430,6 +442,91 @@ export function EditableSlider2({
                 🔒 Locked to: {lockedType}
               </div>
             )}
+
+            <div style={{ marginTop: "12px", borderTop: "1px solid #eee", paddingTop: "12px" }}>
+              <label style={{ fontSize: "12px", fontWeight: "500", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Edit2 size={14} /> Header
+              </label>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                <input
+                  type="checkbox"
+                  id={`slider2-header-enabled-${id}`}
+                  checked={headerEnabled}
+                  onChange={(e) => {
+                    const newEnabled = e.target.checked;
+                    setHeaderEnabled(newEnabled);
+                    dispatch(updateContainerSliderHeader({
+                      catName, containerId, sliderId: id,
+                      enabled: newEnabled, title: headerTitle,
+                      isNested, parentContainerId
+                    }));
+                  }}
+                  style={{ width: "16px", height: "16px", cursor: "pointer" }}
+                />
+                <label htmlFor={`slider2-header-enabled-${id}`} style={{ fontSize: "12px", cursor: "pointer" }}>Enable Header</label>
+              </div>
+              {headerEnabled && (
+                <input
+                  type="text"
+                  value={headerTitle}
+                  onChange={(e) => {
+                    const newTitle = e.target.value;
+                    setHeaderTitle(newTitle);
+                    dispatch(updateContainerSliderHeader({
+                      catName, containerId, sliderId: id,
+                      enabled: headerEnabled, title: newTitle,
+                      isNested, parentContainerId
+                    }));
+                  }}
+                  placeholder="Header title..."
+                  style={{ width: "100%", padding: "6px 8px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "13px" }}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+      {/* Inner content wrapper — padding without overflow:hidden so popup is never clipped */}
+      <div
+        style={{
+          width: "100%",
+          height: droppedContainers.length > 0 ? "fit-content" : "auto",
+          padding: `${sliderPadding}px`,
+          position: "relative",
+        }}
+      >
+
+        {headerEnabled && headerTitle && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "7px 12px",
+              borderRadius: "6px 6px 0 0",
+              flexShrink: 0,
+              minHeight: "36px",
+              pointerEvents: "none",
+            }}
+          >
+            <span
+              style={{
+                fontWeight: "700",
+                fontSize: "15px",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              {headerTitle}
+            </span>
+            <div
+              style={{
+                flex: 1,
+                height: "2.5px",
+                background: "#ff6b35",
+                borderRadius: "2px",
+              }}
+            />
           </div>
         )}
 

@@ -29,6 +29,10 @@ export const nestedReducers = {
               gap: 10
             },
             items: [],
+            header: {
+              enabled: false,
+              title: ""
+            },
             spacing: {
               padding: 10,
               margin: 0
@@ -70,6 +74,20 @@ export const nestedReducers = {
     logState(state, "updateNestedContainerGrid");
   },
 
+  updateNestedContainerHeader(state, action) {
+    const { catName, parentContainerId, nestedContainerId, enabled, title } = action.payload;
+    const nestedCont = state.pages
+      .find(p => p.catName === catName)
+      ?.containers.find(c => c.id === parentContainerId)
+      ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
+
+    if (nestedCont) {
+      if (enabled !== undefined) nestedCont.header.enabled = enabled;
+      if (title !== undefined) nestedCont.header.title = title;
+    }
+    logState(state, "updateNestedContainerHeader");
+  },
+
   updateNestedContainerSpacing(state, action) {
     const { catName, parentContainerId, nestedContainerId, padding, margin } = action.payload;
     const nestedCont = state.pages
@@ -93,7 +111,6 @@ export const nestedReducers = {
       ?.nestedContainers?.find(nc => nc.id === nestedContainerId);
 
     if (nestedCont) {
-      // Find preset dimensions if presetId is provided
       let presetDimensions = null;
       if (presetId) {
         const preset = state.presetContainers.find(p => p.id === presetId);
@@ -102,7 +119,6 @@ export const nestedReducers = {
         }
       }
 
-      // Default dimensions
       const defaultDimensions = {
         containerWidth: 800,
         containerHeight: 300,
@@ -117,7 +133,6 @@ export const nestedReducers = {
         containerType,
         showSeparator: false,
         shfval: 1,
-        // Add dimensions for Universal Container at slot level
         ...(containerType === "Universal Container" && {
           dimensions: presetDimensions || defaultDimensions
         })
@@ -191,7 +206,6 @@ export const nestedReducers = {
     logState(state, "updateNestedSlotShfval");
   },
 
-  // New reducer to update slot-level dimensions for Universal Container in nested containers
   updateNestedSlotDimensions(state, action) {
     const { catName, parentContainerId, nestedContainerId, slotId, containerWidth, containerHeight, imgWidth, imgHeight, padding } = action.payload;
     const slot = state.pages

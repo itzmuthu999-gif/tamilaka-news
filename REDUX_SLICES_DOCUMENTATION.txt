@@ -1,0 +1,201 @@
+REDUX STATE STRUCTURE (Frontend)
+
+Scope
+- This document describes the Redux state tree for the entire Frontend.
+- The store is configured in `Frontend/src/store.js` and persisted to localStorage under `redux-state`.
+
+Root Store Keys
+- newsform
+- admin
+- editpaper
+- users
+
+State Tree (schema-style)
+state
+  newsform
+    MLayout: number
+    allNews: Array<News>
+    trash: Array<News>
+    currentNews: News | null
+    language: string (default "ta")
+    translatedNews: Array<any>
+
+  admin
+    allPages: Array<Page>
+    topNavHeaders1: Array<PageId>
+    topNavHeaders2: Array<PageId>
+    dropdownPosition1: number
+    dropdownPosition2: number
+    selectedDistrict1: string
+    selectedDistrict2: string
+
+  editpaper
+    activePage: string
+    activeLineId: string | null
+    presetContainers: Array<PresetContainer>
+    pages: Array<PageLayout>
+
+  users
+    users: Array<User>
+
+
+Type Definitions (structure details)
+
+News
+- id: number (Date.now())
+- time: string (local time string)
+- data: object (Tamil news content)
+  - headline: string
+  - oneLiner: string
+  - thumbnail: File | string | null
+  - zonal: string
+  - author: string
+  - images: Array<any>
+- dataEn: object | null (English version; same fields as data)
+- fullContent: Array<ContentBox>
+- containerOverlays: Array<OverlayContainer>
+- containerSettings: object
+  - height: number
+  - padding: number
+  - gap: number
+  - gridColumns: number
+- layout: number (stored copy of MLayout for the news item)
+- hiddenElements: object
+  - thumbnail: boolean
+  - author: boolean
+  - zonar: boolean
+- comments: Array<Comment>
+- containers: Array<any> (legacy/unused in Templatepage; created in slice)
+
+ContentBox
+- type: "paragraph" | "image" | "video"
+- id: number
+- x: number
+- y: number
+- width: number
+- height: number
+- content: string (paragraph text or image URL)
+- contentEn: string (for paragraph translation, optional)
+- videoData: object | null (only for type "video")
+- dimensions: object (only for type "video", e.g. { width })
+
+OverlayContainer
+- id: number
+- settings:
+  - columns: number
+  - gap: number
+  - padding: number
+  - boxes: Array<ContentBox>
+
+Comment
+- id: number
+- name: string
+- text: string
+- timestamp: string
+
+
+Page (admin slice)
+- id: string (nanoid)
+- name:
+  - tam: string
+  - eng: string
+- topnavpos: number | null
+- sidenavpos: number | null
+- districts: Array<District> (only present on the last “Select District” page)
+
+District
+- tam: string
+- eng: string
+
+
+PageLayout (editpaper slice)
+- catName: string
+- settings:
+  - height: number
+  - gridColumns: number
+  - gap: number
+  - padding: number
+- containers: Array<LayoutContainer>
+- sliders: Array<LayoutSlider> (page-level; currently unused in editor UI)
+- lines: Array<LayoutLine>
+
+LayoutContainer
+- id: string
+- grid:
+  - columns: number
+  - gap: number
+- items: Array<ContainerSlot>
+- header:
+  - enabled: boolean
+  - title: string
+- spacing:
+  - padding: number
+  - margin: number
+- nestedContainers: Array<LayoutContainer>
+- sliders: Array<LayoutSlider>
+- lines: Array<LayoutLine>
+
+ContainerSlot
+- slotId: string
+- newsId: number | null
+- containerType: string (e.g., "Big Container Type 1", "Normal Container Type 3", "Universal Container", "Poll", "Video Container")
+- showSeparator: boolean
+- shfval: number
+- dimensions: object (only for "Universal Container" slots; includes containerWidth, containerHeight, imgWidth, imgHeight, padding)
+- pollData: object | null (only when containerType = "Poll")
+- videoData: object | null (only when containerType = "Video Container")
+
+LayoutSlider
+- id: string
+- type: string ("type1" | "type2")
+- dimensions: object (optional; containerWidth, containerHeight, imgWidth, imgHeight, padding)
+- padding: number
+- size:
+  - width: number
+- gap: number
+- items: Array<ContainerSlot>
+- lockedType: string | null (enforces single containerType inside slider)
+- header:
+  - enabled: boolean
+  - title: string
+
+LayoutLine
+- id: string
+- lineType: string ("pink-bold" | "light-grey")
+- orientation: string ("horizontal" | "vertical")
+- length: number
+- x: number
+- y: number
+
+PresetContainer
+- id: string
+- presetName: string
+- shfval: number (1–12)
+- dimensions:
+  - containerWidth: number
+  - containerHeight: number
+  - imgWidth: number
+  - imgHeight: number
+  - padding: number
+
+User
+- id: string (nanoid)
+- name: string
+- email: string
+- password: string
+- role: string
+- createdAt: string (ISO)
+- updatedAt: string (ISO, optional)
+
+
+Cross-Slice Relationships (how state connects)
+- admin.allPages drives navigation (top nav and side nav) in Newspaper views.
+- editpaper.pages is the source of truth for layout rendering in Newspaper.
+- newsform.allNews is the source of truth for article content in Newsbund, PreviewPage, and all container renderers.
+- admin page/district changes are synced into editpaper pages by `syncPagesFromAdmin`.
+
+Notes
+- `adminSelectors.js` references `state.admin.allDistricts`, but districts actually live in the last `allPages` entry (Select District page).
+- `newsform` stores full article content and translation variants in a single object per news item.
+
+End of document

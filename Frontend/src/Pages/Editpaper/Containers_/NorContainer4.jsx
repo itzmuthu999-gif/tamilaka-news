@@ -22,7 +22,7 @@ import {
   updateSliderSlotShfval,
 } from "../../Slice/editpaperSlice/editpaperslice";
 
-const NorContainer4 = ({
+const NorContainer4A = ({
   border = false,
   onDelete,
   slotId,
@@ -205,7 +205,7 @@ const NorContainer4 = ({
   return (
     <div style={{ position: "relative", width: "100%" }}>
       <div
-        className={version === 1 ? "ep-nm-news-7" : "ep-nm-news-8"}
+        className={version === 1 ? "ep-nm-news-4a-1" : "ep-nm-news-4a-2"}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onClick={handleNavigate}
@@ -216,28 +216,50 @@ const NorContainer4 = ({
       >
         <style>
           {`
-            .ep-nm-news-7 {
+            .ep-nm-news-4a-1 {
               width: 300px;
-              height: 100px;
               max-width: 300px;
-              max-height: 100px;
               flex: 0 0 300px;
-              overflow: hidden;
               display: flex;
+              flex-direction: column;
               transition: 0.5s ease-in-out;
               cursor: pointer;
             }
             
-            .ep-nm-news-7:hover {
+            .ep-nm-news-4a-1:hover {
               color: rgb(237, 1, 141);
             }
 
-            .ep-nm7-sbc {
+            .ep-nm-news-4a-2 {
+              width: 300px;
+              max-width: 300px;
+              flex: 0 0 300px;
+              display: flex;
+              flex-direction: column;
+              transition: 0.5s ease-in-out;
+              cursor: pointer;
+            }
+            
+            .ep-nm-news-4a-2:hover {
+              color: rgb(237, 1, 141);
+            }
+
+            .ep-nm4a1-inner,
+            .ep-nm4a2-inner {
+              display: flex;
+              width: 100%;
+              height: 100px;
+              max-height: 100px;
+              overflow: hidden;
+            }
+
+            .ep-nm4a1-sbc,
+            .ep-nm4a2-sbc {
               flex: 1;
               min-width: 0;
             }
             
-            .epnn7-img {
+            .epnn4a1-img {
               width: 100px;
               height: 100px;
               border-radius: 5px;
@@ -245,41 +267,20 @@ const NorContainer4 = ({
               flex-shrink: 0;
             }
             
-            .epnn7-img img {
+            .epnn4a1-img img {
               width: 100%;
               height: 100%;
               object-fit: cover;
             }
 
-            .epnn7-hdln {
+            .epnn4a1-hdln {
               font-size: 15px;
               font-weight: bold;
               height: 84px;
               overflow: hidden;
             }
 
-            .ep-nm-news-8 {
-              width: 300px;
-              height: 100px;
-              max-width: 300px;
-              max-height: 100px;
-              flex: 0 0 300px;
-              overflow: hidden;
-              display: flex;
-              transition: 0.5s ease-in-out;
-              cursor: pointer;
-            }
-            
-            .ep-nm-news-8:hover {
-              color: rgb(237, 1, 141);
-            }
-
-            .ep-nm8-sbc {
-              flex: 1;
-              min-width: 0;
-            }
-            
-            .epnn8-img {
+            .epnn4a2-img {
               width: 100px;
               height: 100px;
               border-radius: 5px;
@@ -287,13 +288,13 @@ const NorContainer4 = ({
               flex-shrink: 0;
             }
             
-            .epnn8-img img {
+            .epnn4a2-img img {
               width: 100%;
               height: 100%;
               object-fit: cover;
             }
 
-            .epnn8-hdln {
+            .epnn4a2-hdln {
               font-size: 15px;
               font-weight: bold;
               height: 84px;
@@ -341,52 +342,61 @@ const NorContainer4 = ({
               height: 1px;
               background-color: #999;
               margin-top: 10px;
+              display: block;
             }
 
             @media (max-width: 768px) {
-              .ep-nm-news-7,
-              .ep-nm-news-8 {
+              .ep-nm-news-4a-1,
+              .ep-nm-news-4a-2 {
                 width: 100%;
                 max-width: 300px;
                 flex: 1 1 auto;
+              }
+
+              .ep-nm4a1-inner,
+              .ep-nm4a2-inner {
                 height: auto;
                 min-height: 100px;
               }
               
-              .epnn7-img,
-              .epnn8-img {
+              .epnn4a1-img,
+              .epnn4a2-img {
                 width: 90px;
                 height: 90px;
               }
               
-              .epnn7-hdln,
-              .epnn8-hdln {
+              .epnn4a1-hdln,
+              .epnn4a2-hdln {
                 font-size: 14px;
                 height: auto;
               }
             }
 
             @media (max-width: 480px) {
-              .ep-nm-news-7,
-              .ep-nm-news-8 {
-                flex-direction: column;
-                height: auto;
+              .ep-nm-news-4a-1,
+              .ep-nm-news-4a-2 {
                 max-width: 100%;
               }
+
+              .ep-nm4a1-inner,
+              .ep-nm4a2-inner {
+                flex-direction: column;
+                height: auto;
+              }
               
-              .epnn7-img,
-              .epnn8-img {
+              .epnn4a1-img,
+              .epnn4a2-img {
                 width: 100%;
                 height: 120px;
               }
               
-              .ep-nm7-sbc,
-              .ep-nm8-sbc {
+              .ep-nm4a1-sbc,
+              .ep-nm4a2-sbc {
                 width: 100%;
               }
               
-              .epnn7-hdln,
-              .epnn8-hdln {
+              .epnn4a1-hdln,
+              .epnn4a2-hdln {
                 font-size: 13px;
                 height: auto;
                 max-height: none;
@@ -425,31 +435,32 @@ const NorContainer4 = ({
         )}
 
         {version === 1 && (
-          <>
-            <div className="epnn7-img">
+          <div className="ep-nm4a1-inner">
+            <div className="epnn4a1-img">
               <img src={renderData.image} alt="" />
             </div>
-            <div className="ep-nm7-sbc">
-              <div className="epnn7-hdln">{renderData.headline}</div>
+            <div className="ep-nm4a1-sbc">
+              <div className="epnn4a1-hdln">{renderData.headline}</div>
               <div className="epn-tm">{renderData.time}</div>
             </div>
-          </>
+          </div>
         )}
 
         {version === 2 && (
-          <>
-            <div className="ep-nm8-sbc">
-              <div className="epnn8-hdln">{renderData.headline}</div>
+          <div className="ep-nm4a2-inner">
+            <div className="ep-nm4a2-sbc">
+              <div className="epnn4a2-hdln">{renderData.headline}</div>
               <div className="epn-tm">{renderData.time}</div>
             </div>
-            <div className="epnn8-img">
+            <div className="epnn4a2-img">
               <img src={renderData.image} alt="" />
             </div>
-          </>
+          </div>
         )}
-      </div>
 
-      {showSeparator && <div className="separator-line" />}
+        {/* Separator line is INSIDE the container so it matches its width exactly */}
+        {showSeparator && <div className="separator-line" />}
+      </div>
 
       {border && (
         <button
@@ -477,4 +488,4 @@ const iconBtnStyle = {
   transition: "all 0.2s ease",
 };
 
-export default NorContainer4;
+export default NorContainer4A;

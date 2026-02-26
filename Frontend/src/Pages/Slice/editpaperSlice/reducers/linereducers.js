@@ -29,6 +29,25 @@ export const lineReducers = {
       logState(state, "addLine");
     },
     prepare(catName, lineType, orientation, position, containerId, parentContainerId) {
+      // Coordinates in `position` are always relative to the inner content area
+      // of the drop target (padding already subtracted by the drop handler):
+      //
+      //  Page-level (Editpaper.jsx):
+      //    x = clientX - rect.left - pageSettings.padding
+      //    y = clientY - rect.top  - pageSettings.padding
+      //
+      //  Container-level (EditableContainer.jsx):
+      //    x = clientX - rect.left - containerPadding
+      //    y = clientY - rect.top  - containerPadding
+      //
+      // After any drag, react-rnd onDragStop d.x/d.y are also inner-content-relative
+      // (CSS transform offset from the element\'s flow start, which begins at the
+      // content area after padding).
+      //
+      // PagePreview renders page lines inside the same padded wrapper, so
+      // position:absolute top:line.y resolves from the inner content area. ✓
+      // PreviewEditableLine overlay covers the container outer div (position:relative),
+      // and line.x/y are inner-relative, so the overlay correctly positions them. ✓
       return {
         payload: {
           catName,
@@ -40,7 +59,7 @@ export const lineReducers = {
             orientation,
             length: orientation === "horizontal" ? 500 : 300,
             x: position?.x ?? 100,
-            y: position?.y ?? 100
+            y: position?.y ?? 100,
           }
         }
       };

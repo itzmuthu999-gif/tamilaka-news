@@ -20,6 +20,10 @@ export const containerReducers = {
               gap: 10
             },
             items: [],
+            header: {
+              enabled: false,
+              title: ""
+            },
             spacing: {
               padding: 10,
               margin: 0
@@ -53,6 +57,19 @@ export const containerReducers = {
       page.containers = page.containers.filter(c => c.id !== containerId);
     }
     logState(state, "deleteContainer");
+  },
+
+  updateContainerHeader(state, action) {
+    const { catName, containerId, enabled, title } = action.payload;
+    const cont = state.pages
+      .find(p => p.catName === catName)
+      ?.containers.find(c => c.id === containerId);
+
+    if (cont) {
+      if (enabled !== undefined) cont.header.enabled = enabled;
+      if (title !== undefined) cont.header.title = title;
+    }
+    logState(state, "updateContainerHeader");
   },
 
   updateContainerSpacing(state, action) {

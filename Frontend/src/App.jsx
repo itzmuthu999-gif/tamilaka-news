@@ -1,6 +1,7 @@
 
 import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from './Pages/Login';
 import AdminHome from './Pages/AdminHome';
 
 import Newsbund from './Pages/Newsbund';
@@ -19,7 +20,8 @@ function App() {
     <>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AdminHome />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/AdminHome" element={<AdminHome />} />
 
           <Route path="/Newsbund" element={<Newsbund />} />
             <Route path="/Newsupload" element={<Templatepage />} />

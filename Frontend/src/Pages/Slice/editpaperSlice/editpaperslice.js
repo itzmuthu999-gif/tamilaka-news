@@ -7,6 +7,8 @@ import { nestedReducers } from "./reducers/nestedReducers";
 import { lineReducers } from "./reducers/lineReducers";
 import { syncReducers } from "./reducers/syncReducers";
 import { presetReducers } from "./reducers/presetReducers";
+import { pollReducers } from "./reducers/pollReducers";
+import { videoReducers } from "./reducers/videoReducers";
 
 /* ---------- initial state ---------- */
 const initialState = {
@@ -220,7 +222,9 @@ const pageLayoutSlice = createSlice({
     ...nestedReducers,
     ...lineReducers,
     ...syncReducers,
-    ...presetReducers
+    ...presetReducers,
+      ...pollReducers,
+    ...videoReducers,
   }
 });
 
@@ -292,11 +296,23 @@ export const {
 
   // Sync actions
   syncPagesFromAdmin,
+    // Poll actions
+  addPollSlot,
+  updatePollData,
+  removePollFromSlot,
+  removePollFromNestedSlot,
 
   // Preset actions
   addPresetContainer,
   deletePresetContainer,
-  updatePresetContainer
+  updatePresetContainer,
+
+  // Video actions
+  addVideoSlot,
+  addVideoSlotToSlider,
+  updateVideoData,
+  updateVideoDimensions,
+  removeVideoFromSlot
 } = pageLayoutSlice.actions;
 
 export default pageLayoutSlice.reducer;

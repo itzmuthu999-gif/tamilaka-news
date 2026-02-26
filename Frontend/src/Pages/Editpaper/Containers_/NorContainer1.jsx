@@ -204,6 +204,195 @@ const NorContainer1 = ({
 
   return (
     <div style={{ position: "relative", width: "100%" }}>
+      <style>
+        {`
+          .ep-nm-news-1 {
+            width: 800px;
+            height: fit-content;
+            display: flex;
+            flex-direction: column;
+            transition: 0.5s ease-in-out;
+            cursor: pointer;
+          }
+
+          .ep-nm-news-1:hover {
+            color: rgb(237, 1, 141);
+          }
+
+          .ep-nm-news-1-inner,
+          .ep-nm-news-2-inner {
+            display: flex;
+            width: 100%;
+          }
+
+          .epnn1-img {
+            width: 390px;
+            height: 200px;
+            max-width: 700px;
+            max-height: 200px;
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
+          }
+
+          .epnn1-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .ep-nm1-sbc {
+            flex: 1;
+            min-width: 0;
+          }
+
+          .epnn1-hdln {
+            font-size: 20px;
+            font-weight: bold;
+          }
+
+          .epnn1-onln {
+            font-size: 13px;
+          }
+
+          .ep-nm-news-2 {
+            width: 800px;
+            height: fit-content;
+            display: flex;
+            flex-direction: column;
+            transition: 0.5s ease-in-out;
+            cursor: pointer;
+          }
+
+          .ep-nm-news-2:hover {
+            color: rgb(237, 1, 141);
+          }
+
+          .epnn2-img {
+            width: 390px;
+            height: 200px;
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
+          }
+
+          .epnn2-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .ep-nm2-sbc {
+            flex: 1;
+            min-width: 0;
+          }
+
+          .epnn2-hdln {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+          }
+
+          .epnn2-onln {
+            font-size: 13px;
+            margin-bottom: 8px;
+          }
+
+          .separator-btn {
+            position: absolute;
+            bottom: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+          }
+
+          .separator-btn:hover {
+            background: rgba(240, 240, 240, 0.95);
+            border-color: #999;
+          }
+
+          .separator-btn.active {
+            background: rgba(153, 153, 153, 0.95);
+            color: #fff;
+            border-color: #666;
+          }
+
+          .separator-line {
+            width: 100%;
+            height: 1px;
+            background-color: #999;
+            margin-top: 10px;
+            display: block;
+          }
+
+          @media (max-width: 1024px) {
+            .ep-nm-news-1,
+            .ep-nm-news-2 {
+              width: 100%;
+              max-width: 800px;
+            }
+
+            .epnn1-img,
+            .epnn2-img {
+              width: 45%;
+              min-width: 250px;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .ep-nm-news-1-inner,
+            .ep-nm-news-2-inner {
+              flex-direction: column;
+            }
+
+            .epnn1-img,
+            .epnn2-img {
+              width: 100%;
+              height: 180px;
+            }
+
+            .epnn1-hdln,
+            .epnn2-hdln {
+              font-size: 18px;
+            }
+
+            .epnn1-onln,
+            .epnn2-onln {
+              font-size: 12px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .epnn1-img,
+            .epnn2-img {
+              height: 150px;
+            }
+
+            .epnn1-hdln,
+            .epnn2-hdln {
+              font-size: 16px;
+            }
+
+            .epnn1-onln,
+            .epnn2-onln {
+              font-size: 11px;
+            }
+          }
+        `}
+      </style>
+
       <div
         className={version === 1 ? "ep-nm-news-1" : "ep-nm-news-2"}
         onDrop={handleDrop}
@@ -214,187 +403,6 @@ const NorContainer1 = ({
           position: "relative",
         }}
       >
-        <style>
-          {`
-            .ep-nm-news-1 {
-              width: 800px;
-              height: fit-content;
-              display: flex;
-              transition: 0.5s ease-in-out;
-              cursor: pointer;
-            }
-            
-            .ep-nm-news-1:hover {
-              color: rgb(237, 1, 141);
-            }
-            
-            .epnn1-img {
-              width: 390px;
-              height: 200px;
-              max-width: 700px;
-              max-height: 200px;
-              border-radius: 5px;
-              overflow: hidden;
-              flex-shrink: 0;
-            }
-            
-            .epnn1-img img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-            }
-            
-            .ep-nm1-sbc {
-              flex: 1;
-              min-width: 0;
-            }
-            
-            .epnn1-hdln {
-              font-size: 20px;
-              font-weight: bold;
-            }
-            
-            .epnn1-onln {
-              font-size: 13px;
-            }
-
-            .ep-nm-news-2 {
-              width: 800px;
-              height: fit-content;
-              display: flex;
-              transition: 0.5s ease-in-out;
-              cursor: pointer;
-            }
-            
-            .ep-nm-news-2:hover {
-              color: rgb(237, 1, 141);
-            }
-
-            .epnn2-img {
-              width: 390px;
-              height: 200px;
-              border-radius: 5px;
-              overflow: hidden;
-              flex-shrink: 0;
-            }
-            
-            .epnn2-img img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-            }
-            
-            .ep-nm2-sbc {
-              flex: 1;
-              min-width: 0;
-            }
-            
-            .epnn2-hdln {
-              font-size: 20px;
-              font-weight: bold;
-              margin-bottom: 8px;
-            }
-            
-            .epnn2-onln {
-              font-size: 13px;
-              margin-bottom: 8px;
-            }
-            
-            .separator-btn {
-              position: absolute;
-              bottom: -14px;
-              left: 50%;
-              transform: translateX(-50%);
-              background: rgba(255, 255, 255, 0.95);
-              border: 1px solid #ccc;
-              border-radius: 50%;
-              width: 28px;
-              height: 28px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              cursor: pointer;
-              font-size: 16px;
-              z-index: 10;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-              transition: all 0.2s ease;
-            }
-
-            .separator-btn:hover {
-              background: rgba(240, 240, 240, 0.95);
-              border-color: #999;
-            }
-
-            .separator-btn.active {
-              background: rgba(153, 153, 153, 0.95);
-              color: #fff;
-              border-color: #666;
-            }
-            
-            .separator-line {
-              width: 100%;
-              height: 1px;
-              background-color: #999;
-              margin-top: 10px;
-            }
-
-            @media (max-width: 1024px) {
-              .ep-nm-news-1,
-              .ep-nm-news-2 {
-                width: 100%;
-                max-width: 800px;
-              }
-              
-              .epnn1-img,
-              .epnn2-img {
-                width: 45%;
-                min-width: 250px;
-              }
-            }
-
-            @media (max-width: 768px) {
-              .ep-nm-news-1,
-              .ep-nm-news-2 {
-                flex-direction: column;
-                width: 100%;
-              }
-              
-              .epnn1-img,
-              .epnn2-img {
-                width: 100%;
-                height: 180px;
-              }
-              
-              .epnn1-hdln,
-              .epnn2-hdln {
-                font-size: 18px;
-              }
-              
-              .epnn1-onln,
-              .epnn2-onln {
-                font-size: 12px;
-              }
-            }
-
-            @media (max-width: 480px) {
-              .epnn1-img,
-              .epnn2-img {
-                height: 150px;
-              }
-              
-              .epnn1-hdln,
-              .epnn2-hdln {
-                font-size: 16px;
-              }
-              
-              .epnn1-onln,
-              .epnn2-onln {
-                font-size: 11px;
-              }
-            }
-          `}
-        </style>
-
         {border && (
           <div
             style={{
@@ -425,7 +433,7 @@ const NorContainer1 = ({
         )}
 
         {version === 1 && (
-          <>
+          <div className="ep-nm-news-1-inner">
             <div className="epnn1-img">
               <img src={renderData.image} alt="" />
             </div>
@@ -434,11 +442,11 @@ const NorContainer1 = ({
               <div className="epnn1-onln">{renderData.content}</div>
               <div className="epn-tm">{renderData.time}</div>
             </div>
-          </>
+          </div>
         )}
 
         {version === 2 && (
-          <>
+          <div className="ep-nm-news-2-inner">
             <div className="ep-nm2-sbc">
               <div className="epnn2-hdln">{renderData.headline}</div>
               <div className="epnn2-onln">{renderData.content}</div>
@@ -447,11 +455,12 @@ const NorContainer1 = ({
             <div className="epnn2-img">
               <img src={renderData.image} alt="" />
             </div>
-          </>
+          </div>
         )}
-      </div>
 
-      {showSeparator && <div className="separator-line" />}
+        {/* Separator line is INSIDE the container so it matches its width exactly */}
+        {showSeparator && <div className="separator-line" />}
+      </div>
 
       {border && (
         <button

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Rnd } from "react-rnd";
 import { AiOutlineSlack } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
+import { FaVideo } from "react-icons/fa";
 import { BiGridAlt } from "react-icons/bi";
 import layout1 from "../../assets/Layout1.png";
 import layout2 from "../../assets/Layout2.png";
@@ -180,6 +181,12 @@ export default function Newsform({
   const handleImageDragStart = (e) => {
     e.dataTransfer.effectAllowed = "copy";
     e.dataTransfer.setData("add-box-type", "image");
+  };
+
+  // ── NEW: drag handler for video box ──────────────────────────────────────
+  const handleVideoDragStart = (e) => {
+    e.dataTransfer.effectAllowed = "copy";
+    e.dataTransfer.setData("add-box-type", "video");
   };
 
   return (
@@ -411,22 +418,52 @@ export default function Newsform({
                 </p>
               </div>
 
+              {/* ── Add content items row ────────────────────────────────── */}
               <div className="add-pi">
-                <div 
-                  className="add-para" 
+                <div
+                  className="add-para"
                   draggable
                   onDragStart={handleParagraphDragStart}
                   style={{ cursor: "move" }}
                 >
                   Add Paragraph
                 </div>
-                <div 
-                  className="add-img" 
+                <div
+                  className="add-img"
                   draggable
                   onDragStart={handleImageDragStart}
                   style={{ cursor: "move" }}
                 >
                   Add Image
+                </div>
+
+                {/* ── NEW: Add Video button ───────────────────────────────── */}
+                <div
+                  className="add-video"
+                  draggable
+                  onDragStart={handleVideoDragStart}
+                  style={{
+                    cursor: "move",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "8px 12px",
+                    background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%)",
+                    color: "#fff",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    userSelect: "none",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                    transition: "opacity 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                  title="Drag onto the canvas or into a Container Overlay"
+                >
+                  <FaVideo size={13} />
+                  Add Video
                 </div>
               </div>
 

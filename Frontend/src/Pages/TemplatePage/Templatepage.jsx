@@ -26,6 +26,7 @@ import ParagraphBox from './Components/ParagraphBox.jsx';
 import Melumnews from './Components/Melumnews.jsx';
 import NewsContainerSettings from './Components/NewsContainerSettings.jsx';
 import ContainerOverlay from './Components/ContainerOverlay.jsx';
+import NewsVideoBox from './Components/NewsVideoBox.jsx';   // ← NEW
 
 export default function Templatepage() {
   const dispatch = useDispatch();
@@ -84,15 +85,18 @@ export default function Templatepage() {
     }));
   };
 
+  // ── Box management ───────────────────────────────────────────────────────
   const addBox = (type) => {
     const newBox = { 
       id: Date.now(), 
       type, 
       x: 100, 
       y: 100, 
-      width: type === 'paragraph' ? 550 : 250, 
-      height: type === 'paragraph' ? 200 : 200, 
-      content: "" 
+      width:   type === 'paragraph' ? 550 : type === 'video' ? 600 : 250, 
+      height:  type === 'paragraph' ? 200 : type === 'video' ? 340 : 200, 
+      content: "",
+      // video-specific initial data
+      ...(type === 'video' ? { videoData: null, dimensions: { width: 600 } } : {})
     };
     setBoxes(prev => [...prev, newBox]);
   };
@@ -110,6 +114,7 @@ export default function Templatepage() {
     });
   };
 
+  // ── Container overlay management ─────────────────────────────────────────
   const addContainerOverlay = () => {
     const newContainer = {
       id: Date.now(),
@@ -137,6 +142,7 @@ export default function Templatepage() {
     );
   };
 
+  // ── Drag & drop ──────────────────────────────────────────────────────────
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -147,15 +153,17 @@ export default function Templatepage() {
     e.stopPropagation();
     
     const isContainerOverlay = e.dataTransfer.getData('container-overlay');
-    const addBoxType = e.dataTransfer.getData('add-box-type');
+    const addBoxType         = e.dataTransfer.getData('add-box-type');
     
     if (isContainerOverlay === 'true') {
       addContainerOverlay();
     } else if (addBoxType) {
+      // paragraph | image | video
       addBox(addBoxType);
     }
   };
 
+  // ── Settings & save ───────────────────────────────────────────────────────
   const handleContainerSettingsChange = (newSettings) => {
     setContainerSettings(newSettings);
   };
@@ -326,21 +334,11 @@ export default function Templatepage() {
                 >
                   {formNewsData?.zonal || "No zonal data yet"}
                   <div className="hide-btn-hover" style={{
-                    position: 'absolute',
-                    top: '-8px',
-                    right: '-8px',
-                    background: '#ff0059',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    opacity: 0,
-                    transition: 'opacity 0.2s'
+                    position: 'absolute', top: '-8px', right: '-8px',
+                    background: '#ff0059', color: 'white', borderRadius: '50%',
+                    width: '20px', height: '20px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', fontSize: '12px', opacity: 0, transition: 'opacity 0.2s'
                   }}>
                     <FaTimes />
                   </div>
@@ -355,21 +353,11 @@ export default function Templatepage() {
                 >
                   By: {formNewsData?.author || "Unknown Author"}
                   <div className="hide-btn-hover" style={{
-                    position: 'absolute',
-                    top: '-8px',
-                    right: '-8px',
-                    background: '#ff0059',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    opacity: 0,
-                    transition: 'opacity 0.2s'
+                    position: 'absolute', top: '-8px', right: '-8px',
+                    background: '#ff0059', color: 'white', borderRadius: '50%',
+                    width: '20px', height: '20px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', fontSize: '12px', opacity: 0, transition: 'opacity 0.2s'
                   }}>
                     <FaTimes />
                   </div>
@@ -386,22 +374,12 @@ export default function Templatepage() {
                   onDoubleClick={() => toggleElementVisibility('thumbnail')}
                 >
                   <div className="hide-btn-hover" style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    background: '#ff0059',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '24px',
-                    height: '24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    opacity: 0,
-                    transition: 'opacity 0.2s',
-                    zIndex: 10
+                    position: 'absolute', top: '8px', right: '8px',
+                    background: '#ff0059', color: 'white', borderRadius: '50%',
+                    width: '24px', height: '24px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', fontSize: '14px', opacity: 0,
+                    transition: 'opacity 0.2s', zIndex: 10
                   }}>
                     <FaTimes />
                   </div>
@@ -426,12 +404,7 @@ export default function Templatepage() {
                         <video
                           src={finalThumb}
                           controls
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            borderRadius: '8px'
-                          }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
                         >
                           Your browser does not support the video tag.
                         </video>
@@ -448,6 +421,7 @@ export default function Templatepage() {
               )}
             </div>
 
+            {/* ── Main drop canvas ────────────────────────────────────── */}
             <div 
               className="el-full-news" 
               onDragOver={handleDragOver}
@@ -466,39 +440,69 @@ export default function Templatepage() {
                 settings={containerSettings}
                 onSettingsChange={handleContainerSettingsChange}
               />
-{containerOverlays.map((container) => (
-  <div key={container.id} style={{ gridColumn: `1 / -1` }}>
-    <ContainerOverlay
-      id={container.id}
-      onDelete={removeContainerOverlay}
-      onUpdate={updateContainerOverlay}
-      initialSettings={container.settings}
-      activeLang={activeLang}
-    />
-  </div>
-))}
-{boxes.map((box) => {
-  return box.type === "paragraph" ? (
-    <ParagraphBox 
-      key={box.id}
-      id={box.id} 
-      onDelete={removeBox} 
-      onUpdate={updateBoxContent} 
-      initialContent={activeLang === "en" && box.contentEn != null ? box.contentEn : box.content}
-      contentKey={activeLang === "en" ? "contentEn" : "content"}
-      box={box}
-    />
-  ) : (
-    <ImageBox 
-      key={box.id}
-      id={box.id} 
-      onDelete={removeBox} 
-      onUpdate={updateBoxContent} 
-      initialContent={box.content}
-      box={box}
-    />
-  );
-})}
+
+              {/* Container overlays */}
+              {containerOverlays.map((container) => (
+                <div key={container.id} style={{ gridColumn: `1 / -1` }}>
+                  <ContainerOverlay
+                    id={container.id}
+                    onDelete={removeContainerOverlay}
+                    onUpdate={updateContainerOverlay}
+                    initialSettings={container.settings}
+                    activeLang={activeLang}
+                  />
+                </div>
+              ))}
+
+              {/* Free-standing boxes: paragraph | image | video */}
+              {boxes.map((box) => {
+                if (box.type === "paragraph") {
+                  return (
+                    <ParagraphBox 
+                      key={box.id}
+                      id={box.id} 
+                      onDelete={removeBox} 
+                      onUpdate={updateBoxContent} 
+                      initialContent={activeLang === "en" && box.contentEn != null ? box.contentEn : box.content}
+                      contentKey={activeLang === "en" ? "contentEn" : "content"}
+                      box={box}
+                    />
+                  );
+                }
+
+                if (box.type === "image") {
+                  return (
+                    <ImageBox 
+                      key={box.id}
+                      id={box.id} 
+                      onDelete={removeBox} 
+                      onUpdate={updateBoxContent} 
+                      initialContent={box.content}
+                      box={box}
+                    />
+                  );
+                }
+
+                // ── NEW: free-standing video box on canvas ─────────────
+                if (box.type === "video") {
+                  return (
+                    <div key={box.id} style={{ gridColumn: `1 / -1` }}>
+                      <NewsVideoBox
+                        id={box.id}
+                        onDelete={removeBox}
+                        onUpdate={updateBoxContent}
+                        initialData={{
+                          videoData:  box.videoData  || null,
+                          dimensions: box.dimensions || { width: 600 }
+                        }}
+                        isInContainer={false}
+                      />
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
             </div>
           </div>
        

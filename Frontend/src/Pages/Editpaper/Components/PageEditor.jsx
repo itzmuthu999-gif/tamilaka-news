@@ -399,6 +399,11 @@ export default function PageEditor({
     { id: 11, label: "Ad banner 2" },
   ];
 
+  const otherTypes = [
+    { id: 20, label: "Poll" },
+    { id: 21, label: "Video Container" },
+  ];
+
   const getActiveItems = () => {
     switch (activeTab) {
       case "containers":
@@ -571,7 +576,7 @@ export default function PageEditor({
           )}
 
           <div className="tabs-container">
-            {["containers", "sliders", "lines", "ad", "presets"].map((tab) => (
+            {["containers", "sliders", "lines", "presets", "others"].map((tab) => (
               <div
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -823,6 +828,62 @@ export default function PageEditor({
             ) : activeTab === "presets" ? (
               /* PRESETS TAB */
               <PresetsTab />
+            ) : activeTab === "others" ? (
+              /* OTHERS TAB */
+              <div style={{ padding: "20px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "15px",
+                  }}
+                >
+                  {otherTypes.map((item) => (
+                    <div
+                      key={item.id}
+                      draggable
+                      onDragStart={(e) => {
+                        if (item.label === "Poll") {
+                          e.dataTransfer.setData("isPoll", "true");
+                        } else if (item.label === "Video Container") {
+                          e.dataTransfer.setData("isVideo", "true");
+                        }
+                        e.dataTransfer.effectAllowed = "copy";
+                      }}
+                      onDragEnd={(e) => {
+                        e.preventDefault();
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "15px",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        cursor: "grab",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "10px",
+                        border: "2px solid #e91e63",
+                        borderRadius: "8px",
+                        background: "#fff",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "#fce4ec";
+                        e.currentTarget.style.borderColor = "#c2185b";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "#fff";
+                        e.currentTarget.style.borderColor = "#e91e63";
+                      }}
+                      className="dds-add-cont-btn"
+                    >
+                      <Plus size={18} />
+                      {item.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : (
               /* OTHER TABS */
 

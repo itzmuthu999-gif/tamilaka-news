@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaTimes, FaEdit } from 'react-icons/fa';
 import ImageBox from './ImageBox.jsx';
 import ParagraphBox from './ParagraphBox.jsx';
+import NewsVideoBox from './NewsVideoBox.jsx';   // ← NEW
 
 const defaultSettings = {
   columns: 2,
@@ -10,7 +11,13 @@ const defaultSettings = {
   boxes: []
 };
 
-export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettings = {}, activeLang = "ta" }) {
+export default function ContainerOverlay({
+  id,
+  onDelete,
+  onUpdate,
+  initialSettings = {},
+  activeLang = "ta",
+}) {
   const [settings, setSettings] = useState({
     ...defaultSettings,
     ...initialSettings,
@@ -25,7 +32,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
     };
     setSettings(loaded);
   }, [id]);
-  
+
   const [showSettings, setShowSettings] = useState(false);
   const [tempSettings, setTempSettings] = useState({ ...settings });
 
@@ -52,37 +59,32 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const boxId = e.dataTransfer.getData('boxId');
-    const boxType = e.dataTransfer.getData('boxType');
+
+    const boxId      = e.dataTransfer.getData('boxId');
+    const boxType    = e.dataTransfer.getData('boxType');
     const addBoxType = e.dataTransfer.getData('add-box-type');
-    
+
     if (boxId && boxType) {
+      // Existing box being re-dropped (paragraph / image move)
       const newBox = {
         id: parseInt(boxId),
         type: boxType,
         content: ''
       };
-      
-      const updatedSettings = {
-        ...settings,
-        boxes: [...settings.boxes, newBox]
-      };
-      
+      const updatedSettings = { ...settings, boxes: [...settings.boxes, newBox] };
       setSettings(updatedSettings);
       onUpdate(id, updatedSettings);
+
     } else if (addBoxType) {
+      // Drag from Newsform sidebar: "paragraph", "image", or "video"
       const newBox = {
         id: Date.now(),
         type: addBoxType,
-        content: ''
+        content: '',
+        // video boxes carry their own sub-state; initialise with empty data
+        ...(addBoxType === 'video' ? { videoData: null, dimensions: { width: 560 } } : {})
       };
-      
-      const updatedSettings = {
-        ...settings,
-        boxes: [...settings.boxes, newBox]
-      };
-      
+      const updatedSettings = { ...settings, boxes: [...settings.boxes, newBox] };
       setSettings(updatedSettings);
       onUpdate(id, updatedSettings);
     }
@@ -100,7 +102,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
   const updateBoxInContainer = (boxId, updates) => {
     const updatedSettings = {
       ...settings,
-      boxes: settings.boxes.map(b => 
+      boxes: settings.boxes.map(b =>
         b.id === boxId ? { ...b, ...updates } : b
       )
     };
@@ -123,6 +125,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
           background: 'rgba(102, 126, 234, 0.05)'
         }}
       >
+        {/* ── Top-right control buttons ──────────────────────────── */}
         <div
           style={{
             position: 'absolute',
@@ -171,6 +174,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
           </button>
         </div>
 
+        {/* ── Settings panel ─────────────────────────────────────── */}
         {showSettings && (
           <div
             style={{
@@ -196,13 +200,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
                 max="6"
                 value={tempSettings.columns}
                 onChange={(e) => setTempSettings({ ...tempSettings, columns: parseInt(e.target.value) || 1 })}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '13px'
-                }}
+                style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px' }}
               />
             </div>
             <div style={{ marginBottom: '12px' }}>
@@ -215,13 +213,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
                 max="50"
                 value={tempSettings.gap}
                 onChange={(e) => setTempSettings({ ...tempSettings, gap: parseInt(e.target.value) || 0 })}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '13px'
-                }}
+                style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px' }}
               />
             </div>
             <div style={{ marginBottom: '12px' }}>
@@ -234,13 +226,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
                 max="100"
                 value={tempSettings.padding}
                 onChange={(e) => setTempSettings({ ...tempSettings, padding: parseInt(e.target.value) || 0 })}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '13px'
-                }}
+                style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px' }}
               />
             </div>
             <button
@@ -262,6 +248,7 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
           </div>
         )}
 
+        {/* ── Grid of boxes ──────────────────────────────────────── */}
         <div
           style={{
             display: 'grid',
@@ -271,13 +258,18 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
           }}
         >
           {settings.boxes.length === 0 ? (
-            <div style={{ gridColumn: `span ${settings.columns}`, textAlign: 'center', color: '#999', padding: '20px' }}>
-              Drop paragraph or image boxes here
+            <div style={{
+              gridColumn: `span ${settings.columns}`,
+              textAlign: 'center',
+              color: '#999',
+              padding: '20px'
+            }}>
+              Drop paragraph, image, or video boxes here
             </div>
           ) : (
             settings.boxes.map((box) => (
               <div key={box.id}>
-                {box.type === 'paragraph' ? (
+                {box.type === 'paragraph' && (
                   <ParagraphBox
                     id={box.id}
                     onDelete={removeBoxFromContainer}
@@ -287,13 +279,29 @@ export default function ContainerOverlay({ id, onDelete, onUpdate, initialSettin
                     box={{ x: 0, y: 0, width: 200, height: 150, ...box }}
                     isInContainer={true}
                   />
-                ) : (
+                )}
+
+                {box.type === 'image' && (
                   <ImageBox
                     id={box.id}
                     onDelete={removeBoxFromContainer}
                     onUpdate={updateBoxInContainer}
                     initialContent={box.content}
                     box={{ x: 0, y: 0, width: 200, height: 150, ...box }}
+                    isInContainer={true}
+                  />
+                )}
+
+                {/* ── NEW: Video box inside container ──────────────── */}
+                {box.type === 'video' && (
+                  <NewsVideoBox
+                    id={box.id}
+                    onDelete={removeBoxFromContainer}
+                    onUpdate={updateBoxInContainer}
+                    initialData={{
+                      videoData:  box.videoData  || null,
+                      dimensions: box.dimensions || { width: 560 }
+                    }}
                     isInContainer={true}
                   />
                 )}

@@ -9,6 +9,7 @@ import PagePreview from "./Components2/PagePreview";
 export default function NewsPaperM() {
   const [isOn, setIsOn] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activePage, setActivePage] = useState("main");
   
   const themeStyle = {
     backgroundColor: isOn ? "#141414" : "#ffffff",
@@ -40,18 +41,23 @@ export default function NewsPaperM() {
           setIsOn={setIsOn}
           isOn={isOn}
           openSidebar={() => setSidebarOpen(true)}
+          activePage={activePage}
+          setActivePage={setActivePage}
         />
 
         <Sidebar
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           openSidebar={() => setSidebarOpen(true)}
+          activePage={activePage}
+          setActivePage={setActivePage}
         />
         
         <div className="np-main-cont-ov">
           <div className="ep-ed-full-cont">
-            {/* Render the main page preview from Redux */}
-            <PagePreview pageName="main" />
+            <br />
+            {/* Render the active page preview from Redux */}
+            <PagePreview pageName={activePage} />
           </div>
           
           <Footer/>
