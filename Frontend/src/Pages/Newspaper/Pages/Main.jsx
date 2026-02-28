@@ -13,7 +13,7 @@ import NorContainer4 from "../Containers_/NorContainer4";
 import NorContainer4A from "../Containers_/NorContainer4A";
 import NorContainer5 from "../Containers_/NorContainer5";
 
-import AdBox from "../Components/Adbox";
+import AdBox from "../Components/AdBox";
 import AutoScrollContainer from "../Components/AutoScrollContainer";
 import Line from "../Components/Line";
 

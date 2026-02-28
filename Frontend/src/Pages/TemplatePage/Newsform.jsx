@@ -9,7 +9,7 @@ import layout2 from "../../assets/Layout2.png";
 import { useDispatch } from "react-redux";
 import { setLayout } from "../Slice/newsformslice.js";
 import { useSelector } from "react-redux";
-import "../TemplatePage/Templatepage.scss";
+import "../TemplatePage/TemplatePage.scss";
 
 const emptyFormData = () => ({
   headline: "",
