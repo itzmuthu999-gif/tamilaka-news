@@ -8,7 +8,7 @@ import Sidebar from "./Sidebar/Sidebar";
 import Websitelyt from "./WebsiteLayout/Websitelyt";
 import Manageuser from "./Manageuser/Manageuser.jsx";
 import { selectAllPages, selectDistrictPage } from "../Slice/adminSelectors.js";
-import { syncPagesFromAdmin } from "../Slice/editpaperSlice/editpaperslice.js";
+import { syncPagesFromAdmin } from "../Slice/editpaperSlice/editpaperSlice.js";
 import { updateAdminConfig } from "../../Api/adminApi.js";
 
 export default function Adminop() {

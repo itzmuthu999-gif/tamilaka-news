@@ -12,7 +12,7 @@ import {
   updateLineArguments,
   setActivePage,
   deletePresetContainer,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 import { selectAllPages, selectDistrictPage } from "../../Slice/adminSelectors";
 import { saveLayout } from "../../../Api/layoutApi.js";
 

@@ -10,7 +10,7 @@ import {
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
   removeSlotFromContainerSlider,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 
 const VideoContainer = ({
   border = false,

@@ -10,7 +10,7 @@ import { IoSunnySharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { setLanguage } from "../../Slice/newsformslice.js";
+import { setLanguage } from "../../Slice/newsformSlice.js";
 import { useNavigate } from "react-router-dom";
 import { getTodayInTamil } from './getTodayInTamil.js';
 // Utility: highlight matching text within a string

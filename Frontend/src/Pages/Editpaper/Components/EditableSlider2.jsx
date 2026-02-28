@@ -13,7 +13,7 @@ import {
   // FIX 1: Import the missing dropNewsIntoSliderSlot action
   dropNewsIntoSliderSlot,
   addVideoSlotToSlider,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
 import BigNewsContainer2 from "../Containers_/BigContainer2";

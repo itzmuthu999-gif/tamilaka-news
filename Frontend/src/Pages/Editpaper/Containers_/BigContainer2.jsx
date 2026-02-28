@@ -19,7 +19,7 @@ import {
   updateSlotShfval,
   updateNestedSlotShfval,
   updateSliderSlotShfval,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 
 import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";

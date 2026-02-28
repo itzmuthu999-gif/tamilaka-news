@@ -7,9 +7,9 @@ import {
   updateContentContainerSpacing,
   addItemToContentContainer,
   removeItemFromContentContainer
-} from "../../Slice/newsformslice.js";
-import ParagraphBox from "./ParagraphBox.jsx";
-import ImageBox from "./ImageBox.jsx";
+} from "../Pages/Slice/newsformSlice.js";
+import ParagraphBox from "../Pages/TemplatePage/Components/ParagraphBox.jsx";
+import ImageBox from "../Pages/TemplatePage/Components/ImageBox.jsx";
 
 export default function ContentContainer({ 
   containerId, 

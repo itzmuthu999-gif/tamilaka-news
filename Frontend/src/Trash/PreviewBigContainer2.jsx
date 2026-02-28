@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import jwt from "../../../assets/jwt.jpg";
+import jwt from "../assets/jwt.jpg";
 
 const PreviewBigContainer2 = ({ newsId, version = 1 }) => {
   const navigate = useNavigate();

@@ -17,7 +17,7 @@ import {
   toggleNestedSeparator,
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 
 const NorContainer4B = ({
   newsId = null,

@@ -5,7 +5,7 @@ import logo from "../../../assets/logo1.png";
 import { IoSearchSharp } from "react-icons/io5";
 import { BiWorld } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
-import { setLanguage } from "../../Slice/newsformslice.js";
+import { setLanguage } from "../../Slice/newsformSlice.js";
 
 // Utility: highlight matching text within a string
 function HighlightText({ text, query }) {

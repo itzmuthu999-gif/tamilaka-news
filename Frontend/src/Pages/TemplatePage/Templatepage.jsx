@@ -16,7 +16,7 @@ import {
   setAllNews,
   setCurrentNews, 
   setLayout
-} from "../Slice/newsformslice.js";
+} from "../Slice/newsformSlice.js";
 import { createNews, updateNews as updateNewsApi } from "../../Api/newsApi.js";
 import './TemplatePage.scss';
 

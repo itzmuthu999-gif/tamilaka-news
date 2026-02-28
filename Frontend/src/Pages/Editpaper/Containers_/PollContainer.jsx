@@ -7,7 +7,7 @@ import {
   removePollFromNestedSlot,
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 import { FaPaperPlane, FaPlus } from "react-icons/fa";
 
 const PollContainer = ({

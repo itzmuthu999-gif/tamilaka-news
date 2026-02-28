@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { 
   addContainer,
   addLine,
-} from "../Slice/editpaperSlice/editpaperslice";
+} from "../Slice/editpaperSlice/editpaperSlice";
 
 import "./editpapercss.scss";
 

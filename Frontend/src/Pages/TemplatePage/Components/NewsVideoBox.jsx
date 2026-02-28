@@ -9,7 +9,7 @@ import { FaPlay, FaYoutube, FaUpload } from "react-icons/fa";
  * Self-contained video component for the Newsform / Templatepage system.
  * Does NOT depend on editpaperSlice. All video data is managed via local
  * state and propagated up through `onUpdate` so the parent can persist it
- * into the newsformslice (via updateBoxInContainer or updateBoxContent).
+ * into the newsformSlice (via updateBoxInContainer or updateBoxContent).
  *
  * Props
  * ─────

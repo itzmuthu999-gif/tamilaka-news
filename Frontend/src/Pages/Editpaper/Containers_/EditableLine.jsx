@@ -6,7 +6,7 @@ import {
   updateLineLength,
   deleteLine,
   setActiveLine,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 
 
 export default function EditableLine({

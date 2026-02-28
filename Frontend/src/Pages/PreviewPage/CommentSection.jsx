@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateNews } from "../Slice/newsformslice.js";
+import { updateNews } from "../Slice/newsformSlice.js";
 import { updateNews as updateNewsApi } from "../../Api/newsApi.js";
 import "./Previewpge.scss";
 import timeFun from "../Newspaper/Containers_/timeFun.js";

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import luffy from '../assets/luffy.webp'
 import { FaRegClock, FaPen, FaEye, FaTrash } from "react-icons/fa";
-import { deleteNews, setCurrentNews } from "./Slice/newsformslice.js";
+import { deleteNews, setCurrentNews } from "./Slice/newsformSlice.js";
 import { deleteNews as deleteNewsApi } from "../Api/newsApi.js";
 import './Newsbund.scss';
 

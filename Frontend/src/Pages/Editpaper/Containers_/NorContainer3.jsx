@@ -20,7 +20,7 @@ import {
   updateSlotShfval,
   updateNestedSlotShfval,
   updateSliderSlotShfval,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 
 const NorContainer3 = ({
   border = false,

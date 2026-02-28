@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { setLayout } from "../../Slice/newsformslice.js";
+import { setLayout } from "../../Slice/newsformSlice.js";
 import { useSelector } from "react-redux";
 import layout1 from "../../../assets/Layout1.png";
 import layout2 from "../../../assets/Layout2.png";

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updatePollData } from "../../Slice/editpaperSlice/editpaperslice";
+import { updatePollData } from "../../Slice/editpaperSlice/editpaperSlice";
 import { saveLayout } from "../../../Api/layoutApi";
 
 /**

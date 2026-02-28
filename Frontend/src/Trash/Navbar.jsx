@@ -1,5 +1,5 @@
 import React from 'react'
-import logo from "../../../assets/logo1.png";
+import logo from "../assets/logo1.png";
 import { IoSearchSharp } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiWorld } from "react-icons/bi";
@@ -8,8 +8,8 @@ import { HiMiniMoon } from "react-icons/hi2";
 import { IoSunnySharp } from "react-icons/io5";
 import { useState,useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { setLanguage, setTranslatedNews } from "../../Slice/newsformslice.js";
-import { translateToEnglish } from "../../Slice/translate.js";
+import { setLanguage, setTranslatedNews } from "../Pages/Slice/newsformSlice.js";
+import { translateToEnglish } from "../Pages/Slice/translate.js";
 
 export default function Navbar({ setIsOn, isOn, openSidebar }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth > 768);

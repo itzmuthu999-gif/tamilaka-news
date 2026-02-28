@@ -22,7 +22,7 @@ import {
   updateNestedSlotDimensions,
   updateSliderSlotDimensions,
   addPresetContainer,
-} from "../../Slice/editpaperSlice/editpaperslice";
+} from "../../Slice/editpaperSlice/editpaperSlice";
 
 /**
  * Universal News Container Component
