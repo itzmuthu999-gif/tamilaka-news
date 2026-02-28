@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IoClose } from "react-icons/io5";
 import logo from "../../../assets/logo1.png";
 import { IoSearchSharp } from "react-icons/io5";
+import { BiWorld } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { setLanguage } from "../../Slice/newsformslice.js";
 
 // Utility: highlight matching text within a string
 function HighlightText({ text, query }) {
@@ -33,14 +35,17 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState({ pages: [], news: [] });
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [langPopupOpen, setLangPopupOpen] = useState(false);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const searchContainerRef = useRef(null);
   const searchInputRef = useRef(null);
+  const globeRef = useRef(null);
 
   // Get navigation data from Redux store
   const { allPages } = useSelector((state) => state.admin);
-  const { allNews, language } = useSelector((state) => state.newsform);
+  const { allNews, translatedNews, language } = useSelector((state) => state.newsform);
 
   // Filter and sort pages that should appear in sidebar
   const sidebarPages = allPages
@@ -59,6 +64,13 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
   const handleDistrictClick = (districtName) => {
     setActivePage(districtName.toLowerCase());
     onClose();
+  };
+
+  const handleLanguageSelect = (lang) => {
+    setLangPopupOpen(false);
+    if (lang !== language) {
+      dispatch(setLanguage(lang));
+    }
   };
 
   // Close suggestions when clicking outside search area
@@ -80,6 +92,18 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
       setSearchSuggestions({ pages: [], news: [] });
     }
   }, [open]);
+
+  // Close lang popup on outside click
+  useEffect(() => {
+    if (!langPopupOpen) return;
+    const handleClick = (e) => {
+      if (globeRef.current && !globeRef.current.contains(e.target)) {
+        setLangPopupOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [langPopupOpen]);
 
   // Build search suggestions whenever query changes
   const buildSuggestions = useCallback((query) => {
@@ -123,7 +147,8 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
 
     // Match news by headline or oneLiner
     const matchedNews = [];
-    allNews.forEach(news => {
+    const newsSource = language === "en" ? translatedNews : allNews;
+    newsSource.forEach(news => {
       const headline = news.data?.headline || news.title || "";
       const oneLiner = news.data?.oneLiner || news.content || "";
       if (
@@ -140,7 +165,7 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
 
     setSearchSuggestions({ pages: matchedPages.slice(0, 5), news: matchedNews.slice(0, 5) });
     setShowSuggestions(true);
-  }, [allPages, allNews, language]);
+  }, [allPages, allNews, translatedNews, language]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -192,10 +217,11 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
 
         {/* Search bar with suggestions */}
         <div className="sb-header">
-          <div
-            ref={searchContainerRef}
-            style={{ position: "relative", width: "100%" }}
-          >
+          <div className="sb-search-row">
+            <div
+              ref={searchContainerRef}
+              className="sb-search-wrap"
+            >
             {/* Search Input */}
             <div
               className="search-bar"
@@ -317,6 +343,66 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
               </div>
             )}
           </div>
+
+          <div ref={globeRef} className="sb-lang">
+            <button
+              type="button"
+              className="sb-lang-toggle"
+              onClick={() => setLangPopupOpen((prev) => !prev)}
+              aria-label="Change language"
+            >
+              <BiWorld />
+            </button>
+            {langPopupOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: "0",
+                  backgroundColor: "white",
+                  border: "1px solid #f9c0e0",
+                  borderRadius: "10px",
+                  boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
+                  zIndex: 400,
+                  minWidth: "140px",
+                  overflow: "hidden",
+                }}
+              >
+                {[
+                  { code: "en", label: "English", sublabel: "English" },
+                  { code: "ta", label: "தமிழ்", sublabel: "Tamil" },
+                ].map(({ code, label, sublabel }) => {
+                  const isActive = code === language;
+                  return (
+                    <div
+                      key={code}
+                      onClick={() => handleLanguageSelect(code)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "6px 10px",
+                        cursor: "pointer",
+                        background: isActive ? "#fff0f8" : "white",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#fdf0f8"; }}
+                      onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "white"; }}
+                    >
+                      <div>
+                        <div style={{ fontSize: "14px", fontWeight: isActive ? 600 : 400, color: isActive ? "#e91e8c" : "#333" }}>{label}</div>
+                        <div style={{ fontSize: "11px", color: "#aaa" }}>{sublabel}</div>
+                      </div>
+                      {isActive && (
+                        <span style={{ color: "#e91e8c", fontSize: "14px", fontWeight: 700 }}>âœ“</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          </div>
         </div>
 
         {/* Sidebar Navigation Items */}
@@ -327,7 +413,7 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
               return (
                 <SidebarItem
                   key={page.id}
-                  title={page.name.tam}
+                  title={language === "ta" ? page.name.tam : page.name.eng}
                   active={active}
                   toggle={toggle}
                 >
@@ -337,7 +423,7 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
                       onClick={() => handleDistrictClick(district.eng)}
                       style={{ cursor: "pointer" }}
                     >
-                      {district.tam}
+                      {language === "ta" ? district.tam : district.eng}
                     </li>
                   ))}
                 </SidebarItem>
@@ -352,7 +438,7 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
                   onClick={() => handlePageClick(page.name.eng)}
                   style={{ cursor: "pointer" }}
                 >
-                  {page.name.tam}
+                  {language === "ta" ? page.name.tam : page.name.eng}
                 </div>
               </div>
             );

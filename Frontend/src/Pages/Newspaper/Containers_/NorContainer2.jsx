@@ -9,9 +9,12 @@ const NorContainer2 = ({
   border = false,
 }) => {
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform?.allNews || []);
+  const { allNews = [], translatedNews = [], language } = useSelector(
+    (state) => state.newsform || {}
+  );
 
-  const news = allNews.find((n) => n.id === newsId);
+  const newsSource = language === "en" ? translatedNews : allNews;
+  const news = newsSource.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -30,7 +33,7 @@ const NorContainer2 = ({
           return DEFAULT_DATA.image;
         })(),
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: timeFun(news.time) || DEFAULT_DATA.time,
+        time: timeFun(news.time || news.createdAt || news.updatedAt) || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 
@@ -160,3 +163,4 @@ const NorContainer2 = ({
 };
 
 export default NorContainer2;
+

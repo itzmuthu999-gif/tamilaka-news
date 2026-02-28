@@ -13,11 +13,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FaTimes } from "react-icons/fa";
 
 import { 
-  saveNews, 
-  updateNews, 
+  setAllNews,
   setCurrentNews, 
   setLayout
 } from "../Slice/newsformslice.js";
+import { createNews, updateNews as updateNewsApi } from "../../Api/newsApi.js";
 import './TemplatePage.scss';
 
 import Newsform from './Newsform.jsx';
@@ -32,6 +32,7 @@ export default function Templatepage() {
   const dispatch = useDispatch();
   const currentNews = useSelector((state) => state.newsform.currentNews);
   const MLayout = useSelector(state => state.newsform.MLayout);
+  const allNews = useSelector(state => state.newsform.allNews || []);
 
   const [boxes, setBoxes] = useState([]);
   const [containerOverlays, setContainerOverlays] = useState([]);
@@ -168,40 +169,48 @@ export default function Templatepage() {
     setContainerSettings(newSettings);
   };
 
-  const saveThisNews = () => {
-    if (currentNews && currentNews.id) {
-      dispatch(updateNews({
-        id: currentNews.id,
-        updatedNews: {
-          data: formState,
-          dataEn: formStateEn || null,
-          fullContent: boxes,
-          containerOverlays: containerOverlays,
-          containerSettings: containerSettings,
-          layout: MLayout,
-          hiddenElements: hiddenElements
-        }
-      }));
-      alert('News updated');
-    } else {
-      dispatch(saveNews({
-        data: formState || {},
-        dataEn: formStateEn || null,
-        fullContent: boxes,
-        containerOverlays: containerOverlays,
-        containerSettings: containerSettings,
-        layout: MLayout,
-        hiddenElements: hiddenElements
-      }));
-      alert('News saved');
-      
-      dispatch(setCurrentNews({
-        id: Date.now(),
-        data: formState || {},
-        dataEn: formStateEn || null,
-        fullContent: boxes,
-        containerOverlays: containerOverlays
-      }));
+  const saveThisNews = async () => {
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      alert("Please log in as Admin to save news.");
+      return;
+    }
+
+    const payload = {
+      data: formState || {},
+      dataEn: formStateEn || null,
+      fullContent: boxes,
+      containerOverlays: containerOverlays,
+      containerSettings: containerSettings,
+      layout: MLayout,
+      hiddenElements: hiddenElements,
+      comments: currentNews?.comments || []
+    };
+
+    try {
+      if (currentNews && (currentNews._id || currentNews.id)) {
+        const apiId = currentNews._id || currentNews.id;
+        const updated = await updateNewsApi(apiId, payload);
+        const hasMatch = allNews.some(
+          (n) => n._id === updated._id || n.id === updated.id
+        );
+        const updatedList = hasMatch
+          ? allNews.map((n) =>
+              n._id === updated._id || n.id === updated.id ? updated : n
+            )
+          : [...allNews, updated];
+        dispatch(setAllNews(updatedList));
+        dispatch(setCurrentNews(updated));
+        alert("News updated");
+      } else {
+        const created = await createNews(payload);
+        dispatch(setAllNews([...allNews, created]));
+        dispatch(setCurrentNews(created));
+        alert("News saved");
+      }
+    } catch (error) {
+      console.error("Failed to save news:", error);
+      alert("Failed to save news. Check the server and try again.");
     }
   };
 
@@ -215,6 +224,9 @@ export default function Templatepage() {
   }, []);
 
   const formNewsData = activeLang === "en" && formStateEn ? formStateEn : formState;
+  const zonalLabel = Array.isArray(formNewsData?.zonal)
+    ? formNewsData.zonal.join(", ")
+    : formNewsData?.zonal;
 
   const getAllParagraphBoxes = useCallback(() => {
     const outsideParagraphs = boxes.filter((b) => b.type === "paragraph");
@@ -319,9 +331,7 @@ export default function Templatepage() {
           </div>
         </div>
       </div>
-      <div className="break-news">
-        <p>சென்னை விமான நிலையத்தில் பாதுகாப்பு சோதனை தீவிரம் | டெல்லியில் மழை வெள்ளம் – போக்குவரத்து பாதிப்பு | பெங்களூரில் பெரிய IT நிறுவனத்தில் திடீர் பணிநீக்கம் | தமிழகத்தில் இன்று மின்தடை அறிவிப்பு | கோவை அருகே வெடிகுண்டு பரபரப்பு – போலீஸ் விசாரணை தொடக்கம் | பங்குசந்தை சரிவு – முதலீட்டாளர்கள் அதிர்ச்சி</p>
-      </div>
+      <br /><br />
       <div className="news-m-cont">
         <div className="news-m-cont2">
           <div className="ele-news">
@@ -332,7 +342,7 @@ export default function Templatepage() {
                   style={{ position: 'relative', display: 'inline-block' }}
                   onDoubleClick={() => toggleElementVisibility('zonar')}
                 >
-                  {formNewsData?.zonal || "No zonal data yet"}
+                  {zonalLabel || "No category yet"}
                   <div className="hide-btn-hover" style={{
                     position: 'absolute', top: '-8px', right: '-8px',
                     background: '#ff0059', color: 'white', borderRadius: '50%',
@@ -390,10 +400,14 @@ export default function Templatepage() {
                     let isVideo = false;
 
                     if (thumb) {
-                      if (typeof thumb === "string") {
-                        finalThumb = thumb;
-                        isVideo = thumb.includes('.mp4') || thumb.includes('.webm') || thumb.includes('.ogg');
-                      } else if (thumb instanceof File) {
+                    if (typeof thumb === "string") {
+                      finalThumb = thumb;
+                      isVideo =
+                        thumb.startsWith("data:video/") ||
+                        thumb.includes(".mp4") ||
+                        thumb.includes(".webm") ||
+                        thumb.includes(".ogg");
+                    } else if (thumb instanceof File) {
                         finalThumb = URL.createObjectURL(thumb);
                         isVideo = thumb.type?.startsWith('video/');
                       }

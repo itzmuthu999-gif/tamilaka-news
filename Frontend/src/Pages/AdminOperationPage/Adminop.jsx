@@ -2,13 +2,14 @@
 import "./adminop.scss";
 import "./Adminop.css";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import HandlePages from "./HandlePages/HandlePages";
 import Sidebar from "./Sidebar/Sidebar";
 import Websitelyt from "./WebsiteLayout/Websitelyt";
 import Manageuser from "./Manageuser/Manageuser.jsx";
 import { selectAllPages, selectDistrictPage } from "../Slice/adminSelectors.js";
 import { syncPagesFromAdmin } from "../Slice/editpaperSlice/editpaperslice.js";
+import { updateAdminConfig } from "../../Api/adminApi.js";
 
 export default function Adminop() {
   const dispatch = useDispatch();
@@ -28,11 +29,40 @@ export default function Adminop() {
   // Get data from Redux store
   const allPages = useSelector(selectAllPages);
   const districtPage = useSelector(selectDistrictPage);
+  const adminState = useSelector((state) => state.admin);
+  const initialSync = useRef(true);
   
   // Sync pages from adminSlice to editpaperSlice when data changes
   useEffect(() => {
     dispatch(syncPagesFromAdmin({ allPages, districtPage }));
   }, [allPages, districtPage, dispatch]);
+
+  // Persist admin config to backend (debounced)
+  useEffect(() => {
+    if (initialSync.current) {
+      initialSync.current = false;
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      const token = localStorage.getItem("userToken");
+      if (!token) return;
+
+      updateAdminConfig({
+        allPages: adminState.allPages,
+        topNavHeaders1: adminState.topNavHeaders1,
+        topNavHeaders2: adminState.topNavHeaders2,
+        dropdownPosition1: adminState.dropdownPosition1,
+        dropdownPosition2: adminState.dropdownPosition2,
+        selectedDistrict1: adminState.selectedDistrict1,
+        selectedDistrict2: adminState.selectedDistrict2
+      }).catch((error) => {
+        console.error("Failed to save admin config:", error);
+      });
+    }, 600);
+
+    return () => clearTimeout(timeout);
+  }, [adminState]);
   
   // Extract Tamil names for HandlePages component compatibility
   const pages = allPages.filter((page, index) => index !== allPages.length - 1).map(page => page.name.tam);

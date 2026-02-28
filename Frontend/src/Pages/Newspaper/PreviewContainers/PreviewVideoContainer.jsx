@@ -118,7 +118,7 @@ const PreviewVideoContainer = ({
   };
 
   return (
-    <div style={wrapperStyle}>
+    <div className="preview-video-container" style={wrapperStyle}>
       {/* ── Thumbnail + play button ── */}
       {!isPlaying && (
         <div

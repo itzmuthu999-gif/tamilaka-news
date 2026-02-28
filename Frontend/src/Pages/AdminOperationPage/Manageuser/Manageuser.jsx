@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { FaUserPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
-import { addUser, updateUser, deleteUser } from '../../Slice/userSlice.js';
+import { setUsers } from '../../Slice/userSlice.js';
+import { registerUser, updateUser as updateUserApi, deleteUser as deleteUserApi, getUsers } from '../../../Api/userApi.js';
 import './manageuser.scss';
 
 const Manageuser = () => {
@@ -28,7 +29,7 @@ const Manageuser = () => {
   };
 
   // Create new user
-  const handleCreateUser = (e) => {
+  const handleCreateUser = async (e) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -36,13 +37,21 @@ const Manageuser = () => {
       return;
     }
 
-    // Dispatch addUser action
-    dispatch(addUser(
-      formData.name,
-      formData.email,
-      formData.password,
-      formData.role
-    ));
+    try {
+      await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role
+      });
+
+      const updatedUsers = await getUsers();
+      dispatch(setUsers(updatedUsers));
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      alert("Failed to create user. Make sure you're logged in as Admin.");
+      return;
+    }
 
     // Reset form and close modal
     setFormData({
@@ -71,7 +80,7 @@ const Manageuser = () => {
   };
 
   // Update existing user
-  const handleUpdateUser = (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
     
     if (formData.password && formData.password !== formData.confirmPassword) {
@@ -79,13 +88,25 @@ const Manageuser = () => {
       return;
     }
 
-    // Dispatch updateUser action
-    dispatch(updateUser({
-      id: editingUser.id,
-      name: formData.name,
-      email: formData.email,
-      role: formData.role
-    }));
+    try {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role
+      };
+
+      if (formData.password) {
+        payload.password = formData.password;
+      }
+
+      await updateUserApi(editingUser.id, payload);
+      const updatedUsers = await getUsers();
+      dispatch(setUsers(updatedUsers));
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      alert("Failed to update user. Make sure you're logged in as Admin.");
+      return;
+    }
 
     // Reset form and close modal
     setFormData({
@@ -102,10 +123,17 @@ const Manageuser = () => {
   };
 
   // Delete user
-  const handleDeleteUser = (userId) => {
+  const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
-      dispatch(deleteUser(userId));
-      alert('User deleted successfully!');
+      try {
+        await deleteUserApi(userId);
+        const updatedUsers = await getUsers();
+        dispatch(setUsers(updatedUsers));
+        alert('User deleted successfully!');
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+        alert("Failed to delete user. Make sure you're logged in as Admin.");
+      }
     }
   };
 

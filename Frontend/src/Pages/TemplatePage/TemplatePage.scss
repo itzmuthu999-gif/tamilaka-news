@@ -471,3 +471,210 @@
     background: #000;
   }
 }  
+
+// ---------- Redesigned Newsform panel ----------
+.newsform-panel {
+  background: linear-gradient(145deg, #fff7fb 0%, #ffe6f2 100%);
+  border: 1px solid rgba(255, 0, 140, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(233, 30, 99, 0.18);
+  padding: 12px;
+}
+
+.newsform-con {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 14px;
+  padding: 14px;
+  height: 100%;
+  box-shadow: inset 0 0 0 1px rgba(255, 0, 140, 0.06);
+}
+
+.drag-header {
+  background: linear-gradient(135deg, #ff4da6 0%, #e60073 100%);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  box-shadow: 0 6px 16px rgba(230, 0, 115, 0.35);
+}
+
+.news-form {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 8px 20px rgba(230, 0, 115, 0.08);
+}
+
+.newsform-lang-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff0f8;
+  border: 1px solid #ffd0e8;
+  margin-bottom: 16px;
+}
+
+.newsform-lang-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a4005a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.newsform-lang-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.newsform-lang-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #ffc2df;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  color: #a4005a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.newsform-lang-btn.is-active {
+  background: #ff4da6;
+  color: #fff;
+  border-color: #ff4da6;
+  box-shadow: 0 6px 14px rgba(255, 77, 166, 0.3);
+}
+
+.form-label {
+  color: #b10060;
+}
+
+.form-textarea,
+.form-select,
+.form-file {
+  border-radius: 10px;
+  border: 1px solid #f1b8d5;
+  background: #fff;
+}
+
+.form-textarea:focus,
+.form-select:focus,
+.form-file:focus {
+  border-color: #ff4da6;
+  box-shadow: 0 0 0 3px rgba(255, 77, 166, 0.15);
+}
+
+.form-file.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.newsform-note {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #a36;
+}
+
+.newsform-multiselect {
+  position: relative;
+}
+
+.newsform-multiselect-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #f1b8d5;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.newsform-multiselect.is-disabled .newsform-multiselect-trigger {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.newsform-multiselect-caret {
+  color: #ff4da6;
+  font-size: 12px;
+}
+
+.newsform-multiselect-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #f1b8d5;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 10px 24px rgba(230, 0, 115, 0.18);
+  z-index: 20;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.newsform-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+}
+
+.newsform-option:hover {
+  background: #fff0f8;
+}
+
+.newsform-option.is-checked {
+  background: #ffe1f0;
+  font-weight: 600;
+}
+
+.newsform-selected-tags {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.newsform-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #ffe1f0;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #a4005a;
+}
+
+.newsform-tag-remove {
+  background: transparent;
+  border: none;
+  color: #a4005a;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.newsform-empty {
+  padding: 8px;
+  font-size: 12px;
+  color: #999;
+}

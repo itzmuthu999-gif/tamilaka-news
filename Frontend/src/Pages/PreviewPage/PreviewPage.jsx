@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import luffy from "../../assets/luffy.webp";
 import newsimg from "../../assets/newsimg.avif";
-import { IoSearchSharp } from "react-icons/io5";
+import { IoSearchSharp, IoSettingsOutline } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiWorld } from "react-icons/bi";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -17,6 +17,7 @@ import CommentSection from "./CommentSection";
 import Navbarr from "../Newspaper/Components/Navbarr";
 import Sidebar from "../Newspaper/Components/Sidebar";
 import "../Newspaper/newspaper.scss";
+import "../Newspaper/PreviewContainers/previewcont.css";
 import "./Previewpge.scss";
 
 import timeFun from "../Newspaper/Containers_/timeFun";
@@ -36,10 +37,15 @@ import {
 import { FaXTwitter } from "react-icons/fa6";
 import BigNewsContainer4B from "../Newspaper/Containers_/BigContainer4B";
 import PreviewNorContainer5 from "../Newspaper/PreviewContainers/PreviewNorContainer5";
+import { updateNewsPageConfig } from "../../Api/newsPageApi";
+import { setNewsPageConfig } from "../Slice/newspageSlice";
 
-export default function PreviewPage() {
+export default function PreviewPage({ forcedNewsId = null, editMode = false }) {
+  const dispatch = useDispatch();
   const { id } = useParams();
-  const allNews = useSelector((state) => state.newsform.allNews);
+  const { allNews, translatedNews, language } = useSelector((state) => state.newsform);
+  const newsPageConfig = useSelector((state) => state.newspage?.config);
+  const allPages = useSelector((state) => state.admin?.allPages || []);
   
   // Font size state - starts at 100% (base size)
   const [fontSize, setFontSize] = useState(100);
@@ -81,6 +87,34 @@ export default function PreviewPage() {
     },
   };
 
+  const categoryList = useMemo(() => {
+    const categories = Array.from(
+      new Set(
+        allPages
+          .filter(
+            (page) =>
+              page?.name?.eng &&
+              page.name.eng !== "Select District" &&
+              !page.districts
+          )
+          .map((page) => page.name.eng)
+      )
+    );
+
+    const fallbackCategories = ["politics", "cinema", "sports", "weather", "astrology"];
+    return categories.length > 0 ? categories : fallbackCategories;
+  }, [allPages]);
+
+  const [editSection, setEditSection] = useState(null);
+  const [modalState, setModalState] = useState({
+    headerTam: "",
+    headerEng: "",
+    deliveryType: "shuffle",
+    count: 5,
+    category: "",
+    selectedIds: [],
+  });
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   useEffect(() => {
@@ -92,8 +126,131 @@ export default function PreviewPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const currentNews = allNews.find((news) => news.id === Number(id));
+  const newsSource = language === "en" && translatedNews?.length ? translatedNews : allNews;
+  const fallbackId = allNews.length > 0 ? allNews[0].id : null;
+  const activeId = forcedNewsId ?? (id ? Number(id) : null) ?? fallbackId;
+  const currentNews =
+    newsSource.find((news) => news.id === Number(activeId)) ||
+    allNews.find((news) => news.id === Number(activeId));
   const MLayout = useSelector((state) => state.newsform.MLayout);
+
+  const filterNewsByCategory = (category, list) => {
+    if (!category) return list;
+    return list.filter((news) => {
+      const zonal = news.data?.zonal;
+      if (Array.isArray(zonal)) {
+        return zonal.some(
+          (cat) => String(cat).toLowerCase() === String(category).toLowerCase()
+        );
+      }
+      if (typeof zonal === "string") {
+        return zonal.trim().toLowerCase() === String(category).toLowerCase();
+      }
+      return false;
+    });
+  };
+
+  const defaultHeaderBySection = (sectionKey) => {
+    return sectionKey === "slider" ? "Top News" : "More News";
+  };
+
+  const resolveDisplayIds = (section, fallbackCount) => {
+    const resolved =
+      Array.isArray(section?.resolvedIds) && section.resolvedIds.length > 0
+        ? section.resolvedIds
+        : Array.isArray(section?.selectedIds) && section.selectedIds.length > 0
+        ? section.selectedIds
+        : [];
+
+    if (resolved.length > 0) return resolved;
+
+    const count = Number(section?.count || fallbackCount || 0);
+    return allNews.slice(0, count).map((n) => n.id);
+  };
+
+  const sideConfig = newsPageConfig?.side || {};
+  const sliderConfig = newsPageConfig?.slider || {};
+
+  const sideHeaderText =
+    (language === "en" ? sideConfig?.header?.eng : sideConfig?.header?.tam) ||
+    defaultHeaderBySection("side");
+  const sliderHeaderText =
+    (language === "en" ? sliderConfig?.header?.eng : sliderConfig?.header?.tam) ||
+    defaultHeaderBySection("slider");
+
+  const sideIds = resolveDisplayIds(sideConfig, sideConfig?.count || 5);
+  const sliderIds = resolveDisplayIds(sliderConfig, sliderConfig?.count || 6);
+
+  const openSettings = (sectionKey) => {
+    const section = sectionKey === "slider" ? sliderConfig : sideConfig;
+    const fallbackCount = sectionKey === "slider" ? 6 : 5;
+
+    setModalState({
+      headerTam: section?.header?.tam || "",
+      headerEng: section?.header?.eng || "",
+      deliveryType: section?.deliveryType || "shuffle",
+      count: section?.count || fallbackCount,
+      category: section?.category || "",
+      selectedIds: Array.isArray(section?.selectedIds) ? section.selectedIds : [],
+    });
+    setEditSection(sectionKey);
+  };
+
+  const closeSettings = () => {
+    setEditSection(null);
+  };
+
+  const pickRandomIds = (category, count) => {
+    const pool = filterNewsByCategory(category, allNews);
+    const ids = pool.map((n) => n.id);
+
+    const shuffled = [...ids];
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, Math.min(count, shuffled.length));
+  };
+
+  const handleSaveSection = async () => {
+    if (!editSection) return;
+
+    const fallbackCount = editSection === "slider" ? 6 : 5;
+    const count = Math.max(1, Number(modalState.count || fallbackCount));
+
+    const resolvedIds =
+      modalState.deliveryType === "shuffle"
+        ? pickRandomIds(modalState.category, count)
+        : Array.isArray(modalState.selectedIds)
+        ? modalState.selectedIds
+        : [];
+
+    const nextConfig = {
+      side: sideConfig || {},
+      slider: sliderConfig || {},
+      [editSection]: {
+        ...(editSection === "slider" ? sliderConfig : sideConfig),
+        header: {
+          tam: modalState.headerTam || "",
+          eng: modalState.headerEng || "",
+        },
+        deliveryType: modalState.deliveryType,
+        count,
+        category: modalState.category || "",
+        selectedIds: Array.isArray(modalState.selectedIds) ? modalState.selectedIds : [],
+        resolvedIds,
+      },
+    };
+
+    try {
+      const updated = await updateNewsPageConfig(nextConfig);
+      dispatch(setNewsPageConfig(updated));
+      setEditSection(null);
+    } catch (error) {
+      console.error("Failed to update newspage settings:", error);
+      alert("Failed to update newspage settings. Please try again.");
+    }
+  };
   
   if (!currentNews) 
     return <div style={{ padding: 40 }}>No news selected for preview.</div>;
@@ -181,7 +338,7 @@ export default function PreviewPage() {
                 </div>
               )}
               <div className="mannsw-sc-time">
-                {timeFun(currentNews.time) || "No date available"}
+                {timeFun(currentNews.time || currentNews.createdAt || currentNews.updatedAt) || "No date available"}
               </div>
               <div className="mannsw-lnksz">
                 <div style={styles.container}>
@@ -275,24 +432,62 @@ export default function PreviewPage() {
           </div>
 
           {MLayout === 1 && !isMobile && <Line direction="V" length="1250px" thickness="1px" color="#e80d8c" />}
-          {MLayout === 1 && <Melumnews />}
+          {MLayout === 1 && (
+            <Melumnews
+              headerName={sideHeaderText}
+              newsIds={sideIds}
+              editMode={editMode}
+              onOpenSettings={() => openSettings("side")}
+            />
+          )}
         </div>
       </div>
-       <div className="mannsw-ns-header"><div className="mannswns-nd-o2"><Newsheader name={"Top news"} /></div></div>
+       <div className="mannsw-ns-header">
+         <div className="mannswns-nd-o2">
+           <div className="npe-header-row">
+             <Newsheader name={sliderHeaderText} />
+             {editMode && (
+               <button
+                 className="npe-settings-btn"
+                 onClick={() => openSettings("slider")}
+                 type="button"
+               >
+                 <IoSettingsOutline />
+               </button>
+             )}
+           </div>
+         </div>
+       </div>
       <div className="footer-overlay">
         
         <div className="npmc-c3">
           <AutoScrollContainer gap={0} autoScrollDelay={10000} autoTranslateX={310} manualTranslateX={310}>
-            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
-            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
-            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
-            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
-            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
-            <BigNewsContainer4B  imgHeight={200}  imgWidth={300}/>
+            {sliderIds.map((newsId, idx) => (
+              <BigNewsContainer4B
+                key={`${newsId}-${idx}`}
+                newsId={newsId}
+                imgHeight={200}
+                imgWidth={300}
+              />
+            ))}
           </AutoScrollContainer>
         </div>
         <Footer/>
       </div>
+      {editMode && (
+        <NewsSectionEditModal
+          open={!!editSection}
+          sectionKey={editSection}
+          onClose={closeSettings}
+          categoryList={categoryList}
+          modalState={modalState}
+          setModalState={setModalState}
+          allNews={allNews}
+          newsSource={newsSource}
+          onSave={handleSaveSection}
+          filterNewsByCategory={filterNewsByCategory}
+        />
+      )}
     </div>
   );
 }
@@ -383,7 +578,7 @@ function AdvertisementBox({ width = "300px", height = "250px" }) {
   );
 }
 
-function Melumnews() {
+function Melumnews({ headerName, newsIds = [], editMode = false, onOpenSettings }) {
   return (
     <>
       <div className="mens-side-news">
@@ -391,22 +586,220 @@ function Melumnews() {
           <AdvertisementBox width="100%" height="100px" />
         </div>
         <div className="mens-morenews">
-          <Newsheader name={"Top news"} />
+          <div className="npe-header-row">
+            <Newsheader name={headerName} />
+            {editMode && (
+              <button
+                className="npe-settings-btn"
+                onClick={onOpenSettings}
+                type="button"
+              >
+                <IoSettingsOutline />
+              </button>
+            )}
+          </div>
         </div>
         <div className="mens-in-cont">
-          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
-          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
-          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
-          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
-          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
-          <PreviewNorContainer5 newsId={1770655083664} version={2}/>
-          <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
+          {newsIds.length === 0 && (
+            <div className="npe-empty">No news selected.</div>
+          )}
+          {newsIds.map((newsId, idx) => (
+            <React.Fragment key={`${newsId}-${idx}`}>
+              <PreviewNorContainer5 newsId={newsId} version={2} />
+              {idx < newsIds.length - 1 && (
+                <Line direction="H" length="100%" thickness="0.5px" color="#b6b6b6ff" />
+              )}
+            </React.Fragment>
+          ))}
         </div>
       </div>
     </>
+  );
+}
+
+function NewsSectionEditModal({
+  open,
+  sectionKey,
+  onClose,
+  categoryList,
+  modalState,
+  setModalState,
+  allNews,
+  newsSource,
+  onSave,
+  filterNewsByCategory,
+}) {
+  if (!open) return null;
+
+  const sectionTitle =
+    sectionKey === "slider" ? "Slider Settings" : "Sidebar (Melum News) Settings";
+
+  const isShuffle = modalState.deliveryType === "shuffle";
+  const isCustom = modalState.deliveryType === "custom";
+
+  const categoryNews = modalState.category
+    ? filterNewsByCategory(modalState.category, allNews)
+    : allNews;
+
+  const getDisplayHeadline = (news) => {
+    const display = newsSource?.find((n) => n.id === news.id) || news;
+    return display?.data?.headline || "Untitled News";
+  };
+
+  const toggleSelected = (newsId) => {
+    setModalState((prev) => {
+      const selected = new Set(prev.selectedIds || []);
+      if (selected.has(newsId)) {
+        selected.delete(newsId);
+      } else {
+        selected.add(newsId);
+      }
+      return { ...prev, selectedIds: Array.from(selected) };
+    });
+  };
+
+  return (
+    <div className="npe-modal-overlay" onClick={onClose}>
+      <div className="npe-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="npe-modal-header">
+          <div className="npe-modal-title">{sectionTitle}</div>
+          <button className="npe-icon-btn" onClick={onClose} type="button">
+            X
+          </button>
+        </div>
+
+        <div className="npe-form">
+          <div className="npe-form-row">
+            <div className="npe-field">
+              <label>Header text (Tamil)</label>
+              <input
+                className="npe-input"
+                type="text"
+                value={modalState.headerTam}
+                onChange={(e) =>
+                  setModalState((prev) => ({ ...prev, headerTam: e.target.value }))
+                }
+                placeholder="Tamil header"
+              />
+            </div>
+            <div className="npe-field">
+              <label>Header text (English)</label>
+              <input
+                className="npe-input"
+                type="text"
+                value={modalState.headerEng}
+                onChange={(e) =>
+                  setModalState((prev) => ({ ...prev, headerEng: e.target.value }))
+                }
+                placeholder="English header"
+              />
+            </div>
+          </div>
+
+          <div className="npe-form-row">
+            <div className="npe-field">
+              <label>Content delivery type</label>
+              <select
+                className="npe-input"
+                value={modalState.deliveryType}
+                onChange={(e) =>
+                  setModalState((prev) => ({
+                    ...prev,
+                    deliveryType: e.target.value,
+                  }))
+                }
+              >
+                <option value="shuffle">Shuffle</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            {isShuffle && (
+              <div className="npe-field">
+                <label>Count</label>
+                <input
+                  className="npe-input"
+                  type="number"
+                  min="1"
+                  value={modalState.count}
+                  onChange={(e) =>
+                    setModalState((prev) => ({
+                      ...prev,
+                      count: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="npe-form-row">
+            <div className="npe-field">
+              <label>Category</label>
+              <select
+                className="npe-input"
+                value={modalState.category}
+                onChange={(e) =>
+                  setModalState((prev) => ({
+                    ...prev,
+                    category: e.target.value,
+                  }))
+                }
+              >
+                <option value="">Select category</option>
+                {categoryList.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {isCustom && (
+            <div className="npe-news-picker">
+              <div className="npe-picker-title">
+                Choose news from the selected category
+              </div>
+              {!modalState.category && (
+                <div className="npe-empty">Select a category to list news.</div>
+              )}
+              {modalState.category && (
+                <div className="npe-news-list">
+                  {categoryNews.length === 0 && (
+                    <div className="npe-empty">No news in this category.</div>
+                  )}
+                  {categoryNews.map((news) => (
+                    <label key={news.id} className="npe-news-item">
+                      <input
+                        type="checkbox"
+                        checked={(modalState.selectedIds || []).includes(news.id)}
+                        onChange={() => toggleSelected(news.id)}
+                      />
+                      <span>{getDisplayHeadline(news)}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {isShuffle && (
+            <div className="npe-hint">
+              Shuffle will pick a random set of news from the selected category.
+            </div>
+          )}
+        </div>
+
+        <div className="npe-modal-actions">
+          <button className="npe-secondary-btn" onClick={onClose} type="button">
+            Cancel
+          </button>
+          <button className="npe-primary-btn" onClick={onSave} type="button">
+            Upload
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -436,6 +829,21 @@ function ParagraphResponsive({ box }) {
 }
 
 function ImageResponsive({ box }) {
+  const resolveImageSrc = (content) => {
+    if (!content) return newsimg;
+    if (content instanceof File) {
+      return URL.createObjectURL(content);
+    }
+    if (typeof content === "string") {
+      // Blob URLs are session-bound and break on refresh. Use a safe fallback.
+      if (content.startsWith("blob:")) return newsimg;
+      return content;
+    }
+    return newsimg;
+  };
+
+  const [imgSrc, setImgSrc] = React.useState(() => resolveImageSrc(box?.content));
+
   return (
     <div
       className="preview-image-responsive"
@@ -446,7 +854,7 @@ function ImageResponsive({ box }) {
       }}
     >
       <img 
-        src={box.content} 
+        src={imgSrc} 
         alt="news" 
         style={{
           width: "100%",
@@ -454,6 +862,7 @@ function ImageResponsive({ box }) {
           display: "block",
           objectFit: "cover",
         }}
+        onError={() => setImgSrc(newsimg)}
       />
     </div>
   );

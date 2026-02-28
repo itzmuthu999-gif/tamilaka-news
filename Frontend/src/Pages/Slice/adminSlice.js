@@ -153,6 +153,28 @@ const adminSlice = createSlice({
   name: "admin",
   initialState,
   reducers: {
+    setAdminConfig: (state, action) => {
+      const {
+        allPages,
+        topNavHeaders1,
+        topNavHeaders2,
+        dropdownPosition1,
+        dropdownPosition2,
+        selectedDistrict1,
+        selectedDistrict2
+      } = action.payload || {};
+
+      if (Array.isArray(allPages)) state.allPages = allPages;
+      if (Array.isArray(topNavHeaders1)) state.topNavHeaders1 = topNavHeaders1;
+      if (Array.isArray(topNavHeaders2)) state.topNavHeaders2 = topNavHeaders2;
+      if (typeof dropdownPosition1 === "number") state.dropdownPosition1 = dropdownPosition1;
+      if (typeof dropdownPosition2 === "number") state.dropdownPosition2 = dropdownPosition2;
+      if (typeof selectedDistrict1 === "string") state.selectedDistrict1 = selectedDistrict1;
+      if (typeof selectedDistrict2 === "string") state.selectedDistrict2 = selectedDistrict2;
+
+      updateAllPagePositions(state);
+    },
+
     // -------------------- PAGE MANAGEMENT --------------------
     addPage: (state, action) => {
       const newPage = {
@@ -420,6 +442,7 @@ const adminSlice = createSlice({
 });
 
 export const {
+  setAdminConfig,
   addPage,
   updatePage,
   deletePage,

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePollData } from "../../Slice/editpaperSlice/editpaperslice";
+import { saveLayout } from "../../../Api/layoutApi";
 
 /**
  * PreviewPollContainer
@@ -19,6 +20,9 @@ const PreviewPollContainer = ({
   parentContainerId = null,
 }) => {
   const dispatch = useDispatch();
+  const layoutState = useSelector((state) => state.editpaper);
+  const hasMountedRef = useRef(false);
+  const lastTotalVotesRef = useRef(null);
 
   // Read poll data straight from Redux (same path used in the editor)
   const pollData = useSelector((state) => {
@@ -42,6 +46,32 @@ const PreviewPollContainer = ({
   const [revealed, setRevealed] = useState(false);
 
   if (!pollData) return null;
+
+  const buildLayoutPayload = (state) => ({
+    pages: state.pages,
+    presetContainers: state.presetContainers,
+    activePage: state.activePage,
+    activeLineId: state.activeLineId,
+  });
+
+  useEffect(() => {
+    if (!pollData) return;
+
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      lastTotalVotesRef.current = pollData.totalVotes ?? 0;
+      return;
+    }
+
+    if (pollData.totalVotes === lastTotalVotesRef.current) return;
+
+    lastTotalVotesRef.current = pollData.totalVotes;
+
+    const payload = buildLayoutPayload(layoutState);
+    saveLayout(payload).catch((error) => {
+      console.error("Failed to persist poll vote:", error);
+    });
+  }, [pollData?.totalVotes, layoutState]);
 
   const getPercentage = (votes) => {
     if (!pollData.totalVotes) return 0;
@@ -84,120 +114,7 @@ const PreviewPollContainer = ({
 
   return (
     <div className="preview-poll-wrapper">
-      <style>{`
-        .preview-poll-wrapper {
-          width: 100%;
-          max-width: 450px;
-          min-height: 200px;
-          background: #1a1a1a;
-          border-radius: 12px;
-          padding: 20px;
-          box-sizing: border-box;
-        }
-
-        .preview-poll-question {
-          font-size: 20px;
-          font-weight: 600;
-          color: white;
-          margin-bottom: 24px;
-          line-height: 1.4;
-        }
-
-        .preview-poll-hint {
-          font-size: 12px;
-          color: #888;
-          margin-bottom: 16px;
-        }
-
-        /* ── Unvoted state: plain clickable option ── */
-        .preview-poll-option-unvoted {
-          position: relative;
-          background: #2a2a2a;
-          border-radius: 8px;
-          overflow: hidden;
-          margin-bottom: 12px;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          border: 2px solid transparent;
-        }
-
-        .preview-poll-option-unvoted:hover {
-          border-color: #e91e63;
-          transform: translateX(4px);
-        }
-
-        .preview-poll-option-unvoted-content {
-          padding: 16px;
-          color: white;
-          font-size: 16px;
-          font-weight: 500;
-        }
-
-        /* ── Voted state: animated bar behind content ── */
-        .preview-poll-option-voted {
-          position: relative;
-          background: #2a2a2a;
-          border-radius: 8px;
-          overflow: hidden;
-          margin-bottom: 12px;
-          transition: all 0.25s ease;
-          cursor: default;
-        }
-
-        .preview-poll-option-voted.is-chosen {
-          box-shadow: 0 0 0 2px #e91e63;
-        }
-
-        .preview-poll-fill {
-          position: absolute;
-          left: 0;
-          top: 0;
-          height: 100%;
-          background: #e91e63;
-          transition: width 0.6s ease;
-          z-index: 1;
-        }
-
-        .preview-poll-option-voted-content {
-          position: relative;
-          z-index: 2;
-          padding: 16px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .preview-poll-option-text {
-          color: white;
-          font-size: 16px;
-          font-weight: 500;
-        }
-
-        .preview-poll-stats {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          flex-shrink: 0;
-        }
-
-        .preview-poll-pct {
-          font-size: 20px;
-          font-weight: bold;
-          color: white;
-        }
-
-        .preview-poll-count {
-          font-size: 13px;
-          color: #bbb;
-        }
-
-        .preview-poll-total {
-          font-size: 12px;
-          color: #666;
-          margin-top: 12px;
-          text-align: right;
-        }
-      `}</style>
+      
 
       <div className="preview-poll-question">{pollData.question}</div>
 

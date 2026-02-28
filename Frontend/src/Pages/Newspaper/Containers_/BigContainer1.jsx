@@ -34,7 +34,7 @@ const newsToShow = language === "en" ? translatedNews : allNews;
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: timeFun(news.time) || DEFAULT_DATA.time,
+        time: timeFun(news.time || news.createdAt || news.updatedAt) || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 
@@ -96,3 +96,4 @@ const newsToShow = language === "en" ? translatedNews : allNews;
 };
 
 export default BigNewsContainer1;
+

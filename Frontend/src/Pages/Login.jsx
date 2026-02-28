@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import { loginUser } from "../Api/userApi.js";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -12,18 +13,14 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login process - you can replace this with actual authentication
     try {
-      // Add your login logic here
-      console.log('Login attempt:', { email, password });
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Navigate to AdminHome after successful login
+      const response = await loginUser({ email, password });
+      localStorage.setItem("userToken", response.token);
+      localStorage.setItem("userData", JSON.stringify(response.user));
       navigate('/AdminHome');
     } catch (error) {
       console.error('Login failed:', error);
+      alert("Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }

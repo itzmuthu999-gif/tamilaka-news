@@ -10,8 +10,7 @@ import { IoSunnySharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { setLanguage, setTranslatedNews } from "../../Slice/newsformslice.js";
-import { translateToEnglish } from "../../Slice/translate.js";
+import { setLanguage } from "../../Slice/newsformslice.js";
 import { useNavigate } from "react-router-dom";
 import { getTodayInTamil } from './getTodayInTamil.js';
 // Utility: highlight matching text within a string
@@ -42,7 +41,7 @@ export default function Navbarr({ setIsOn, isOn, openSidebar, activePage, setAct
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { allNews, language } = useSelector((state) => state.newsform);
+  const { allNews, translatedNews, language } = useSelector((state) => state.newsform);
   const { allPages, selectedDistrict1 } = useSelector((state) => state.admin);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth > 768);
@@ -169,7 +168,7 @@ export default function Navbarr({ setIsOn, isOn, openSidebar, activePage, setAct
 
     // Match news by headline, oneLiner, content
     const matchedNews = [];
-    const newsSource = language === "ta" ? allNews : allNews;
+    const newsSource = language === "en" ? translatedNews : allNews;
     newsSource.forEach(news => {
       const headline = news.data?.headline || news.title || "";
       const oneLiner = news.data?.oneLiner || news.content || "";
@@ -187,22 +186,12 @@ export default function Navbarr({ setIsOn, isOn, openSidebar, activePage, setAct
 
     setSearchSuggestions({ pages: matchedPages.slice(0, 5), news: matchedNews.slice(0, 5) });
     setShowSuggestions(true);
-  }, [allPages, allNews, language]);
+  }, [allPages, allNews, translatedNews, language]);
 
-  const handleLanguageSelect = async (lang) => {
+  const handleLanguageSelect = (lang) => {
     setLangPopupOpen(false);
-    if (lang === "en" && language === "ta") {
-      const translated = await Promise.all(
-        allNews.map(async (news) => ({
-          ...news,
-          title: await translateToEnglish(news.title),
-          content: await translateToEnglish(news.content),
-        }))
-      );
-      dispatch(setTranslatedNews(translated));
-      dispatch(setLanguage("en"));
-    } else if (lang === "ta" && language !== "ta") {
-      dispatch(setLanguage("ta"));
+    if (lang !== language) {
+      dispatch(setLanguage(lang));
     }
   };
 
@@ -233,6 +222,13 @@ export default function Navbarr({ setIsOn, isOn, openSidebar, activePage, setAct
       setSearchQuery("");
       setShowSuggestions(false);
     }
+  };
+
+  const handleLogoClick = () => {
+    if (setActivePage) {
+      setActivePage("main");
+    }
+    navigate("/Newspaper");
   };
 
   const handleSearchChange = (e) => {
@@ -279,7 +275,7 @@ export default function Navbarr({ setIsOn, isOn, openSidebar, activePage, setAct
           {isMobile && (
             <div className="nav-c1-date-v2">{getTodayInTamil()}</div>
           )}
-          <div className="nav-c1-logo-v2" style={{ position: "relative" }}>
+          <div className="nav-c1-logo-v2" style={{ position: "relative", cursor: "pointer" }} onClick={handleLogoClick}>
             <div className="nav-c1l-t1-v2">
               <img src={logo} />
             </div>
@@ -468,7 +464,7 @@ export default function Navbarr({ setIsOn, isOn, openSidebar, activePage, setAct
                       { code: "en", label: "English", sublabel: "English" },
                       { code: "ta", label: "தமிழ்", sublabel: "Tamil" },
                     ].map(({ code, label, sublabel }) => {
-                      const isActive = (code === "ta" && language === "ta") || (code === "en" && language !== "ta");
+                      const isActive = code === language;
                       return (
                         <div
                           key={code}

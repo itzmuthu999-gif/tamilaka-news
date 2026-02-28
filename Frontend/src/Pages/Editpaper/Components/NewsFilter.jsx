@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Rnd } from "react-rnd";
 import "./newsfilter.scss";
@@ -7,18 +7,47 @@ import { IoClose } from "react-icons/io5";
 export default function NewsFilter({ open, onClose }) {
   // Retrieve real news from Redux store
   const allNews = useSelector((state) => state.newsform.allNews || []);
+  const allPages = useSelector((state) => state.admin.allPages || []);
 
-  // Fixed list of categories
-  const categories = ["politics", "cinema", "sports", "weather", "astrology"];
+  const categories = Array.from(
+    new Set(
+      allPages
+        .filter(
+          (page) =>
+            page?.name?.eng &&
+            page.name.eng !== "Select District" &&
+            !page.districts
+        )
+        .map((page) => page.name.eng)
+    )
+  );
 
-  const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const fallbackCategories = ["politics", "cinema", "sports", "weather", "astrology"];
+  const categoryList = categories.length > 0 ? categories : fallbackCategories;
+
+  const [activeCategory, setActiveCategory] = useState(categoryList[0]);
+
+  // Keep activeCategory in sync if the list changes
+  useEffect(() => {
+    if (categoryList.length > 0 && !categoryList.includes(activeCategory)) {
+      setActiveCategory(categoryList[0]);
+    }
+  }, [categoryList, activeCategory]);
 
   // Filter news based on active category (case-insensitive)
   // Note: zonal is inside news.data.zonal (matching Newsbund structure)
-  const filteredNews = allNews.filter(
-    (news) =>
-      news.data?.zonal?.trim().toLowerCase() === activeCategory.toLowerCase()
-  );
+  const filteredNews = allNews.filter((news) => {
+    const zonal = news.data?.zonal;
+    if (Array.isArray(zonal)) {
+      return zonal.some(
+        (cat) => String(cat).toLowerCase() === activeCategory.toLowerCase()
+      );
+    }
+    if (typeof zonal === "string") {
+      return zonal.trim().toLowerCase() === activeCategory.toLowerCase();
+    }
+    return false;
+  });
 
   const getThumbnail = (thumbnail) => {
     if (!thumbnail) return null;
@@ -62,7 +91,7 @@ export default function NewsFilter({ open, onClose }) {
           </div>
         </div>
         <div className="ep-fl1-btns">
-          {categories.map((cat, idx) => (
+          {categoryList.map((cat, idx) => (
             <div
               key={idx}
               className={`epf1b-btn ${activeCategory === cat ? "active" : ""}`}

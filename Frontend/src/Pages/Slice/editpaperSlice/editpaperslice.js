@@ -12,6 +12,7 @@ import { videoReducers } from "./reducers/videoReducers";
 
 /* ---------- initial state ---------- */
 const initialState = {
+  hydrated: false,
   activePage: "main",
   activeLineId: null,
   presetContainers: [], // Array to store saved preset containers
@@ -215,6 +216,22 @@ const pageLayoutSlice = createSlice({
   name: "pageLayout",
   initialState,
   reducers: {
+    setLayoutHydrated: (state) => {
+      state.hydrated = true;
+    },
+    setLayoutState: (state, action) => {
+      const { pages, presetContainers, activePage, activeLineId } = action.payload || {};
+
+      if (Array.isArray(pages)) state.pages = pages;
+      if (Array.isArray(presetContainers)) state.presetContainers = presetContainers;
+      if (typeof activePage === "string" && activePage.length > 0) {
+        state.activePage = activePage;
+      }
+      if (activeLineId !== undefined) {
+        state.activeLineId = activeLineId;
+      }
+      state.hydrated = true;
+    },
     ...pageReducers,
     ...containerReducers,
     ...slotReducers,
@@ -230,6 +247,8 @@ const pageLayoutSlice = createSlice({
 
 /* ---------- exports ---------- */
 export const {
+  setLayoutHydrated,
+  setLayoutState,
   // Page actions
   addPage,
   setActivePage,

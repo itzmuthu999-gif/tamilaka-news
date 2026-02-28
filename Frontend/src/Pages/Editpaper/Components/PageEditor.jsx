@@ -14,9 +14,11 @@ import {
   deletePresetContainer,
 } from "../../Slice/editpaperSlice/editpaperslice";
 import { selectAllPages, selectDistrictPage } from "../../Slice/adminSelectors";
+import { saveLayout } from "../../../Api/layoutApi.js";
 
 import "./pageeditor.scss";
-
+import norcont1 from "../../../assets/Containers/norcont1.png";
+import norcont4b from "../../../assets/Containers/norcont4b.png";
 import bcont1 from "../../../assets/Containers/bcont1.png";
 
 import bcont2 from "../../../assets/Containers/bcont2.png";
@@ -32,10 +34,17 @@ import ncont2 from "../../../assets/Containers/ncont2.png";
 import ncont3 from "../../../assets/Containers/ncont3.png";
 
 import ncont4 from "../../../assets/Containers/ncont4.png";
-import ncont4B from "../../../assets/Containers/ncont4.png";
+// import ncont4B from "../../../assets/Containers/ncont4.png";
 
 import ncont5 from "../../../assets/Containers/ncont5.png";
 import Universalcont from "../../../assets/Containers/ncont5.png";
+
+const buildLayoutPayload = (layoutState) => ({
+  pages: layoutState.pages,
+  presetContainers: layoutState.presetContainers,
+  activePage: layoutState.activePage,
+  activeLineId: layoutState.activeLineId
+});
 
 // PresetsTab Component
 const PresetsTab = () => {
@@ -167,6 +176,7 @@ export default function PageEditor({
   const activePage = useSelector((state) => state.editpaper.activePage);
 
   const activeLineId = useSelector((state) => state.editpaper.activeLineId);
+  const layoutState = useSelector((state) => state.editpaper);
 
   // Get pages and districts from admin slice
   const allPages = useSelector(selectAllPages);
@@ -328,6 +338,24 @@ export default function PageEditor({
     dispatch(addLine(activePage, lineType, orientation, { x: 100, y: 100 }));
   };
 
+  const handleSaveLayout = async () => {
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) {
+        alert("Please log in as Admin to save layout.");
+        return;
+      }
+
+      await saveLayout({
+        ...buildLayoutPayload(layoutState)
+      });
+      alert("Layout saved");
+    } catch (error) {
+      console.error("Failed to save layout:", error);
+      alert("Failed to save layout. Check the server and try again.");
+    }
+  };
+
   const containerTypes = [
     { id: 1, img: bcont1, label: "Big Container Type 1" },
     
@@ -340,20 +368,20 @@ export default function PageEditor({
 
     { id: 5, img: bcont4, label: "Big Container Type 4A" },
 
-    { id: 6, img: bcont4, label: "Big Container Type 5" },
+    { id: 6, img: ncont4, label: "Big Container Type 5" },
 
-    { id: 7, img: ncont1, label: "Normal Container Type 1" },
+    { id: 7, img: norcont1, label: "Normal Container Type 1" },
 
-    { id: 8, img: ncont2, label: "Normal Container Type 2" },
+    { id: 8, img: ncont4, label: "Normal Container Type 2" },
 
     { id: 9, img: ncont3, label: "Normal Container Type 3" },
 
-    { id: 10, img: ncont4, label: "Normal Container Type 4" },
+    { id: 10, img: ncont5, label: "Normal Container Type 4" },
 
     { id: 11, img: ncont4, label: "Normal Container Type 4A" },
 
-    { id: 12, img: ncont5, label: "Normal Container Type 5" },
-    { id: 13, img: ncont4, label: "Normal Container Type 4B" },
+    { id: 12, img: ncont1, label: "Normal Container Type 5" },
+    { id: 13, img: norcont4b, label: "Normal Container Type 4B" },
       { id: 14, img: bcont1, label: "Universal Container" },
   ];
 
@@ -453,7 +481,9 @@ export default function PageEditor({
         }}
       >
         <div className="switch-pages-section">
-          <button className="save-changes-btn">Save changes</button>
+          <button className="save-changes-btn" onClick={handleSaveLayout}>
+            Save changes
+          </button>
 
           <div className="section-title">switch pages</div>
 

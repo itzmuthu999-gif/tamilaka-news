@@ -3,6 +3,14 @@ import { useState } from 'react';
 import { FaCheck, FaEdit, FaTimes } from "react-icons/fa";
 import { Rnd } from "react-rnd";
 
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
 export default function ImageBox({ id, onDelete, onUpdate, initialContent, box, isInContainer = false }) {
   const [image, setImage] = useState(initialContent || null);
   const [editing, setEditing] = useState(!initialContent);
@@ -13,13 +21,13 @@ export default function ImageBox({ id, onDelete, onUpdate, initialContent, box, 
   //   e.dataTransfer.setData("boxType", "image");
   // };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setImage(url);
+      const dataUrl = await readFileAsDataUrl(file);
+      setImage(dataUrl);
       setEditing(false);
-      onUpdate(id, { content: url });
+      onUpdate(id, { content: dataUrl });
     }
   };
 

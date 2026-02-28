@@ -965,7 +965,7 @@ const UniversalNewsContainer = ({
                           imgWidth,
                           imgHeight,
                           padding
-                        }));
+                        }, version));
                         setPresetName("");
                         setShowSavePresetPopup(false);
                         // Show success message

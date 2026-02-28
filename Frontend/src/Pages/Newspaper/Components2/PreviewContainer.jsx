@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import "../PreviewContainers/previewcont.css";
 
 // Import all preview components
 import PreviewBigContainer1 from "../PreviewContainers/PreviewBigContainer1";

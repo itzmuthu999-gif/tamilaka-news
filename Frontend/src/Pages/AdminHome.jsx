@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 
 
@@ -71,6 +71,7 @@ import {
 
 
 import "./Adminhome.scss";
+import { getProgress } from "../Api/progressApi";
 
 
 
@@ -79,6 +80,47 @@ import "./Adminhome.scss";
 
 
 export default function AdminHome() {
+  const [progressItems, setProgressItems] = useState([]);
+  const [progressError, setProgressError] = useState("");
+
+  useEffect(() => {
+    const loadProgress = async () => {
+      try {
+        const data = await getProgress(60);
+        setProgressItems(Array.isArray(data) ? data : []);
+        setProgressError("");
+      } catch (error) {
+        console.error("Failed to load progress:", error);
+        setProgressError("Unable to load progress updates.");
+      }
+    };
+
+    loadProgress();
+  }, []);
+
+  const formatTime = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleString();
+  };
+
+  const progressTitle = useMemo(() => {
+    return `Progress (${progressItems.length})`;
+  }, [progressItems.length]);
+
+  const formatAction = (item) => {
+    switch (item.action) {
+      case "login":
+        return "Logged in";
+      case "news_create":
+        return "Created news";
+      case "news_update":
+        return "Updated news";
+      default:
+        return item.details || "Activity";
+    }
+  };
 
 
 
@@ -554,7 +596,99 @@ export default function AdminHome() {
 
 
 
-          {/* Recent Activity */}
+          
+
+          {/* Progress Notifications */}
+
+          <div className="progress-section">
+
+            <h2>{progressTitle}</h2>
+
+
+
+            {progressError && (
+
+              <div className="progress-empty">{progressError}</div>
+
+            )}
+
+
+
+            {!progressError && progressItems.length === 0 && (
+
+              <div className="progress-empty">No progress updates yet.</div>
+
+            )}
+
+
+
+            {!progressError && progressItems.length > 0 && (
+
+              <div className="progress-list">
+
+                {progressItems.map((item) => {
+
+                  const showNews = Boolean(item.newsTitle || item.newsImage);
+
+                  return (
+
+                    <div key={item._id || item.id} className="progress-item">
+
+                      <div className="progress-meta">
+
+                        <div className="progress-user">{item.userName || "Unknown"}</div>
+
+                        <div className="progress-action">{formatAction(item)}</div>
+
+                        <div className="progress-time">{formatTime(item.createdAt)}</div>
+
+                      </div>
+
+
+
+                      {showNews && (
+
+                        <div className="progress-news">
+
+                          {item.newsImage && (
+
+                            <img
+
+                              src={item.newsImage}
+
+                              alt="news"
+
+                              className="progress-news-img"
+
+                            />
+
+                          )}
+
+                          <div className="progress-news-title">
+
+                            {item.newsTitle || "News"}
+
+                          </div>
+
+                        </div>
+
+                      )}
+
+                    </div>
+
+                  );
+
+                })}
+
+              </div>
+
+            )}
+
+          </div>
+
+
+
+{/* Recent Activity */}
 
 
 

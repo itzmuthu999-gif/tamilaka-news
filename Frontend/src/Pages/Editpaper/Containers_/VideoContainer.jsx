@@ -3,6 +3,7 @@ import { IoIosClose } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import { FaPlay, FaPause, FaYoutube, FaUpload } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
+import { uploadVideoWithThumbnail } from "../../../Api/uploadApi";
 import {
   updateVideoData,
   updateVideoDimensions,
@@ -59,6 +60,7 @@ const VideoContainer = ({
   const [tempWidth, setTempWidth] = useState(containerWidth);
   const [showChangeFile, setShowChangeFile] = useState(false);
   const [videoAspectRatio, setVideoAspectRatio] = useState(16 / 9); // Default to 16:9
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     setTempWidth(containerWidth);
@@ -140,19 +142,25 @@ const VideoContainer = ({
     }
   };
 
-  const handleDeviceUpload = () => {
-    if (selectedVideo && selectedThumbnail) {
-      const videoUrl = URL.createObjectURL(selectedVideo);
-      const thumbnailUrl = URL.createObjectURL(selectedThumbnail);
-      
+  const handleDeviceUpload = async () => {
+    if (!selectedVideo || !selectedThumbnail) {
+      alert("Please select both video and thumbnail files");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const { videoUrl, thumbnailUrl } = await uploadVideoWithThumbnail(
+        selectedVideo,
+        selectedThumbnail
+      );
+
       const data = {
         type: "device",
-        videoUrl: videoUrl,
+        videoUrl,
         thumbnail: thumbnailUrl,
-        videoFile: selectedVideo,
-        thumbnailFile: selectedThumbnail,
       };
-      
+
       dispatch(
         updateVideoData({
           catName,
@@ -164,15 +172,18 @@ const VideoContainer = ({
           sliderId: isSlider || isSlider2 ? sliderId : null,
         })
       );
-      
+
       setShowUploadUI(false);
       setShowChangeFile(false);
       setUploadType(null);
       setSelectedVideo(null);
       setSelectedThumbnail(null);
-      setShowEditPopup(false); // FIX: Close the edit popup
-    } else {
-      alert("Please select both video and thumbnail files");
+      setShowEditPopup(false);
+    } catch (error) {
+      console.error("Video upload failed:", error);
+      alert("Video upload failed. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -386,18 +397,18 @@ const VideoContainer = ({
           <div style={{ display: "flex", gap: "10px" }}>
             <button
               onClick={handleDeviceUpload}
-              disabled={!selectedVideo || !selectedThumbnail}
+              disabled={!selectedVideo || !selectedThumbnail || isUploading}
               style={{
                 padding: "12px 24px",
                 fontSize: "14px",
-                background: selectedVideo && selectedThumbnail ? "#2196F3" : "#ccc",
+                background: selectedVideo && selectedThumbnail && !isUploading ? "#2196F3" : "#ccc",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: selectedVideo && selectedThumbnail ? "pointer" : "not-allowed",
+                cursor: selectedVideo && selectedThumbnail && !isUploading ? "pointer" : "not-allowed",
               }}
             >
-              Upload
+              {isUploading ? "Uploading..." : "Upload"}
             </button>
             <button
               onClick={() => {

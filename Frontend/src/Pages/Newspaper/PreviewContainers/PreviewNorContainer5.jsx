@@ -1,4 +1,5 @@
 import { useState } from "react";
+import timeFun from "../Containers_/timeFun";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
@@ -18,7 +19,9 @@ const PreviewNorContainer5 = ({
 }) => {
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform?.allNews || []);
+  const { allNews = [], translatedNews = [], language } = useSelector(
+    (state) => state.newsform || {}
+  );
 
   // FIX: Read showSeparator from Redux slot state if slot props are provided,
   // otherwise fall back to the prop passed directly.
@@ -47,7 +50,8 @@ const PreviewNorContainer5 = ({
       ? slotFromRedux?.showSeparator || false
       : showSeparatorProp || false;
 
-  const news = allNews.find((n) => n.id === newsId);
+  const newsSource = language === "en" ? translatedNews : allNews;
+  const news = newsSource.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
     image: jwt,
@@ -57,21 +61,7 @@ const PreviewNorContainer5 = ({
     time: "Just now",
   };
 
-  const formatTime = (timestamp) => {
-    if (!timestamp) return "Just now";
-    const now = new Date();
-    const newsTime = new Date(timestamp);
-    const diffMs = now - newsTime;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-    const diffMonths = Math.floor(diffMs / 2592000000);
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
-    if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? "s" : ""} ago`;
-    if (diffDays < 30) return `${diffDays} d ago`;
-    return `${diffMonths} month${diffMonths > 1 ? "s" : ""} ago`;
-  };
+  const formatTime = (timestamp) => timeFun(timestamp);
 
   const renderData = news
     ? {
@@ -84,7 +74,7 @@ const PreviewNorContainer5 = ({
         })(),
         headline: news.data?.headline || DEFAULT_DATA.headline,
         content: news.data?.oneLiner || DEFAULT_DATA.content,
-        time: formatTime(news.time) || DEFAULT_DATA.time,
+        time: formatTime(news.time || news.createdAt || news.updatedAt) || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 
@@ -102,31 +92,6 @@ const PreviewNorContainer5 = ({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <style>
-        {`
-          .ep-nm2-news-2,
-          .ep-nm2-news-3 {
-            display: flex;
-            flex-direction: column;
-            width: 410px;
-            height: fit-content;
-            min-width: 410px;
-            min-height: 100px;
-          }
-
-          @media (max-width: 768px) {
-            .ep-nm2-news-2,
-            .ep-nm2-news-3 {
-              width: 100%;
-              min-width: unset;
-              max-width: 550px;
-              height: auto;
-              min-height: 120px;
-            }
-          }
-        `}
-      </style>
-
       <div
         className={version === 1 ? "ep-nm2-news-2" : "ep-nm2-news-3"}
         onClick={handleNavigate}
@@ -230,3 +195,5 @@ const imgstyle = {
 };
 
 export default PreviewNorContainer5;
+
+

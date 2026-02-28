@@ -11,10 +11,12 @@ export const slotReducers = {
     if (cont) {
       // Find preset dimensions if presetId is provided
       let presetDimensions = null;
+      let presetShfval = null;
       if (presetId) {
         const preset = state.presetContainers.find(p => p.id === presetId);
         if (preset) {
           presetDimensions = preset.dimensions;
+          presetShfval = preset.shfval;
         }
       }
 
@@ -32,7 +34,7 @@ export const slotReducers = {
         newsId: null,
         containerType,
         showSeparator: false,
-        shfval: 1,
+        shfval: presetShfval || 1,
         // Add dimensions for Universal Container at slot level
         ...(containerType === "Universal Container" && {
           dimensions: presetDimensions || defaultDimensions

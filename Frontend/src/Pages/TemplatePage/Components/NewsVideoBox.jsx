@@ -19,6 +19,14 @@ import { FaPlay, FaYoutube, FaUpload } from "react-icons/fa";
  * initialData   – { videoData, dimensions } from Redux / parent state
  * isInContainer – boolean, controls border style
  */
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
 const NewsVideoBox = ({
   id,
   onDelete,
@@ -74,9 +82,7 @@ const NewsVideoBox = ({
         setVideoAspectRatio(vid.videoWidth / vid.videoHeight);
         URL.revokeObjectURL(vid.src);
       };
-      if (videoData.videoFile instanceof File) {
-        vid.src = URL.createObjectURL(videoData.videoFile);
-      } else if (videoData.videoUrl) {
+      if (videoData.videoUrl) {
         vid.src = videoData.videoUrl;
       }
     }
@@ -113,19 +119,17 @@ const NewsVideoBox = ({
     setShowEditPopup(false);
   };
 
-  const handleDeviceUpload = () => {
+  const handleDeviceUpload = async () => {
     if (!selectedVideo || !selectedThumb) {
       alert("Please select both a video file and a thumbnail image");
       return;
     }
-    const videoUrl     = URL.createObjectURL(selectedVideo);
-    const thumbnailUrl = URL.createObjectURL(selectedThumb);
+    const videoUrl = await readFileAsDataUrl(selectedVideo);
+    const thumbnailUrl = await readFileAsDataUrl(selectedThumb);
     const data = {
       type: "device",
       videoUrl,
       thumbnail: thumbnailUrl,
-      videoFile: selectedVideo,
-      thumbnailFile: selectedThumb,
     };
     setVideoData(data);
     propagate(data, dimensions);

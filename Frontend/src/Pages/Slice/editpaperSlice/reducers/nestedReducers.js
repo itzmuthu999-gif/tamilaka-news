@@ -112,10 +112,12 @@ export const nestedReducers = {
 
     if (nestedCont) {
       let presetDimensions = null;
+      let presetShfval = null;
       if (presetId) {
         const preset = state.presetContainers.find(p => p.id === presetId);
         if (preset) {
           presetDimensions = preset.dimensions;
+          presetShfval = preset.shfval;
         }
       }
 
@@ -132,7 +134,7 @@ export const nestedReducers = {
         newsId: null,
         containerType,
         showSeparator: false,
-        shfval: 1,
+        shfval: presetShfval || 1,
         ...(containerType === "Universal Container" && {
           dimensions: presetDimensions || defaultDimensions
         })

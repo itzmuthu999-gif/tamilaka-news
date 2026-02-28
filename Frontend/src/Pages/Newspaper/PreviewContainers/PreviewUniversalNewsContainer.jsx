@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import timeFun from "../Containers_/timeFun";
 import { useSelector } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";
 
@@ -13,7 +14,9 @@ const PreviewUniversalNewsContainer = ({
   sliderId = null,
 }) => {
   const navigate = useNavigate();
-  const allNews = useSelector((state) => state.newsform?.allNews || []);
+  const { allNews = [], translatedNews = [], language } = useSelector(
+    (state) => state.newsform || {}
+  );
 
   // Read slot from Redux directly — all values come from here
   const slot = useSelector((state) => {
@@ -54,7 +57,8 @@ const PreviewUniversalNewsContainer = ({
   const showSeparator   = slot?.showSeparator               ?? false;
 
   const newsId = slot?.newsId;
-  const news   = allNews.find((n) => n.id === newsId);
+  const newsSource = language === "en" ? translatedNews : allNews;
+  const news   = newsSource.find((n) => n.id === newsId);
 
   const DEFAULT_DATA = {
     media:     jwt,
@@ -64,21 +68,7 @@ const PreviewUniversalNewsContainer = ({
     time:      "Just now",
   };
 
-  const formatTime = (timestamp) => {
-    if (!timestamp) return "Just now";
-    const now = new Date();
-    const newsTime = new Date(timestamp);
-    const diffMs = now - newsTime;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-    const diffMonths = Math.floor(diffMs / 2592000000);
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
-    if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? "s" : ""} ago`;
-    if (diffDays < 30) return `${diffDays} d ago`;
-    return `${diffMonths} month${diffMonths > 1 ? "s" : ""} ago`;
-  };
+  const formatTime = (timestamp) => timeFun(timestamp);
 
   const renderData = news
     ? {
@@ -92,7 +82,7 @@ const PreviewUniversalNewsContainer = ({
         mediaType: news.data?.video ? "video" : "image",
         headline:  news.data?.headline  || DEFAULT_DATA.headline,
         content:   news.data?.oneLiner  || DEFAULT_DATA.content,
-        time:      formatTime(news.time) || DEFAULT_DATA.time,
+        time:      formatTime(news.time || news.createdAt || news.updatedAt) || DEFAULT_DATA.time,
       }
     : DEFAULT_DATA;
 
@@ -275,23 +265,7 @@ const PreviewUniversalNewsContainer = ({
           transition: "0.3s ease-in-out",
         }}
       >
-        <style>{`
-          .preview-universal-container:hover {
-            color: rgb(237, 1, 141);
-          }
-          .separator-line-universal {
-            width: 100%;
-            height: 1px;
-            background-color: #999;
-            margin-top: 10px;
-          }
-          @media (max-width: 768px) {
-            .preview-universal-container {
-              width: 100% !important;
-              max-width: 100%;
-            }
-          }
-        `}</style>
+        
 
         {renderLayout()}
       </div>
@@ -302,3 +276,5 @@ const PreviewUniversalNewsContainer = ({
 };
 
 export default PreviewUniversalNewsContainer;
+
+

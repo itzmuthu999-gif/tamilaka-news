@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { AiOutlineSlack } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
@@ -9,17 +9,30 @@ import layout2 from "../../assets/Layout2.png";
 import { useDispatch } from "react-redux";
 import { setLayout } from "../Slice/newsformslice.js";
 import { useSelector } from "react-redux";
-import { translateToEnglish } from "../Slice/translate.js";
 import "../TemplatePage/Templatepage.scss";
 
 const emptyFormData = () => ({
   headline: "",
   oneLiner: "",
   thumbnail: null,
-  zonal: "",
+  zonal: [],
   author: "",
   images: [],
 });
+
+const normalizeCategories = (value) => {
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (typeof value === "string" && value.trim()) return [value.trim()];
+  return [];
+};
+
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 
 export default function Newsform({
   initialData = null,
@@ -32,21 +45,55 @@ export default function Newsform({
 }) {
   const [tamilBuffer, setTamilBuffer] = useState(emptyFormData());
   const [englishBuffer, setEnglishBuffer] = useState(null);
-  const [translating, setTranslating] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [openForm, setOpenForm] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const dispatch = useDispatch();
   const MLayout = useSelector((state) => state.newsform.MLayout);
   const allPages = useSelector((state) => state.admin.allPages || []);
 
-  const displayData = activeLang === "en" && englishBuffer ? englishBuffer : tamilBuffer;
+  const categoryOptions = Array.from(
+    new Set(
+      allPages
+        .filter(
+          (page) =>
+            page?.name?.eng &&
+            page.name.eng !== "Select District" &&
+            !page.districts
+        )
+        .map((page) => page.name.eng)
+    )
+  );
+
+  const selectedCategories = normalizeCategories(tamilBuffer.zonal);
+
+  const hasEnglishBuffer = englishBuffer !== null;
+  const displayData =
+    activeLang === "en"
+      ? englishBuffer || {
+          ...emptyFormData(),
+          thumbnail: tamilBuffer.thumbnail,
+          images: tamilBuffer.images,
+          zonal: tamilBuffer.zonal,
+        }
+      : tamilBuffer;
+
+  const categoryRef = useRef(null);
 
   useEffect(() => {
     if (initialData) {
       const data = initialData.data || emptyFormData();
-      setTamilBuffer((prev) => ({ ...emptyFormData(), ...prev, ...data }));
+      const normalizedData = {
+        ...data,
+        zonal: normalizeCategories(data.zonal),
+      };
+      setTamilBuffer((prev) => ({ ...emptyFormData(), ...prev, ...normalizedData }));
       if (initialData.dataEn) {
-        setEnglishBuffer((prev) => ({ ...emptyFormData(), ...prev, ...initialData.dataEn }));
+        const normalizedEn = {
+          ...initialData.dataEn,
+          zonal: normalizeCategories(initialData.dataEn.zonal),
+        };
+        setEnglishBuffer((prev) => ({ ...emptyFormData(), ...prev, ...normalizedEn }));
       } else {
         setEnglishBuffer(null);
       }
@@ -64,6 +111,38 @@ export default function Newsform({
     }
   }, [initialData]);
 
+  useEffect(() => {
+    if (!categoryOpen) return;
+    const handleClickOutside = (e) => {
+      if (categoryRef.current && !categoryRef.current.contains(e.target)) {
+        setCategoryOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [categoryOpen]);
+
+  useEffect(() => {
+    if (activeLang === "en") setCategoryOpen(false);
+  }, [activeLang]);
+
+  useEffect(() => {
+    if (!hasEnglishBuffer) return;
+    setEnglishBuffer((prev) => {
+      if (!prev) return prev;
+      const sameThumb = prev.thumbnail === tamilBuffer.thumbnail;
+      const sameImages = prev.images === tamilBuffer.images;
+      const sameZonal = prev.zonal === tamilBuffer.zonal;
+      if (sameThumb && sameImages && sameZonal) return prev;
+      return {
+        ...prev,
+        thumbnail: tamilBuffer.thumbnail,
+        images: tamilBuffer.images,
+        zonal: tamilBuffer.zonal,
+      };
+    });
+  }, [tamilBuffer.thumbnail, tamilBuffer.images, tamilBuffer.zonal, hasEnglishBuffer]);
+
   const notifyChange = useCallback(() => {
     onChange({ tamil: { ...tamilBuffer }, english: englishBuffer ? { ...englishBuffer } : null });
   }, [tamilBuffer, englishBuffer, onChange]);
@@ -72,25 +151,57 @@ export default function Newsform({
     notifyChange();
   }, [tamilBuffer, englishBuffer, notifyChange]);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, files } = e.target;
-    if (activeLang === "en" && englishBuffer) {
-      if (files && files[0]) {
-        const file = files[0];
-        setEnglishBuffer((prev) => ({ ...prev, [name]: file }));
-        if (name === "thumbnail") setThumbnailPreview(URL.createObjectURL(file));
-      } else {
-        setEnglishBuffer((prev) => ({ ...prev, [name]: value }));
-      }
-    } else {
-      if (files && files[0]) {
-        const file = files[0];
-        setTamilBuffer((prev) => ({ ...prev, [name]: file }));
-        if (name === "thumbnail") setThumbnailPreview(URL.createObjectURL(file));
-      } else {
-        setTamilBuffer((prev) => ({ ...prev, [name]: value }));
-      }
+    if (activeLang === "en" && (name === "thumbnail" || name === "zonal")) {
+      return;
     }
+
+    if (files && files[0]) {
+      const file = files[0];
+      const dataUrl = await readFileAsDataUrl(file);
+      if (activeLang === "en") {
+        setEnglishBuffer((prev) => ({
+          ...(prev || {
+            ...emptyFormData(),
+            thumbnail: tamilBuffer.thumbnail,
+            images: tamilBuffer.images,
+            zonal: tamilBuffer.zonal,
+          }),
+          [name]: dataUrl,
+        }));
+      } else {
+        setTamilBuffer((prev) => ({ ...prev, [name]: dataUrl }));
+        if (name === "thumbnail") setThumbnailPreview(dataUrl);
+      }
+      return;
+    }
+
+    if (activeLang === "en") {
+      setEnglishBuffer((prev) => ({
+        ...(prev || {
+          ...emptyFormData(),
+          thumbnail: tamilBuffer.thumbnail,
+          images: tamilBuffer.images,
+          zonal: tamilBuffer.zonal,
+        }),
+        [name]: value,
+      }));
+    } else {
+      setTamilBuffer((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const toggleCategory = (value) => {
+    if (activeLang === "en") return;
+    setTamilBuffer((prev) => {
+      const current = normalizeCategories(prev.zonal);
+      const exists = current.includes(value);
+      const next = exists
+        ? current.filter((c) => c !== value)
+        : [...current, value];
+      return { ...prev, zonal: next };
+    });
   };
 
   const switchToEnglishWithEmpty = useCallback(() => {
@@ -98,48 +209,13 @@ export default function Newsform({
       ...emptyFormData(),
       thumbnail: tamilBuffer.thumbnail,
       images: tamilBuffer.images,
+      zonal: tamilBuffer.zonal,
     };
     setEnglishBuffer(emptyEn);
     const emptyParagraphs = paragraphBoxes.map((b) => ({ id: b.id, contentEn: "" }));
     onTranslatedParagraphs(emptyParagraphs);
     onActiveLangChange("en");
-  }, [tamilBuffer.thumbnail, tamilBuffer.images, paragraphBoxes, onTranslatedParagraphs, onActiveLangChange]);
-
-  const handleTranslateToEnglish = async () => {
-    setTranslating(true);
-    try {
-      const [headlineEn, oneLinerEn, authorEn, zonalEn] = await Promise.all([
-        tamilBuffer.headline ? translateToEnglish(tamilBuffer.headline) : Promise.resolve(""),
-        tamilBuffer.oneLiner ? translateToEnglish(tamilBuffer.oneLiner) : Promise.resolve(""),
-        tamilBuffer.author ? translateToEnglish(tamilBuffer.author) : Promise.resolve(""),
-        tamilBuffer.zonal ? translateToEnglish(tamilBuffer.zonal) : Promise.resolve(""),
-      ]);
-      const translatedParagraphs = await Promise.all(
-        paragraphBoxes.map((b) => {
-          const c = (b.content || "").trim();
-          return c ? translateToEnglish(c) : Promise.resolve("");
-        })
-      );
-      const newEnglishBuffer = {
-        ...emptyFormData(),
-        headline: headlineEn,
-        oneLiner: oneLinerEn,
-        author: authorEn,
-        zonal: zonalEn,
-        thumbnail: tamilBuffer.thumbnail,
-        images: tamilBuffer.images,
-      };
-      setEnglishBuffer(newEnglishBuffer);
-      const withIds = paragraphBoxes.map((b, i) => ({ id: b.id, contentEn: translatedParagraphs[i] ?? "" }));
-      onTranslatedParagraphs(withIds);
-      onActiveLangChange("en");
-    } catch (err) {
-      console.error("Translation failed, switching to English with empty fields for manual entry", err);
-      switchToEnglishWithEmpty();
-    } finally {
-      setTranslating(false);
-    }
-  };
+  }, [tamilBuffer.thumbnail, tamilBuffer.images, tamilBuffer.zonal, paragraphBoxes, onTranslatedParagraphs, onActiveLangChange]);
 
   const handleSwitchToTamil = () => {
     onActiveLangChange("ta");
@@ -149,7 +225,7 @@ export default function Newsform({
     if (englishBuffer) {
       onActiveLangChange("en");
     } else {
-      handleTranslateToEnglish();
+      switchToEnglishWithEmpty();
     }
   };
 
@@ -212,24 +288,11 @@ export default function Newsform({
           default={{ x: 1080, y: 0, width: 450, height: 700 }}
           bounds="window"
           dragHandleClassName="drag-header"
-          style={{
-            background: "white",
-            borderRadius: "10px",
-            boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
-            padding: "10px",
-            zIndex: 9999,
-          }}
+          className="newsform-panel"
+          style={{ zIndex: 9999 }}
         >
           <div
             className="drag-header"
-            style={{
-              fontWeight: "bold",
-              cursor: "move",
-              marginBottom: "10px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
           >
             <span>News Form</span>
             <FaTimes
@@ -240,55 +303,24 @@ export default function Newsform({
 
           <div className="newsform-con">
             <form onSubmit={submit} className="news-form">
-              <div className="form-group" style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "12px", color: "#666", marginRight: "4px" }}>Language:</span>
-                <button
-                  type="button"
-                  onClick={handleSwitchToTamil}
-                  disabled={translating}
-                  style={{
-                    padding: "6px 14px",
-                    borderRadius: "6px",
-                    border: activeLang === "ta" ? "2px solid #ff008c" : "1px solid #ccc",
-                    background: activeLang === "ta" ? "#ffd0e8" : "#fff",
-                    cursor: translating ? "not-allowed" : "pointer",
-                    fontWeight: activeLang === "ta" ? "600" : "normal",
-                  }}
-                >
-                  Tamil
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSwitchToEnglish}
-                  disabled={translating}
-                  style={{
-                    padding: "6px 14px",
-                    borderRadius: "6px",
-                    border: activeLang === "en" ? "2px solid #ff008c" : "1px solid #ccc",
-                    background: activeLang === "en" ? "#ffd0e8" : "#fff",
-                    cursor: translating ? "not-allowed" : "pointer",
-                    fontWeight: activeLang === "en" ? "600" : "normal",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
-                  {translating ? (
-                    <>
-                      <span className="newsform-loading-spinner" style={{
-                        width: "14px",
-                        height: "14px",
-                        border: "2px solid #eee",
-                        borderTopColor: "#ff008c",
-                        borderRadius: "50%",
-                        animation: "newsform-spin 0.8s linear infinite",
-                      }} />
-                      Translating...
-                    </>
-                  ) : (
-                    "English"
-                  )}
-                </button>
+              <div className="newsform-lang-toggle">
+                <span className="newsform-lang-label">Language</span>
+                <div className="newsform-lang-buttons">
+                  <button
+                    type="button"
+                    onClick={handleSwitchToTamil}
+                    className={`newsform-lang-btn${activeLang === "ta" ? " is-active" : ""}`}
+                  >
+                    Tamil
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSwitchToEnglish}
+                    className={`newsform-lang-btn${activeLang === "en" ? " is-active" : ""}`}
+                  >
+                    English
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
@@ -337,15 +369,22 @@ export default function Newsform({
                   name="thumbnail"
                   accept="image/*,video/*,.gif"
                   onChange={handleChange}
-                  className="form-file"
+                  className={`form-file${activeLang === "en" ? " is-disabled" : ""}`}
+                  disabled={activeLang === "en"}
                 />
+                {activeLang === "en" && (
+                  <div className="newsform-note">Switch to Tamil to change the thumbnail.</div>
+                )}
 
                 {thumbnailPreview && (
                   <div className="image-preview">
                     {displayData.thumbnail &&
                     (displayData.thumbnail.type?.startsWith("video/") ||
                       (typeof displayData.thumbnail === "string" &&
-                        displayData.thumbnail.includes(".mp4"))) ? (
+                        (displayData.thumbnail.startsWith("data:video/") ||
+                          displayData.thumbnail.includes(".mp4") ||
+                          displayData.thumbnail.includes(".webm") ||
+                          displayData.thumbnail.includes(".ogg")))) ? (
                       <video
                         src={thumbnailPreview}
                         controls
@@ -369,21 +408,71 @@ export default function Newsform({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Zonal</label>
-                <select
-                  name="zonal"
-                  value={displayData.zonal || ""}
-                  onChange={handleChange}
-                  className="form-select"
-                  required
+                <label className="form-label">Category</label>
+                <div
+                  ref={categoryRef}
+                  className={`newsform-multiselect${activeLang === "en" ? " is-disabled" : ""}`}
                 >
-                  <option value="">Select a category</option>
-                  {allPages.filter(page => page.name.eng !== "Select District").map((page) => (
-                    <option key={page.id} value={page.name.eng}>
-                      {page.name.eng}
-                    </option>
-                  ))}
-                </select>
+                  <button
+                    type="button"
+                    className="newsform-multiselect-trigger"
+                    onClick={() => {
+                      if (activeLang === "en") return;
+                      setCategoryOpen((prev) => !prev);
+                    }}
+                    disabled={activeLang === "en"}
+                  >
+                    <span>
+                      {selectedCategories.length > 0
+                        ? selectedCategories.join(", ")
+                        : "Select categories"}
+                    </span>
+                    <span className="newsform-multiselect-caret">v</span>
+                  </button>
+
+                  {selectedCategories.length > 0 && (
+                    <div className="newsform-selected-tags">
+                      {selectedCategories.map((cat) => (
+                        <span key={cat} className="newsform-tag">
+                          {cat}
+                          {activeLang !== "en" && (
+                            <button
+                              type="button"
+                              className="newsform-tag-remove"
+                              onClick={() => toggleCategory(cat)}
+                            >
+                              x
+                            </button>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {categoryOpen && (
+                    <div className="newsform-multiselect-menu">
+                      {categoryOptions.length === 0 && (
+                        <div className="newsform-empty">No categories configured.</div>
+                      )}
+                      {categoryOptions.map((cat) => {
+                        const checked = selectedCategories.includes(cat);
+                        return (
+                          <label key={cat} className={`newsform-option${checked ? " is-checked" : ""}`}>
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => toggleCategory(cat)}
+                            />
+                            <span>{cat}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                {activeLang === "en" && (
+                  <div className="newsform-note">Switch to Tamil to edit categories.</div>
+                )}
               </div>
 
               <div className="form-group">

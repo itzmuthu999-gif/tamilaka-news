@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AiFillGitlab } from "react-icons/ai";
 import { BiCube } from "react-icons/bi";
 import NewsFilter from "./Components/NewsFilter";
@@ -7,6 +7,7 @@ import EditableContainer from "./Components/EditableContainer";
 import EditorSettings from "./Components/EditorSettings";
 import EditableLine from "./Containers_/EditableLine";
 import Navbarr from "../Newspaper/Components/Navbarr";
+import { saveLayout } from "../../Api/layoutApi";
 
 import { useDispatch, useSelector } from "react-redux";
 import { 
@@ -18,7 +19,11 @@ import "./editpapercss.scss";
 
 export default function Editpaper() {
   const dispatch = useDispatch();
-  const { pages, activePage, activeLineId } = useSelector(state => state.editpaper);
+  const layoutState = useSelector(state => state.editpaper);
+  const { pages, activePage, activeLineId, hydrated } = layoutState;
+
+  const saveTimeoutRef = useRef(null);
+  const skipFirstSaveRef = useRef(true);
 
   const currentPage = pages.find(p => p.catName === activePage);
   const containers = currentPage?.containers || [];
@@ -29,6 +34,52 @@ export default function Editpaper() {
   const [showEditor, setShowEditor] = useState(false);
   const [nextId, setNextId] = useState(1);
   const [showNewsFilter, setShowNewsFilter] = useState(false);
+
+  const buildLayoutPayload = (state) => ({
+    pages: state.pages,
+    presetContainers: state.presetContainers,
+    activePage: state.activePage,
+    activeLineId: state.activeLineId
+  });
+
+  const hasLayoutContent = (payload) => {
+    if (payload.presetContainers?.length) return true;
+    return payload.pages?.some((page) =>
+      (page.containers && page.containers.length > 0) ||
+      (page.lines && page.lines.length > 0) ||
+      (page.sliders && page.sliders.length > 0)
+    );
+  };
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+
+    const payload = buildLayoutPayload(layoutState);
+
+    if (skipFirstSaveRef.current) {
+      skipFirstSaveRef.current = false;
+      if (!hasLayoutContent(payload)) return;
+    }
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      saveLayout(payload).catch((error) => {
+        console.error("Auto-save failed:", error);
+      });
+    }, 600);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [layoutState, hydrated]);
 
   const handleCanvasDrop = (e) => {
     e.preventDefault();

@@ -1,5 +1,50 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const resolveEnglishParagraph = (box) => {
+  if (!box || box.type !== "paragraph") return box;
+  const english = box.contentEn;
+  if (english == null || english === "") return box;
+  return { ...box, content: english };
+};
+
+const buildTranslatedNews = (allNews) => {
+  if (!Array.isArray(allNews)) return [];
+  return allNews.map((news) => {
+    const baseData = news?.data || {};
+    const enData = news?.dataEn || {};
+    const data = { ...baseData, ...enData };
+
+    const fullContent = Array.isArray(news?.fullContent)
+      ? news.fullContent.map(resolveEnglishParagraph)
+      : news?.fullContent;
+
+    const containerOverlays = Array.isArray(news?.containerOverlays)
+      ? news.containerOverlays.map((container) => {
+          if (!container?.settings?.boxes) return container;
+          return {
+            ...container,
+            settings: {
+              ...container.settings,
+              boxes: container.settings.boxes.map(resolveEnglishParagraph),
+            },
+          };
+        })
+      : news?.containerOverlays;
+
+    return {
+      ...news,
+      data,
+      fullContent,
+      containerOverlays,
+    };
+  });
+};
+
+const syncTranslatedNews = (state) => {
+  if (state.language !== "en") return;
+  state.translatedNews = buildTranslatedNews(state.allNews);
+};
+
 const initialState = {
   MLayout: 1,
   allNews: [],
@@ -13,6 +58,11 @@ const newsFormSlice = createSlice({
   name: "newsform",
   initialState,
   reducers: {
+    setAllNews: (state, action) => {
+      state.allNews = Array.isArray(action.payload) ? action.payload : [];
+      syncTranslatedNews(state);
+    },
+
     saveNews: (state, action) => {
       console.log('saveNews action called with payload:', action.payload);
       console.log('Current state.allNews:', state.allNews);
@@ -25,13 +75,14 @@ const newsFormSlice = createSlice({
       const news = {
         id: Date.now(),
         ...action.payload,
-        time: new Date().toLocaleString(),
+        time: new Date().toISOString(),
         comments: [],
         containers: [] // Changed from contentContainers to containers
       };
       console.log('Created news object:', news);
       state.allNews.push(news);
       console.log('Updated allNews array:', state.allNews);
+      syncTranslatedNews(state);
     },
 
     setCurrentNews: (state, action) => {
@@ -51,6 +102,7 @@ const newsFormSlice = createSlice({
       if (state.currentNews && state.currentNews.id === id) {
         state.currentNews = { ...state.currentNews, ...updatedNews };
       }
+      syncTranslatedNews(state);
     },
 
     addComment: (state, action) => {
@@ -67,6 +119,7 @@ const newsFormSlice = createSlice({
           timestamp: new Date().toLocaleString()
         });
       }
+      syncTranslatedNews(state);
     },
 
     deleteComment: (state, action) => {
@@ -75,6 +128,7 @@ const newsFormSlice = createSlice({
       if (news && news.comments) {
         news.comments = news.comments.filter(c => c.id !== commentId);
       }
+      syncTranslatedNews(state);
     },
 
     deleteNews: (state, action) => {
@@ -87,6 +141,7 @@ const newsFormSlice = createSlice({
       if (state.currentNews && state.currentNews.id === id) {
         state.currentNews = null;
       }
+      syncTranslatedNews(state);
     },
 
     restoreNews: (state, action) => {
@@ -96,15 +151,18 @@ const newsFormSlice = createSlice({
         state.allNews.push(restored);
       }
       state.trash = state.trash.filter(n => n.id !== id);
+      syncTranslatedNews(state);
     },
 
     permanentDelete: (state, action) => {
       const id = action.payload;
       state.trash = state.trash.filter(n => n.id !== id);
+      syncTranslatedNews(state);
     },
 
     setLanguage: (state, action) => {
       state.language = action.payload;
+      syncTranslatedNews(state);
     },
 
     setTranslatedNews: (state, action) => {
@@ -140,6 +198,7 @@ const newsFormSlice = createSlice({
           state.currentNews.containers.push(newContainer);
         }
       }
+      syncTranslatedNews(state);
     },
 
     deleteContainer: (state, action) => {
@@ -156,6 +215,7 @@ const newsFormSlice = createSlice({
           state.currentNews.containers = state.allNews[newsIndex].containers;
         }
       }
+      syncTranslatedNews(state);
     },
 
     updateContainerSettings: (state, action) => {
@@ -179,6 +239,7 @@ const newsFormSlice = createSlice({
           }
         }
       }
+      syncTranslatedNews(state);
     },
 
     addBoxToContainer: (state, action) => {
@@ -196,6 +257,7 @@ const newsFormSlice = createSlice({
           }
         }
       }
+      syncTranslatedNews(state);
     },
 
     removeBoxFromContainer: (state, action) => {
@@ -213,6 +275,7 @@ const newsFormSlice = createSlice({
           }
         }
       }
+      syncTranslatedNews(state);
     },
 
     updateBoxInContainer: (state, action) => {
@@ -233,12 +296,14 @@ const newsFormSlice = createSlice({
           }
         }
       }
+      syncTranslatedNews(state);
     }
   },
   
 });
 
 export const {
+  setAllNews,
   saveNews,
   updateNews,
   deleteNews,
