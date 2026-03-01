@@ -340,12 +340,6 @@ export default function PageEditor({
 
   const handleSaveLayout = async () => {
     try {
-      const token = localStorage.getItem("userToken");
-      if (!token) {
-        alert("Please log in as Admin to save layout.");
-        return;
-      }
-
       await saveLayout({
         ...buildLayoutPayload(layoutState)
       });

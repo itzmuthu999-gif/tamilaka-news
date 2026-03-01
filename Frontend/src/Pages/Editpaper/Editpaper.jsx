@@ -54,9 +54,6 @@ export default function Editpaper() {
   useEffect(() => {
     if (!hydrated) return;
 
-    const token = localStorage.getItem("userToken");
-    if (!token) return;
-
     const payload = buildLayoutPayload(layoutState);
 
     if (skipFirstSaveRef.current) {

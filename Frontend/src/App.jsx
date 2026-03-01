@@ -31,8 +31,7 @@ function App() {
 
   useEffect(() => {
     const loadInitialData = async () => {
-      const token = localStorage.getItem("userToken");
-      const usersPromise = token ? getUsers() : Promise.resolve(null);
+      const usersPromise = getUsers();
 
       const [newsRes, layoutRes, adminRes, newsPageRes, usersRes] = await Promise.allSettled([
         getAllNews(),

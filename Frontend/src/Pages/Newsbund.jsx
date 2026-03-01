@@ -196,11 +196,6 @@ export default function Newsbund() {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (window.confirm('Are you sure you want to delete this news?')) {
-                          const token = localStorage.getItem("userToken");
-                          if (!token) {
-                            alert("Please log in as Admin to delete news.");
-                            return;
-                          }
                           const apiId = news._id || news.id;
                           deleteNewsApi(apiId)
                             .then(() => {

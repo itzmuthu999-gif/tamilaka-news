@@ -45,9 +45,6 @@ export default function Adminop() {
     }
 
     const timeout = setTimeout(() => {
-      const token = localStorage.getItem("userToken");
-      if (!token) return;
-
       updateAdminConfig({
         allPages: adminState.allPages,
         topNavHeaders1: adminState.topNavHeaders1,

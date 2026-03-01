@@ -23,20 +23,12 @@ export default function CommentSection({ newsId, comments = [] }) {
     ? "Type your comment here..."
     : "உங்கள் கருத்தை இங்கே சேர்க்கவும் ...";
   const namePlaceholder = isEnglish ? "Your name..." : "உங்கள் பெயர் ...";
-  const loginAlert = isEnglish
-    ? "Please log in to post comments."
-    : "கருத்துகளை பதிவிட உள்நுழையவும்.";
   const saveFailAlert = isEnglish
     ? "Failed to save comment. Check the server and try again."
     : "கருத்தை சேமிக்க முடியவில்லை. சர்வரை சரிபார்த்து மீண்டும் முயற்சிக்கவும்.";
 
   const handleSubmit = async () => {
     if (commentText.trim() && userName.trim()) {
-      const token = localStorage.getItem("userToken");
-      if (!token) {
-        alert(loginAlert);
-        return;
-      }
       const newComment = {
         id: Date.now(),
         name: userName.trim(),
