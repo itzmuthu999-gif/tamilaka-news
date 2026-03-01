@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { X, Edit2, Grid3x3, Space, Maximize2, Move } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -30,7 +30,7 @@ import {
   addPollSlot,
   addVideoSlot,
   addVideoSlotToSlider
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
 import BigNewsContainer2 from "../Containers_/BigContainer2";
@@ -101,7 +101,7 @@ export default function EditableContainer({
 }) {
   const dispatch = useDispatch();
 
-  // ── Select container data directly from Redux ─────────────────────────────
+  // â”€â”€ Select container data directly from Redux â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const containerData = useSelector(state => {
     const page = state.editpaper.pages.find(p => p.catName === catName);
     if (isNested && parentContainerId) {
@@ -123,10 +123,10 @@ export default function EditableContainer({
     }
   });
 
-  // ── Values derived from Redux state ───────────────────────────────────────
+  // â”€â”€ Values derived from Redux state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const grid             = containerData?.grid    || { columns: 2, gap: 10 };
   const spacing          = containerData?.spacing || { padding: 10, margin: 0 };
-  // Read header directly from Redux state every render — source of truth
+  // Read header directly from Redux state every render â€” source of truth
   const reduxHeaderEnabled = containerData?.header?.enabled ?? false;
   const reduxHeaderTitle   = containerData?.header?.title   ?? "";
   const nestedContainers = containerData?.nestedContainers || [];
@@ -134,7 +134,7 @@ export default function EditableContainer({
   const sliders          = containerData?.sliders || [];
   const lines            = containerData?.lines   || [];
 
-  // ── Local state for settings panel controls ───────────────────────────────
+  // â”€â”€ Local state for settings panel controls â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [showSettings, setShowSettings]     = useState(false);
   const [columns, setColumns]               = useState(grid.columns);
   const [gap, setGap]                       = useState(grid.gap);
@@ -142,7 +142,7 @@ export default function EditableContainer({
   const [margin, setMargin]                 = useState(spacing.margin);
   const [gridColumnSpan, setGridColumnSpan] = useState(1);
 
-  // ── Header local state — mirrors Redux, re-syncs when Redux changes ───────
+  // â”€â”€ Header local state â€” mirrors Redux, re-syncs when Redux changes â”€â”€â”€â”€â”€â”€â”€
   //    This is the KEY FIX: useEffect keeps local state in sync so that
   //    changes persisted in Redux are reflected after re-mounts / refreshes.
   const [headerEnabled, setHeaderEnabled] = useState(reduxHeaderEnabled);
@@ -153,7 +153,7 @@ export default function EditableContainer({
     setHeaderTitle(reduxHeaderTitle);
   }, [reduxHeaderEnabled, reduxHeaderTitle]);
 
-  // ── Dispatch helper for header — always sends both fields to Redux ─────────
+  // â”€â”€ Dispatch helper for header â€” always sends both fields to Redux â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const dispatchHeader = (enabled, title) => {
     if (isNested && parentContainerId) {
       dispatch(updateNestedContainerHeader({
@@ -173,7 +173,7 @@ export default function EditableContainer({
     }
   };
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
+  // â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleHeaderEnabledChange = (e) => {
     const val = e.target.checked;
     setHeaderEnabled(val);
@@ -294,12 +294,12 @@ export default function EditableContainer({
     e.stopPropagation();
   };
 
-  // ── Colours ───────────────────────────────────────────────────────────────
+  // â”€â”€ Colours â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const borderColor = isNested ? "#f57c00" : "#666";
   const bgColor     = isNested ? "rgba(255, 152, 0, 0.05)" : "transparent";
   const headerAccent = isNested ? "#f57c00" : "#e91e8c";   // magenta for root, orange for nested
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div 
       style={{ 
@@ -315,9 +315,9 @@ export default function EditableContainer({
         flexDirection: "column",
       }}
     >
-      {/* ──────────────────────────────────────────────────────────────────────
+      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Edit / Delete buttons  (position: absolute, outside the flex flow)
-      ────────────────────────────────────────────────────────────────────── */}
+      â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div 
         style={{ 
           position: "absolute", 
@@ -364,9 +364,9 @@ export default function EditableContainer({
         </button>
       </div>
 
-      {/* ──────────────────────────────────────────────────────────────────────
+      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Settings panel (absolute, floats to the side)
-      ────────────────────────────────────────────────────────────────────── */}
+      â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {showSettings && (
         <div 
           style={{ 
@@ -434,7 +434,7 @@ export default function EditableContainer({
             </div>
           </div>
 
-          {/* ── Header section ─────────────────────────────────────────────── */}
+          {/* â”€â”€ Header section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <div style={{ borderTop: "1px solid #eee", paddingTop: "12px" }}>
             <p style={{ fontSize: "12px", fontWeight: "600", margin: "0 0 8px 0", color: headerAccent, display: "flex", alignItems: "center", gap: "6px" }}>
               <Edit2 size={13} /> Header
@@ -454,7 +454,7 @@ export default function EditableContainer({
               </label>
             </div>
 
-            {/* Header name input — only visible when enabled */}
+            {/* Header name input â€” only visible when enabled */}
             {headerEnabled && (
               <div>
                 <label style={{ fontSize: "11px", color: "#666", display: "block", marginBottom: "4px" }}>
@@ -482,12 +482,12 @@ export default function EditableContainer({
         </div>
       )}
 
-      {/* ──────────────────────────────────────────────────────────────────────
+      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           HEADER BAR
           Shown as its own row above the drop zone when headerEnabled = true.
           Structured as: [title text] [stretching coloured line]
           Matches the design in the reference image.
-      ────────────────────────────────────────────────────────────────────── */}
+      â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {headerEnabled && (
         <div
           style={{
@@ -514,7 +514,7 @@ export default function EditableContainer({
             {headerTitle || "header"}
           </span>
 
-          {/* Decorative horizontal line — fills remaining space */}
+          {/* Decorative horizontal line â€” fills remaining space */}
           <div
             style={{
               flex: 1,
@@ -526,9 +526,9 @@ export default function EditableContainer({
         </div>
       )}
 
-      {/* ──────────────────────────────────────────────────────────────────────
-          DROP ZONE  — all existing drag-drop functionality is untouched
-      ────────────────────────────────────────────────────────────────────── */}
+      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+          DROP ZONE  â€” all existing drag-drop functionality is untouched
+      â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div 
         style={{ 
           flex: 1, 
@@ -590,7 +590,7 @@ export default function EditableContainer({
             allElements.sort((a, b) => a.timestamp - b.timestamp);
 
             return allElements.map((element, index) => {
-              // ── Item (news slot) ──────────────────────────────────────────
+              // â”€â”€ Item (news slot) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (element.type === 'item') {
                 const item = element.data;
                 const Component = COMPONENT_MAP[item.containerType];
@@ -620,7 +620,7 @@ export default function EditableContainer({
                 );
               }
 
-              // ── Nested container ──────────────────────────────────────────
+              // â”€â”€ Nested container â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (element.type === 'nested') {
                 const nested = element.data;
                 return (
@@ -635,7 +635,7 @@ export default function EditableContainer({
                 );
               }
 
-              // ── Slider ────────────────────────────────────────────────────
+              // â”€â”€ Slider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (element.type === 'slider') {
                 const slider = element.data;
                 return (

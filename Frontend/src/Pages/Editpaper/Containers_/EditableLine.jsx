@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Rnd } from "react-rnd";
 import { useDispatch } from "react-redux";
 import {
@@ -6,7 +6,7 @@ import {
   updateLineLength,
   deleteLine,
   setActiveLine,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 
 export default function EditableLine({

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
@@ -20,7 +20,7 @@ import {
   updateSlotShfval,
   updateNestedSlotShfval,
   updateSliderSlotShfval,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 const NorContainer2 = ({
   border = false,

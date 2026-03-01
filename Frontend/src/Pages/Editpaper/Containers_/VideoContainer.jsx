@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+﻿import React, { useState, useRef, useEffect } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import { FaPlay, FaPause, FaYoutube, FaUpload } from "react-icons/fa";
@@ -10,7 +10,7 @@ import {
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
   removeSlotFromContainerSlider,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 const VideoContainer = ({
   border = false,
@@ -752,3 +752,4 @@ const VideoContainer = ({
 };
 
 export default VideoContainer;
+

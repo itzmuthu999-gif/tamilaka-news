@@ -116,6 +116,30 @@
   font-family: "Noto Sans Tamil";
 }
 
+.sb-container .nav-c1-logo-v2 {
+  margin: 10px auto 0;
+  align-items: center;
+}
+
+.sb-container .nav-c1l-t1-v2 img {
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 575px) {
+  .sb-container {
+    width: 86vw;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 400px) {
+  .sb-container {
+    width: 82vw;
+    max-width: 280px;
+  }
+}
+
 @keyframes slideIn {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
@@ -127,6 +151,7 @@
   align-items: center;
   padding: 15px;
   border-top: 1px solid #ddd;
+  margin-top: 10px;
 }
 
 .sb-search-row {
@@ -481,6 +506,92 @@
     flex-direction: column;
     gap: 5px;
     width: 400px;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav-c1-v2 {
+    padding: 0 8px;
+  }
+
+  .nav-c3-ham-vm2 {
+    font-size: 24px;
+    z-index: 5;
+    transform: translate(6px, -50%);
+  }
+
+  .nav-c1-logo-v2 {
+    width: 220px;
+    padding: 8px;
+    z-index: 1;
+  }
+
+  .nav-c1l-t1-v2 img {
+    width: 200px;
+  }
+
+  .nav-c1l-t2-v2 {
+    font-size: 9px !important;
+    transform: translateY(22px) !important;
+  }
+
+  .nav-c1-date-v2 {
+    font-size: 11px;
+  }
+
+  .nav-c1-links-v2,
+  .nav-c3-ham-v2 {
+    font-size: 18px;
+    gap: 8px;
+  }
+
+  .nav-c3-sections-v2 {
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .nav-c2-line-v2 {
+    height: 1.5px;
+    margin: 0 4px;
+  }
+
+  .main-screen {
+    padding: 0 8px;
+  }
+
+  .nav-c1-logo {
+    width: 220px;
+    padding: 8px;
+  }
+
+  .nav-c1l-t1 img {
+    width: 200px;
+  }
+
+  .nav-c1l-t2 {
+    font-size: 9px !important;
+    transform: translateY(18px) !important;
+  }
+
+  .foot-con-c11 {
+    gap: 14px;
+    padding: 0 8px !important;
+  }
+
+  .foot-con-c111 {
+    font-size: 12px;
+  }
+
+  .foot-con-c111 .fcc111-1 {
+    font-size: 13px;
+  }
+
+  .foot-cont-c113 {
+    font-size: 12px;
+  }
+
+  .foot-con svg {
+    font-size: 16px;
   }
 }
 

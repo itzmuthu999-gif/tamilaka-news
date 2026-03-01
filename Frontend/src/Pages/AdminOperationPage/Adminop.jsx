@@ -1,4 +1,4 @@
-// Adminop.jsx - Main Admin Page with Sidebar
+﻿// Adminop.jsx - Main Admin Page with Sidebar
 import "./adminop.scss";
 import "./Adminop.css";
 import { useSelector, useDispatch } from "react-redux";
@@ -8,7 +8,7 @@ import Sidebar from "./Sidebar/Sidebar";
 import Websitelyt from "./WebsiteLayout/Websitelyt";
 import Manageuser from "./Manageuser/Manageuser.jsx";
 import { selectAllPages, selectDistrictPage } from "../Slice/adminSelectors.js";
-import { syncPagesFromAdmin } from "../Slice/editpaperSlice/editpaperSlice.js";
+import { syncPagesFromAdmin } from "../Slice/editpaperSlice/editpaperslice.js";
 import { updateAdminConfig } from "../../Api/adminApi.js";
 
 export default function Adminop() {
@@ -78,3 +78,4 @@ export default function Adminop() {
     </main>
   );
 }
+

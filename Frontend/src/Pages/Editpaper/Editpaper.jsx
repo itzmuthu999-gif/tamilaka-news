@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { AiFillGitlab } from "react-icons/ai";
 import { BiCube } from "react-icons/bi";
 import NewsFilter from "./Components/NewsFilter";
@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { 
   addContainer,
   addLine,
-} from "../Slice/editpaperSlice/editpaperSlice";
+} from "../Slice/editpaperSlice/editpaperslice";
 
 import "./editpapercss.scss";
 
@@ -202,3 +202,4 @@ export default function Editpaper() {
     </div>
   );
 }
+

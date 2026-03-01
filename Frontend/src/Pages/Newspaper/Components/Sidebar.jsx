@@ -211,7 +211,7 @@ export default function Sidebar({ open, onClose, activePage, setActivePage }) {
             className="nav-c1l-t2-v2"
             style={{ position: "absolute", transform: "translateY(20px)" }}
           >
-            நடநிலை நாளிதழ்
+            நடுநிலை நாளிதழ்
           </div>
         </div>
 

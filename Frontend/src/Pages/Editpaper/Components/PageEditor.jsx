@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+﻿import React, { useState, useEffect, useRef, useMemo } from "react";
 
 import { X, Plus } from "lucide-react";
 
@@ -12,7 +12,7 @@ import {
   updateLineArguments,
   setActivePage,
   deletePresetContainer,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 import { selectAllPages, selectDistrictPage } from "../../Slice/adminSelectors";
 import { saveLayout } from "../../../Api/layoutApi.js";
 
@@ -140,8 +140,8 @@ const PresetsTab = () => {
             </div>
             
             <div style={{ fontSize: "11px", color: "#666", fontFamily: "monospace" }}>
-              <div>Container: {preset.dimensions.containerWidth}×{preset.dimensions.containerHeight}px</div>
-              <div>Image: {preset.dimensions.imgWidth}×{preset.dimensions.imgHeight}px</div>
+              <div>Container: {preset.dimensions.containerWidth}Ã—{preset.dimensions.containerHeight}px</div>
+              <div>Image: {preset.dimensions.imgWidth}Ã—{preset.dimensions.imgHeight}px</div>
               <div>Padding: {preset.dimensions.padding}px</div>
             </div>
             
@@ -546,7 +546,7 @@ export default function PageEditor({
         <div className="drag-drop-section">
           <div className="section-title">Drag and Drop the containers</div>
 
-          {/* ✅ DRAGGABLE CONTAINER OVERLAY */}
+          {/* âœ… DRAGGABLE CONTAINER OVERLAY */}
 
           {activeTab === "containers" && (
             <div
@@ -950,3 +950,4 @@ export default function PageEditor({
     </div>
   );
 }
+

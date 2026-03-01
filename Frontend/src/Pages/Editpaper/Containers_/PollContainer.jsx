@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,7 +7,7 @@ import {
   removePollFromNestedSlot,
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 import { FaPaperPlane, FaPlus } from "react-icons/fa";
 
 const PollContainer = ({
@@ -399,7 +399,7 @@ const PollContainer = ({
                     onClick={() => handleRemoveOption(index)}
                     className="remove-option-btn"
                   >
-                    ≡
+                    â‰¡
                   </button>
                 )}
               </div>

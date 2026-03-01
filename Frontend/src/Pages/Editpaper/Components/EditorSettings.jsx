@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { IoSettingsOutline } from "react-icons/io5";
 import { useSelector, useDispatch } from "react-redux";
-import { updatePageSettings } from "../../Slice/editpaperSlice/editpaperSlice";
+import { updatePageSettings } from "../../Slice/editpaperSlice/editpaperslice";
 // import "./editorsettings.scss";
 
 export default function EditorSettings() {

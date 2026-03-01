@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
@@ -19,7 +19,7 @@ import {
   updateSlotShfval,
   updateNestedSlotShfval,
   updateSliderSlotShfval,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import { useSelector, useDispatch } from "react-redux";
 import jwt from "../../../assets/jwt.jpg";

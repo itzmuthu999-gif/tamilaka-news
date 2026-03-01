@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+﻿import React, { useState, useRef, useEffect } from "react";
 import { X, Edit2, Space, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,7 +13,7 @@ import {
   // FIX 1: Import the missing dropNewsIntoSliderSlot action
   dropNewsIntoSliderSlot,
   addVideoSlotToSlider,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
 import BigNewsContainer2 from "../Containers_/BigContainer2";
@@ -240,7 +240,7 @@ export function EditableSlider2({
       }),
     );
 
-    // FIX 4: dropNewsIntoSliderSlot was called but the import was missing — now works
+    // FIX 4: dropNewsIntoSliderSlot was called but the import was missing â€” now works
     if (newsId) {
       dispatch(
         dropNewsIntoSliderSlot({
@@ -313,7 +313,7 @@ export function EditableSlider2({
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      {/* Edit/Delete buttons — outside overflow:hidden so they are always visible */}
+      {/* Edit/Delete buttons â€” outside overflow:hidden so they are always visible */}
       <div
         style={{
           position: "absolute",
@@ -353,7 +353,7 @@ export function EditableSlider2({
         </button>
       </div>
 
-      {/* Settings popup — outside overflow:hidden so it is never clipped */}
+      {/* Settings popup â€” outside overflow:hidden so it is never clipped */}
       {showSettings && (
         <div
           style={{
@@ -439,7 +439,7 @@ export function EditableSlider2({
                   color: "#ff6b35",
                 }}
               >
-                🔒 Locked to: {lockedType}
+                ðŸ”’ Locked to: {lockedType}
               </div>
             )}
 
@@ -486,7 +486,7 @@ export function EditableSlider2({
           </div>
         )}
 
-      {/* Inner content wrapper — padding without overflow:hidden so popup is never clipped */}
+      {/* Inner content wrapper â€” padding without overflow:hidden so popup is never clipped */}
       <div
         style={{
           width: "100%",

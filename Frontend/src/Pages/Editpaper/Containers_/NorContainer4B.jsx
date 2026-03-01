@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbArrowsExchange } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
@@ -17,7 +17,7 @@ import {
   toggleNestedSeparator,
   removeSlotFromContainer,
   removeSlotFromNestedContainer,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 const NorContainer4B = ({
   newsId = null,
@@ -365,3 +365,4 @@ const NorContainer4B = ({
 };
 
 export default NorContainer4B;
+

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+﻿import React, { useState, useRef, useEffect } from "react";
 
 import {
   X,
@@ -22,7 +22,7 @@ import {
   removeSlotFromContainerSlider,
   dropNewsIntoSliderSlot,
   addVideoSlotToSlider,
-} from "../../Slice/editpaperSlice/editpaperSlice";
+} from "../../Slice/editpaperSlice/editpaperslice";
 
 import BigNewsContainer1 from "../Containers_/BigContainer1";
 import BigNewsContainer2 from "../Containers_/BigContainer2";
@@ -381,7 +381,7 @@ export function EditableSlider({
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      {/* Edit/Delete buttons — outside overflow:hidden so they are always visible */}
+      {/* Edit/Delete buttons â€” outside overflow:hidden so they are always visible */}
       <div
         style={{
           position: "absolute",
@@ -421,7 +421,7 @@ export function EditableSlider({
         </button>
       </div>
 
-      {/* Settings popup — outside overflow:hidden so it is never clipped */}
+      {/* Settings popup â€” outside overflow:hidden so it is never clipped */}
       {showSettings && (
         <div
           style={{
@@ -532,7 +532,7 @@ export function EditableSlider({
                   color: "#0066cc",
                 }}
               >
-                🔒 Locked to: {lockedType}
+                ðŸ”’ Locked to: {lockedType}
               </div>
             )}
 
@@ -579,7 +579,7 @@ export function EditableSlider({
           </div>
         )}
 
-      {/* Inner content wrapper — padding without overflow:hidden so popup is never clipped */}
+      {/* Inner content wrapper â€” padding without overflow:hidden so popup is never clipped */}
       <div
         style={{
           width: "100%",

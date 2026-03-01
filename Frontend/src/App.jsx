@@ -1,4 +1,4 @@
-
+﻿
 import './App.css'
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -22,7 +22,7 @@ import { getAdminConfig } from "./Api/adminApi";
 import { getNewsPageConfig } from "./Api/newsPageApi";
 import { getUsers } from "./Api/userApi";
 import { setAllNews } from "./Pages/Slice/newsformSlice.js";
-import { setLayoutHydrated, setLayoutState } from "./Pages/Slice/editpaperSlice/editpaperSlice.js";
+import { setLayoutHydrated, setLayoutState } from "./Pages/Slice/editpaperSlice/editpaperslice.js";
 import { setAdminConfig } from "./Pages/Slice/adminSlice.js";
 import { setUsers } from "./Pages/Slice/userSlice.js";
 import { setNewsPageConfig } from "./Pages/Slice/newspageSlice.js";
@@ -93,3 +93,4 @@ function App() {
 }
 
 export default App
+

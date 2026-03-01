@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updatePollData } from "../../Slice/editpaperSlice/editpaperSlice";
+import { updatePollData } from "../../Slice/editpaperSlice/editpaperslice";
 import { saveLayout } from "../../../Api/layoutApi";
 
 /**
@@ -8,7 +8,7 @@ import { saveLayout } from "../../../Api/layoutApi";
  *
  * Read-only renderable poll for the public newspaper view.
  * - No close / edit controls.
- * - Options are clickable → dispatches a vote increment to Redux so the
+ * - Options are clickable â†’ dispatches a vote increment to Redux so the
  *   percentage + count updates instantly and persists in state.
  * - Supports both single and multiple-answer polls via allowMultiple.
  */
@@ -129,7 +129,7 @@ const PreviewPollContainer = ({
         const isChosen = votedIndices.includes(index);
 
         if (!revealed) {
-          // Before any vote — show clean clickable buttons
+          // Before any vote â€” show clean clickable buttons
           return (
             <div
               key={index}
@@ -143,7 +143,7 @@ const PreviewPollContainer = ({
           );
         }
 
-        // After voting — show bars + percentage + count
+        // After voting â€” show bars + percentage + count
         return (
           <div
             key={index}
@@ -176,3 +176,4 @@ const PreviewPollContainer = ({
 };
 
 export default PreviewPollContainer;
+

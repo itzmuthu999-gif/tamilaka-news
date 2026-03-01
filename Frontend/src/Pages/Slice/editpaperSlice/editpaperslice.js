@@ -1,14 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { pageReducers } from "./reducers/pageReducers";
-import { containerReducers } from "./reducers/containerReducers";
-import { slotReducers } from "./reducers/slotReducers";
-import { sliderReducers } from "./reducers/sliderReducers";
-import { nestedReducers } from "./reducers/nestedReducers";
-import { lineReducers } from "./reducers/lineReducers";
-import { syncReducers } from "./reducers/syncReducers";
-import { presetReducers } from "./reducers/presetReducers";
-import { pollReducers } from "./reducers/pollReducers";
-import { videoReducers } from "./reducers/videoReducers";
+import { pageReducers } from "./reducers/pagereducers";
+import { containerReducers } from "./reducers/containerreducers";
+import { slotReducers } from "./reducers/slotreducers";
+import { sliderReducers } from "./reducers/sliderreducers";
+import { nestedReducers } from "./reducers/nestedreducers";
+import { lineReducers } from "./reducers/linereducers";
+import { syncReducers } from "./reducers/syncreducers";
+import { presetReducers } from "./reducers/presetreducers";
+import { pollReducers } from "./reducers/pollreducers";
+import { videoReducers } from "./reducers/videoreducers";
 
 /* ---------- initial state ---------- */
 const initialState = {
