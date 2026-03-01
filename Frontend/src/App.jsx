@@ -72,7 +72,8 @@ function App() {
     <>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<NewsPaperM />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/AdminHome" element={<AdminHome />} />
 
           <Route path="/Newsbund" element={<Newsbund />} />
