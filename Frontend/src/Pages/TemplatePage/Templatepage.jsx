@@ -170,12 +170,6 @@ export default function Templatepage() {
   };
 
   const saveThisNews = async () => {
-    const token = localStorage.getItem("userToken");
-    if (!token) {
-      alert("Please log in as Admin to save news.");
-      return;
-    }
-
     const payload = {
       data: formState || {},
       dataEn: formStateEn || null,
